@@ -1,0 +1,124 @@
+{
+  "title": "Admin Panel",
+  "tabs": {
+    "companies": "Companies",
+    "drivers": "Drivers",
+    "vehicles": "Vehicles",
+    "trailers": "Trailers",
+    "devices": "Devices",
+    "users": "Users"
+  },
+  "deviceTabs": {
+    "eld": "ELD Devices",
+    "portable": "Portable Devices",
+    "gps": "GPS Devices",
+    "camera": "Camera Devices"
+  },
+  "actions": {
+    "addCompany": "Add Company",
+    "addDriver": "Add Driver",
+    "addVehicle": "Add Vehicle",
+    "addTrailer": "Add Trailer",
+    "addUser": "Add User",
+    "addEldDevice": "Add ELD Device",
+    "order": "Order",
+    "export": "Export",
+    "refresh": "Refresh"
+  },
+  "filters": {
+    "name": "Name",
+    "phone": "Phone",
+    "unitNumber": "Unit #",
+    "trailerId": "ID #",
+    "dotNumber": "DOT #",
+    "serialNumber": "Serial Number",
+    "macAddress": "MAC Address",
+    "snNumber": "S/N",
+    "status": "Status",
+    "department": "Department",
+    "ownership": "Ownership",
+    "driver": "Driver",
+    "vehicle": "Vehicle",
+    "all": "All"
+  },
+  "columns": {
+    "company": "Company",
+    "companies": "Companies",
+    "name": "Name",
+    "username": "Username",
+    "phone": "Phone",
+    "email": "Email",
+    "extension": "Extension",
+    "department": "Department",
+    "role": "Role",
+    "tags": "Tags",
+    "status": "Status",
+    "unitNumber": "Unit #",
+    "licensePlate": "License Plate",
+    "vin": "VIN #",
+    "model": "Model",
+    "make": "Make",
+    "year": "Year",
+    "driver": "Driver",
+    "trailerId": "ID #",
+    "type": "Type",
+    "ownership": "Ownership",
+    "dotNumber": "DOT #",
+    "address": "Address",
+    "emailDomain": "Email Domain",
+    "fleet": "Fleet",
+    "plan": "Plan",
+    "terminalCount": "Terminal #",
+    "personalUse": "Personal Use",
+    "yardMoves": "Yard Moves",
+    "exempt": "Exempt",
+    "cycle": "Cycle",
+    "manufacturer": "Manufacturer",
+    "serialNumber": "Serial Number",
+    "macAddress": "MAC Address",
+    "firmwareVersion": "Firmware Version",
+    "iccid": "ICCID",
+    "vehicle": "Vehicle",
+    "platform": "Platform",
+    "platformVersion": "Platform Version",
+    "identifier": "Identifier",
+    "appVersion": "App Version",
+    "sequenceId": "Sequence ID",
+    "online": "Online",
+    "snNumber": "S/N",
+    "asset": "Asset"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "online": "Online",
+    "offline": "Offline",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "ownership": {
+    "company": "Company",
+    "contractor": "Contractor"
+  },
+  "roles": {
+    "company_admin": "Company Admin",
+    "support_personnel": "Support Personnel",
+    "dispatcher": "Dispatcher"
+  },
+  "departments": {
+    "dispatch": "Dispatch",
+    "accounting": "Accounting",
+    "fleet_management": "Fleet Management",
+    "operations": "Operations",
+    "safety": "Safety"
+  },
+  "fleet": {
+    "eminent": "Eminent",
+    "established": "Established"
+  },
+  "plan": {
+    "basic": "Basic",
+    "premium": "Premium",
+    "enterprise": "Enterprise"
+  }
+}

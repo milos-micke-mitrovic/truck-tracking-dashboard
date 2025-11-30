@@ -1,0 +1,9 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "admin": "Admin"
+  },
+  "breadcrumbs": {
+    "home": "Home"
+  }
+}
