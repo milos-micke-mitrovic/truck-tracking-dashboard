@@ -6,7 +6,7 @@ import { CheckIcon } from 'lucide-react'
 
 import { cn } from '@/shared/utils'
 import { Label } from './label'
-import { BodySmall, Muted } from '../typography'
+import { Caption } from '../typography'
 
 type CheckboxProps = Omit<
   React.ComponentProps<typeof CheckboxPrimitive.Root>,
@@ -55,7 +55,7 @@ const Checkbox = forwardRef<
         aria-describedby={error ? `${checkboxId}-error` : undefined}
         onCheckedChange={handleCheckedChange}
         className={cn(
-          'peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+          'peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 cursor-pointer rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
           error && 'border-destructive',
           className
         )}
@@ -85,22 +85,22 @@ const Checkbox = forwardRef<
                 <Label
                   htmlFor={checkboxId}
                   className={cn(
-                    'cursor-pointer leading-tight',
+                    'leading-tight',
                     error && 'text-destructive'
                   )}
                 >
                   {label}
                 </Label>
               )}
-              {description && <Muted>{description}</Muted>}
+              {description && <Caption>{description}</Caption>}
             </div>
           )}
         </div>
 
         {error && (
-          <BodySmall id={`${checkboxId}-error`} color="error">
+          <Caption id={`${checkboxId}-error`} color="error">
             {error}
-          </BodySmall>
+          </Caption>
         )}
       </div>
     )

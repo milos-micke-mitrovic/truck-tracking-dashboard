@@ -145,7 +145,7 @@
   }
 
   .text-caption {
-    @apply text-muted-foreground text-[11px];
+    @apply text-xs;
   }
 
   .text-muted {

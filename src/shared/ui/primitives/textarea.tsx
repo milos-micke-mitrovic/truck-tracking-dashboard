@@ -2,7 +2,7 @@ import { forwardRef } from 'react'
 
 import { cn } from '@/shared/utils'
 import { Label } from './label'
-import { BodySmall, Muted } from '../typography'
+import { Caption } from '../typography'
 
 type TextareaProps = React.ComponentProps<'textarea'> & {
   label?: string
@@ -55,13 +55,13 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {textareaElement}
 
         {error && (
-          <BodySmall id={`${textareaId}-error`} color="error">
+          <Caption id={`${textareaId}-error`} color="error">
             {error}
-          </BodySmall>
+          </Caption>
         )}
 
         {helperText && !error && (
-          <Muted id={`${textareaId}-helper`}>{helperText}</Muted>
+          <Caption id={`${textareaId}-helper`}>{helperText}</Caption>
         )}
       </div>
     )

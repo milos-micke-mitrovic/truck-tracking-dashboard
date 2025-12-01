@@ -145,10 +145,11 @@ export function Caption({
   children,
   className,
   as: Tag = 'span',
+  color = 'muted',
   ...props
 }: TextProps) {
   return (
-    <Tag className={cn('text-caption', getTextClasses(props), className)}>
+    <Tag className={cn('text-xs', getTextClasses({ color, ...props }), className)}>
       {children}
     </Tag>
   )

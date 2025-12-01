@@ -5,7 +5,7 @@ import * as SwitchPrimitive from '@radix-ui/react-switch'
 
 import { cn } from '@/shared/utils'
 import { Label } from './label'
-import { BodySmall, Muted } from '../typography'
+import { Caption } from '../typography'
 
 type SwitchProps = Omit<
   React.ComponentProps<typeof SwitchPrimitive.Root>,
@@ -52,7 +52,7 @@ const Switch = forwardRef<
         aria-describedby={error ? `${switchId}-error` : undefined}
         onCheckedChange={handleCheckedChange}
         className={cn(
-          'peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+          'peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 cursor-pointer items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
           error && 'border-destructive',
           className
         )}
@@ -82,22 +82,22 @@ const Switch = forwardRef<
                 <Label
                   htmlFor={switchId}
                   className={cn(
-                    'cursor-pointer leading-tight',
+                    'leading-tight',
                     error && 'text-destructive'
                   )}
                 >
                   {label}
                 </Label>
               )}
-              {description && <Muted>{description}</Muted>}
+              {description && <Caption>{description}</Caption>}
             </div>
           )}
         </div>
 
         {error && (
-          <BodySmall id={`${switchId}-error`} color="error">
+          <Caption id={`${switchId}-error`} color="error">
             {error}
-          </BodySmall>
+          </Caption>
         )}
       </div>
     )

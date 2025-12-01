@@ -6,7 +6,7 @@ import { Check, ChevronDown, X } from 'lucide-react'
 import { cn } from '@/shared/utils'
 import { IconButton } from './button'
 import { Label } from './label'
-import { BodySmall, Muted } from '../typography'
+import { Caption } from '../typography'
 import {
   Popover,
   PopoverContent,
@@ -155,13 +155,13 @@ function Select({
       {selectElement}
 
       {error && (
-        <BodySmall id={`${selectId}-error`} color="error">
+        <Caption id={`${selectId}-error`} color="error">
           {error}
-        </BodySmall>
+        </Caption>
       )}
 
       {helperText && !error && (
-        <Muted id={`${selectId}-helper`}>{helperText}</Muted>
+        <Caption id={`${selectId}-helper`}>{helperText}</Caption>
       )}
     </div>
   )

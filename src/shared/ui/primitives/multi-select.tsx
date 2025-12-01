@@ -7,7 +7,7 @@ import { cn } from '@/shared/utils'
 import { IconButton } from './button'
 import { Label } from './label'
 import { Badge } from './badge'
-import { BodySmall, Muted } from '../typography'
+import { Caption } from '../typography'
 import {
   Popover,
   PopoverContent,
@@ -168,14 +168,14 @@ function MultiSelect({
                 >
                   <div
                     className={cn(
-                      'border-primary mr-2 flex size-4 items-center justify-center rounded-sm border',
+                      'mr-2 flex size-4 items-center justify-center rounded-sm border',
                       value.includes(option.value)
-                        ? 'bg-primary text-primary-foreground'
-                        : 'opacity-50'
+                        ? 'border-primary bg-primary'
+                        : 'border-input opacity-50'
                     )}
                   >
                     {value.includes(option.value) && (
-                      <Check className="size-3" />
+                      <Check className="size-3 text-white" />
                     )}
                   </div>
                   <span className="truncate">{option.label}</span>
@@ -204,13 +204,13 @@ function MultiSelect({
       {selectElement}
 
       {error && (
-        <BodySmall id={`${selectId}-error`} color="error">
+        <Caption id={`${selectId}-error`} color="error">
           {error}
-        </BodySmall>
+        </Caption>
       )}
 
       {helperText && !error && (
-        <Muted id={`${selectId}-helper`}>{helperText}</Muted>
+        <Caption id={`${selectId}-helper`}>{helperText}</Caption>
       )}
     </div>
   )

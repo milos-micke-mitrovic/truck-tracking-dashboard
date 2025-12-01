@@ -7,7 +7,7 @@ import { Eye, EyeOff, X } from 'lucide-react'
 import { cn } from '@/shared/utils'
 import { IconButton } from './button'
 import { Label } from './label'
-import { BodySmall, Muted } from '../typography'
+import { Caption } from '../typography'
 
 const inputStyles = cn(
   'border-input placeholder:text-muted-foreground flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -198,13 +198,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {inputElement}
 
         {error && (
-          <BodySmall id={`${inputId}-error`} color="error">
+          <Caption id={`${inputId}-error`} color="error">
             {error}
-          </BodySmall>
+          </Caption>
         )}
 
         {helperText && !error && (
-          <Muted id={`${inputId}-helper`}>{helperText}</Muted>
+          <Caption id={`${inputId}-helper`}>{helperText}</Caption>
         )}
       </div>
     )

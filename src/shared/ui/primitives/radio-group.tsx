@@ -6,7 +6,7 @@ import { CircleIcon } from 'lucide-react'
 
 import { cn } from '@/shared/utils'
 import { Label } from './label'
-import { BodySmall, Muted } from '../typography'
+import { Caption } from '../typography'
 
 type RadioOption = {
   value: string
@@ -82,7 +82,7 @@ const RadioGroup = forwardRef<
                 id={`${groupId}-${option.value}`}
                 disabled={option.disabled}
                 className={cn(
-                  'border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+                  'border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 cursor-pointer rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
                   error && 'border-destructive'
                 )}
               >
@@ -97,26 +97,26 @@ const RadioGroup = forwardRef<
                 <Label
                   htmlFor={`${groupId}-${option.value}`}
                   className={cn(
-                    'cursor-pointer leading-tight font-normal',
+                    'leading-tight font-normal',
                     error && 'text-destructive'
                   )}
                 >
                   {option.label}
                 </Label>
-                {option.description && <Muted>{option.description}</Muted>}
+                {option.description && <Caption>{option.description}</Caption>}
               </div>
             </div>
           ))}
         </RadioGroupPrimitive.Root>
 
         {error && (
-          <BodySmall id={`${groupId}-error`} color="error">
+          <Caption id={`${groupId}-error`} color="error">
             {error}
-          </BodySmall>
+          </Caption>
         )}
 
         {helperText && !error && (
-          <Muted id={`${groupId}-helper`}>{helperText}</Muted>
+          <Caption id={`${groupId}-helper`}>{helperText}</Caption>
         )}
       </div>
     )
