@@ -6,8 +6,8 @@ import { useCompanies } from '../api'
 import type { Company, CompanyFilters } from '../types'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { Button, Input } from '@/shared/ui'
-import { FormSelect } from '@/shared/ui/form-fields'
+import { AddCompanyDialog } from './dialogs'
+import { Button, Input, Select } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function CompaniesTab() {
@@ -96,20 +96,20 @@ export function CompaniesTab() {
             <Input
               placeholder={t('filters.name')}
               value={filters.name || ''}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, name: e.target.value }))
-              }
-              className="w-full sm:max-w-[200px]"
+              debounce={300}
+              onDebounceChange={(value) => setFilters((f) => ({ ...f, name: value }))}
+              className="w-[200px]"
             />
             <Input
               placeholder={t('filters.dotNumber')}
               value={filters.dotNumber || ''}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, dotNumber: e.target.value }))
+              debounce={300}
+              onDebounceChange={(value) =>
+                setFilters((f) => ({ ...f, dotNumber: value }))
               }
-              className="w-full sm:max-w-[150px]"
+              className="w-[150px]"
             />
-            <FormSelect
+            <Select
               options={[
                 { value: 'all', label: t('filters.all') },
                 { value: 'active', label: t('status.active') },
@@ -122,15 +122,20 @@ export function CompaniesTab() {
                   status: value as CompanyFilters['status'],
                 }))
               }
-              label={t('filters.status')}
+              placeholder={t('filters.status')}
+              className="w-[130px]"
             />
           </>
         }
         addButton={
-          <Button size="sm">
-            <Plus className="size-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('actions.addCompany')}</span>
-          </Button>
+          <AddCompanyDialog
+            trigger={
+              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+                <span className="hidden sm:inline">{t('actions.addCompany')}</span>
+              </Button>
+            }
+            onSuccess={() => refetch()}
+          />
         }
         onExport={() => {}}
         onRefresh={() => refetch()}
@@ -141,6 +146,7 @@ export function CompaniesTab() {
         isLoading={isLoading}
         manualPagination
         pageCount={data?.meta.totalPages}
+        totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={(state: PaginationState) =>

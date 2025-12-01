@@ -1,14 +1,16 @@
 // Primitives
 export {
   Button,
+  IconButton,
   buttonVariants,
   Input,
   Checkbox,
   Label,
   RadioGroup,
-  RadioGroupItem,
   Switch,
   Textarea,
+  Select,
+  MultiSelect,
   Separator,
   Skeleton,
   Spinner,
@@ -26,6 +28,9 @@ export {
   TabsContent,
   TabsList,
   TabsTrigger,
+  type SelectOption,
+  type MultiSelectOption,
+  type RadioOption,
 } from './primitives'
 
 // Overlay
@@ -128,20 +133,6 @@ export {
   FormMessage,
   useFormField,
 } from './form'
-
-// Form fields (enhanced with labels, errors, icons)
-export {
-  FormInput,
-  FormTextarea,
-  FormSelect,
-  FormMultiSelect,
-  FormCheckbox,
-  FormRadioGroup,
-  FormSwitch,
-  type FormSelectOption,
-  type FormMultiSelectOption,
-  type FormRadioOption,
-} from './form-fields'
 
 // Data Table
 export {

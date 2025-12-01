@@ -1,32 +1,112 @@
 'use client'
 
-import * as React from 'react'
+import { forwardRef } from 'react'
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 import { CheckIcon } from 'lucide-react'
 
 import { cn } from '@/shared/utils'
+import { Label } from './label'
+import { BodySmall, Muted } from '../typography'
 
-function Checkbox({
-  className,
-  ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
-  return (
-    <CheckboxPrimitive.Root
-      data-slot="checkbox"
-      className={cn(
-        'peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
-        className
-      )}
-      {...props}
-    >
-      <CheckboxPrimitive.Indicator
-        data-slot="checkbox-indicator"
-        className="grid place-content-center text-current transition-none"
-      >
-        <CheckIcon className="size-3.5" />
-      </CheckboxPrimitive.Indicator>
-    </CheckboxPrimitive.Root>
-  )
+type CheckboxProps = Omit<
+  React.ComponentProps<typeof CheckboxPrimitive.Root>,
+  'onChange'
+> & {
+  label?: string
+  description?: string
+  error?: string
+  onChange?: (checked: boolean) => void
 }
+
+const Checkbox = forwardRef<
+  React.ComponentRef<typeof CheckboxPrimitive.Root>,
+  CheckboxProps
+>(
+  (
+    {
+      className,
+      label,
+      description,
+      error,
+      disabled,
+      id,
+      onChange,
+      onCheckedChange,
+      ...props
+    },
+    ref
+  ) => {
+    const checkboxId = id || props.name
+
+    const handleCheckedChange = (checked: CheckboxPrimitive.CheckedState) => {
+      if (typeof checked === 'boolean') {
+        onChange?.(checked)
+      }
+      onCheckedChange?.(checked)
+    }
+
+    const checkboxElement = (
+      <CheckboxPrimitive.Root
+        ref={ref}
+        id={checkboxId}
+        data-slot="checkbox"
+        disabled={disabled}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${checkboxId}-error` : undefined}
+        onCheckedChange={handleCheckedChange}
+        className={cn(
+          'peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+          error && 'border-destructive',
+          className
+        )}
+        {...props}
+      >
+        <CheckboxPrimitive.Indicator
+          data-slot="checkbox-indicator"
+          className="grid place-content-center text-current transition-none"
+        >
+          <CheckIcon className="size-3.5" />
+        </CheckboxPrimitive.Indicator>
+      </CheckboxPrimitive.Root>
+    )
+
+    // If no form field props, return just the checkbox
+    if (!label && !description && !error) {
+      return checkboxElement
+    }
+
+    return (
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-start gap-3">
+          {checkboxElement}
+          {(label || description) && (
+            <div className="flex flex-col gap-0.5">
+              {label && (
+                <Label
+                  htmlFor={checkboxId}
+                  className={cn(
+                    'cursor-pointer leading-tight',
+                    error && 'text-destructive'
+                  )}
+                >
+                  {label}
+                </Label>
+              )}
+              {description && <Muted>{description}</Muted>}
+            </div>
+          )}
+        </div>
+
+        {error && (
+          <BodySmall id={`${checkboxId}-error`} color="error">
+            {error}
+          </BodySmall>
+        )}
+      </div>
+    )
+  }
+)
+
+Checkbox.displayName = 'Checkbox'
 
 export { Checkbox }

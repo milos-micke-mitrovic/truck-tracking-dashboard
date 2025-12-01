@@ -28,6 +28,7 @@ const buttonVariants = cva(
         icon: 'size-9',
         'icon-sm': 'size-8',
         'icon-lg': 'size-10',
+        'icon-xs': 'size-5 [&_svg]:size-3.5',
       },
     },
     defaultVariants: {
@@ -45,11 +46,15 @@ function Button({
   loading = false,
   disabled,
   children,
+  prefixIcon,
+  suffixIcon,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
     loading?: boolean
+    prefixIcon?: React.ReactNode
+    suffixIcon?: React.ReactNode
   }) {
   const Comp = asChild ? Slot : 'button'
   const isDisabled = disabled || loading
@@ -61,10 +66,52 @@ function Button({
       disabled={isDisabled}
       {...props}
     >
-      {loading && <Spinner size="sm" className="text-current" />}
+      {loading ? <Spinner size="sm" className="text-current" /> : prefixIcon}
       {children}
+      {suffixIcon}
     </Comp>
   )
 }
 
-export { Button, buttonVariants }
+type IconButtonProps = Omit<
+  React.ComponentProps<'button'>,
+  'children'
+> &
+  Omit<VariantProps<typeof buttonVariants>, 'size'> & {
+    icon: React.ReactNode
+    size?: 'xs' | 'sm' | 'default' | 'lg'
+    loading?: boolean
+    'aria-label': string
+  }
+
+function IconButton({
+  className,
+  variant,
+  size = 'default',
+  loading = false,
+  disabled,
+  icon,
+  ...props
+}: IconButtonProps) {
+  const sizeMap = {
+    xs: 'icon-xs',
+    sm: 'icon-sm',
+    default: 'icon',
+    lg: 'icon-lg',
+  } as const
+
+  const isDisabled = disabled || loading
+
+  return (
+    <button
+      data-slot="icon-button"
+      className={cn(buttonVariants({ variant, size: sizeMap[size], className }))}
+      disabled={isDisabled}
+      {...props}
+    >
+      {loading ? <Spinner size="sm" className="text-current" /> : icon}
+    </button>
+  )
+}
+
+export { Button, IconButton, buttonVariants }

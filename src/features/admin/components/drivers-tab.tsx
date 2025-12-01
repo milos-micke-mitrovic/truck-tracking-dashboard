@@ -6,8 +6,8 @@ import { useDrivers } from '../api'
 import type { Driver, DriverFilters } from '../types'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { Button, Input } from '@/shared/ui'
-import { FormSelect } from '@/shared/ui/form-fields'
+import { AddDriverDialog } from './dialogs'
+import { Button, Input, Select, BodySmall } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function DriversTab() {
@@ -29,9 +29,9 @@ export function DriversTab() {
         <DataTableColumnHeader column={column} title={t('columns.company')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[180px] truncate">
+        <BodySmall as="span" truncate className="max-w-[180px]">
           {row.original.companyName}
-        </span>
+        </BodySmall>
       ),
     },
     {
@@ -93,20 +93,18 @@ export function DriversTab() {
             <Input
               placeholder={t('filters.name')}
               value={filters.name || ''}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, name: e.target.value }))
-              }
-              className="w-full sm:max-w-[200px]"
+              debounce={300}
+              onDebounceChange={(value) => setFilters((f) => ({ ...f, name: value }))}
+              className="w-[200px]"
             />
             <Input
               placeholder={t('filters.phone')}
               value={filters.phone || ''}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, phone: e.target.value }))
-              }
-              className="w-full sm:max-w-[150px]"
+              debounce={300}
+              onDebounceChange={(value) => setFilters((f) => ({ ...f, phone: value }))}
+              className="w-[150px]"
             />
-            <FormSelect
+            <Select
               options={[
                 { value: 'all', label: t('filters.all') },
                 { value: 'active', label: t('status.active') },
@@ -119,15 +117,20 @@ export function DriversTab() {
                   status: value as DriverFilters['status'],
                 }))
               }
-              label={t('filters.status')}
+              placeholder={t('filters.status')}
+              className="w-[130px]"
             />
           </>
         }
         addButton={
-          <Button size="sm">
-            <Plus className="size-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('actions.addDriver')}</span>
-          </Button>
+          <AddDriverDialog
+            trigger={
+              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+                <span className="hidden sm:inline">{t('actions.addDriver')}</span>
+              </Button>
+            }
+            onSuccess={() => refetch()}
+          />
         }
         onExport={() => {}}
         onRefresh={() => refetch()}
@@ -138,6 +141,7 @@ export function DriversTab() {
         isLoading={isLoading}
         manualPagination
         pageCount={data?.meta.totalPages}
+        totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={(state: PaginationState) =>

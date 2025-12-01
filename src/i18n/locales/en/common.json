@@ -39,7 +39,12 @@
     "previous": "Previous",
     "next": "Next",
     "page": "Page {{page}} of {{total}}",
-    "showing": "Showing {{from}} to {{to}} of {{total}} results"
+    "rowsPerPage": "Rows per page",
+    "showing": "Showing {{from}}-{{to}} of {{total}}",
+    "showingEmpty": "No results",
+    "showingSingle": "Showing 1 of 1",
+    "items": "items",
+    "item": "item"
   },
   "table": {
     "noData": "No data available",

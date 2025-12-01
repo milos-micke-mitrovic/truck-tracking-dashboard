@@ -5,85 +5,106 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react'
-import { Button } from '@/shared/ui/primitives/button'
-import { FormSelect } from '@/shared/ui/form-fields'
-import { Label as TypographyLabel } from '@/shared/ui/typography'
+import { useTranslation } from 'react-i18next'
+import { IconButton } from '@/shared/ui/primitives/button'
+import { Select } from '@/shared/ui/primitives/select'
+import { BodySmall } from '@/shared/ui/typography'
 
 type DataTablePaginationProps<TData> = {
   table: Table<TData>
   pageSizeOptions?: number[]
+  totalCount?: number
 }
 
 export function DataTablePagination<TData>({
   table,
   pageSizeOptions = [10, 20, 50, 100],
+  totalCount,
 }: DataTablePaginationProps<TData>) {
-  return (
-    <div className="flex items-center justify-between px-2">
-      <div className="text-muted-foreground flex-1 text-sm">
-        {table.getFilteredSelectedRowModel().rows.length > 0 && (
-          <>
-            {table.getFilteredSelectedRowModel().rows.length} of{' '}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </>
-        )}
-      </div>
+  const { t } = useTranslation('common')
+  const { pageIndex, pageSize } = table.getState().pagination
+  const pageCount = table.getPageCount()
 
-      <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex items-center space-x-2">
-          <TypographyLabel>Rows per page</TypographyLabel>
-          <FormSelect
+  // Calculate range
+  const total = totalCount ?? table.getFilteredRowModel().rows.length
+  const from = total === 0 ? 0 : pageIndex * pageSize + 1
+  const to = Math.min((pageIndex + 1) * pageSize, total)
+
+  // Generate stats text with proper grammar
+  const getStatsText = () => {
+    if (total === 0) {
+      return t('pagination.showingEmpty')
+    }
+    if (total === 1) {
+      return t('pagination.showingSingle')
+    }
+    return t('pagination.showing', { from, to, total })
+  }
+
+  return (
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Stats - left side */}
+      <BodySmall color="muted">{getStatsText()}</BodySmall>
+
+      {/* Controls - right side */}
+      <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+        {/* Rows per page */}
+        <div className="flex items-center gap-2">
+          <BodySmall color="muted" className="hidden sm:block">
+            {t('pagination.rowsPerPage')}
+          </BodySmall>
+          <Select
             options={pageSizeOptions.map((size) => ({
               value: String(size),
               label: String(size),
             }))}
-            value={String(table.getState().pagination.pageSize)}
+            value={String(pageSize)}
             onChange={(value) => table.setPageSize(Number(value))}
+            className="w-[70px]"
           />
         </div>
 
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{' '}
-          {table.getPageCount()}
-        </div>
+        {/* Page indicator */}
+        <BodySmall color="muted" className="hidden sm:block">
+          {t('pagination.page', { page: pageIndex + 1, total: pageCount })}
+        </BodySmall>
 
-        <div className="flex items-center space-x-2">
-          <Button
+        {/* Navigation buttons */}
+        <div className="flex items-center gap-1">
+          <IconButton
             variant="outline"
-            className="hidden size-8 p-0 lg:flex"
+            size="sm"
+            className="hidden sm:flex"
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">Go to first page</span>
-            <ChevronsLeft className="size-4" />
-          </Button>
-          <Button
+            icon={<ChevronsLeft />}
+            aria-label="Go to first page"
+          />
+          <IconButton
             variant="outline"
-            className="size-8 p-0"
+            size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">Go to previous page</span>
-            <ChevronLeft className="size-4" />
-          </Button>
-          <Button
+            icon={<ChevronLeft />}
+            aria-label="Go to previous page"
+          />
+          <IconButton
             variant="outline"
-            className="size-8 p-0"
+            size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">Go to next page</span>
-            <ChevronRight className="size-4" />
-          </Button>
-          <Button
+            icon={<ChevronRight />}
+            aria-label="Go to next page"
+          />
+          <IconButton
             variant="outline"
-            className="hidden size-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            size="sm"
+            className="hidden sm:flex"
+            onClick={() => table.setPageIndex(pageCount - 1)}
             disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">Go to last page</span>
-            <ChevronsRight className="size-4" />
-          </Button>
+            icon={<ChevronsRight />}
+            aria-label="Go to last page"
+          />
         </div>
       </div>
     </div>

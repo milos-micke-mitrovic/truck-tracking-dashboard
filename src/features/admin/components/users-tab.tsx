@@ -6,8 +6,8 @@ import { useUsers } from '../api'
 import type { User, UserFilters } from '../types'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { Button, Input, Badge } from '@/shared/ui'
-import { FormSelect } from '@/shared/ui/form-fields'
+import { AddUserDialog } from './dialogs'
+import { Button, Input, Select, Badge, BodySmall } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function UsersTab() {
@@ -58,7 +58,9 @@ export function UsersTab() {
         <DataTableColumnHeader column={column} title={t('columns.email')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[180px] truncate">{row.original.email}</span>
+        <BodySmall as="span" truncate className="max-w-[180px]">
+          {row.original.email}
+        </BodySmall>
       ),
     },
     {
@@ -105,12 +107,11 @@ export function UsersTab() {
             <Input
               placeholder={t('filters.name')}
               value={filters.name || ''}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, name: e.target.value }))
-              }
-              className="w-full sm:max-w-[200px]"
+              debounce={300}
+              onDebounceChange={(value) => setFilters((f) => ({ ...f, name: value }))}
+              className="w-[200px]"
             />
-            <FormSelect
+            <Select
               options={[
                 { value: 'all', label: t('filters.all') },
                 { value: 'dispatch', label: t('departments.dispatch') },
@@ -129,9 +130,10 @@ export function UsersTab() {
                   department: value as UserFilters['department'],
                 }))
               }
-              label={t('filters.department')}
+              placeholder={t('filters.department')}
+              className="w-[160px]"
             />
-            <FormSelect
+            <Select
               options={[
                 { value: 'all', label: t('filters.all') },
                 { value: 'active', label: t('status.active') },
@@ -144,15 +146,20 @@ export function UsersTab() {
                   status: value as UserFilters['status'],
                 }))
               }
-              label={t('filters.status')}
+              placeholder={t('filters.status')}
+              className="w-[130px]"
             />
           </>
         }
         addButton={
-          <Button size="sm">
-            <Plus className="size-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('actions.addUser')}</span>
-          </Button>
+          <AddUserDialog
+            trigger={
+              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+                <span className="hidden sm:inline">{t('actions.addUser')}</span>
+              </Button>
+            }
+            onSuccess={() => refetch()}
+          />
         }
         onExport={() => {}}
         onRefresh={() => refetch()}
@@ -163,6 +170,7 @@ export function UsersTab() {
         isLoading={isLoading}
         manualPagination
         pageCount={data?.meta.totalPages}
+        totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={(state: PaginationState) =>

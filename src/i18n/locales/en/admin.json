@@ -120,5 +120,24 @@
     "basic": "Basic",
     "premium": "Premium",
     "enterprise": "Enterprise"
+  },
+  "dialogs": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "submitOrder": "Submit Order",
+    "quantity": "Quantity",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional notes or requirements...",
+    "modelPlaceholder": "Specific model (optional)",
+    "addDriverDescription": "Fill in the details to add a new driver to the system.",
+    "addUserDescription": "Fill in the details to create a new user account.",
+    "addCompanyDescription": "Fill in the company details to register a new company.",
+    "addVehicleDescription": "Fill in the details to add a new vehicle to the fleet.",
+    "addTrailerDescription": "Fill in the details to add a new trailer to the fleet.",
+    "orderDeviceDescription": "Submit an order request for new devices.",
+    "orderEldDevice": "Order ELD Device",
+    "orderPortableDevice": "Order Portable Device",
+    "orderGpsDevice": "Order GPS Device",
+    "orderCameraDevice": "Order Camera Device"
   }
 }

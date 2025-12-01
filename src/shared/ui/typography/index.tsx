@@ -1,10 +1,28 @@
 import type { ElementType, ReactNode } from 'react'
 import { cn } from '@/shared/utils'
 
+type TextColor =
+  | 'default'
+  | 'muted'
+  | 'error'
+  | 'success'
+  | 'warning'
+  | 'info'
+
+const colorClasses: Record<TextColor, string> = {
+  default: '',
+  muted: 'text-muted-foreground',
+  error: 'text-destructive',
+  success: 'text-success',
+  warning: 'text-warning',
+  info: 'text-info',
+}
+
 type TypographyProps = {
   children: ReactNode
   className?: string
   id?: string
+  color?: TextColor
   uppercase?: boolean
   lowercase?: boolean
   capitalize?: boolean
@@ -14,6 +32,7 @@ type TypographyProps = {
 }
 
 function getTextClasses({
+  color = 'default',
   uppercase,
   lowercase,
   capitalize,
@@ -22,6 +41,7 @@ function getTextClasses({
   italic,
 }: Omit<TypographyProps, 'children' | 'className' | 'id'>) {
   return cn(
+    colorClasses[color],
     uppercase && 'uppercase',
     lowercase && 'lowercase',
     capitalize && 'capitalize',
@@ -142,7 +162,10 @@ export function Muted({
   ...props
 }: TextProps) {
   return (
-    <Tag id={id} className={cn('text-muted', getTextClasses(props), className)}>
+    <Tag
+      id={id}
+      className={cn('text-muted text-muted-foreground', getTextClasses(props), className)}
+    >
       {children}
     </Tag>
   )

@@ -20,7 +20,7 @@ import {
   TableRow,
 } from '@/shared/ui/primitives/table'
 import { Spinner } from '@/shared/ui/primitives/spinner'
-import { Muted } from '@/shared/ui/typography'
+import { BodySmall } from '@/shared/ui/typography'
 import { DataTablePagination } from './data-table-pagination'
 
 type DataTableProps<TData, TValue> = {
@@ -32,6 +32,7 @@ type DataTableProps<TData, TValue> = {
   pageSizeOptions?: number[]
   manualPagination?: boolean
   pageCount?: number
+  totalCount?: number
   onPaginationChange?: (pagination: PaginationState) => void
   manualSorting?: boolean
   onSortingChange?: (sorting: SortingState) => void
@@ -49,6 +50,7 @@ export function DataTable<TData, TValue>({
   pageSizeOptions = [10, 20, 50, 100],
   manualPagination = false,
   pageCount,
+  totalCount,
   onPaginationChange,
   manualSorting = false,
   onSortingChange,
@@ -143,13 +145,21 @@ export function DataTable<TData, TValue>({
         </Table>
         {(isTableLoading || showEmptyState) && (
           <div className="pointer-events-none absolute inset-0 top-10 flex items-center justify-center">
-            {isTableLoading ? <Spinner /> : <Muted>{emptyText}</Muted>}
+            {isTableLoading ? (
+              <Spinner />
+            ) : (
+              <BodySmall color="muted">{emptyText}</BodySmall>
+            )}
           </div>
         )}
       </div>
 
       {pagination && (
-        <DataTablePagination table={table} pageSizeOptions={pageSizeOptions} />
+        <DataTablePagination
+          table={table}
+          pageSizeOptions={pageSizeOptions}
+          totalCount={totalCount}
+        />
       )}
     </div>
   )

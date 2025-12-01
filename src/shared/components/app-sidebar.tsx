@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LogOut, Settings, Truck } from 'lucide-react'
+import { LogOut, Settings } from 'lucide-react'
+import { Logo } from './logo'
 import {
   Sidebar,
   SidebarContent,
@@ -33,7 +34,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="h-14 justify-center border-b px-4">
         <div className="flex items-center gap-2">
-          <Truck className="size-5 shrink-0" />
+          <Logo size="sm" className="shrink-0" />
           {!isCollapsed && <H4>{t('common:app.name')}</H4>}
         </div>
       </SidebarHeader>

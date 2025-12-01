@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { TFunction } from 'i18next'
-import { Truck } from 'lucide-react'
 import { toast } from 'sonner'
+import { Logo } from '@/shared/components'
 import { useLogin, useAuth } from '@/features/auth'
 import {
   Button,
@@ -71,7 +71,7 @@ export function LoginPage() {
       <div className="from-primary to-primary/80 hidden w-1/2 flex-col justify-between bg-gradient-to-br p-12 lg:flex">
         <div className="flex items-center gap-3">
           <div className="bg-primary-foreground/10 flex size-10 items-center justify-center rounded-lg">
-            <Truck className="text-primary-foreground size-6" />
+            <Logo size="md" className="text-primary-foreground" />
           </div>
           <H4 className="text-primary-foreground">{t('common:app.name')}</H4>
         </div>
@@ -99,14 +99,14 @@ export function LoginPage() {
           {/* Mobile logo */}
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <div className="bg-primary flex size-10 items-center justify-center rounded-lg">
-              <Truck className="text-primary-foreground size-6" />
+              <Logo size="md" className="text-primary-foreground" />
             </div>
             <H4>{t('common:app.name')}</H4>
           </div>
 
           <div className="mb-8">
             <H1 className="mb-2">{t('login.title')}</H1>
-            <BodySmall className="text-muted-foreground">
+            <BodySmall color="muted">
               {t('login.subtitle')}
             </BodySmall>
           </div>
@@ -163,18 +163,18 @@ export function LoginPage() {
 
           {/* Demo credentials hint */}
           <div className="bg-muted/50 mt-8 rounded-lg border p-4">
-            <Label className="text-muted-foreground mb-2 block">
+            <Label color="muted" className="mb-2 block">
               {t('login.demo.title')}
             </Label>
             <div className="space-y-1">
-              <BodySmall className="text-muted-foreground">
+              <BodySmall color="muted">
                 <Label>{t('login.demo.admin')}:</Label> admin / admin123
               </BodySmall>
-              <BodySmall className="text-muted-foreground">
+              <BodySmall color="muted">
                 <Label>{t('login.demo.dispatcher')}:</Label> dispatcher /
                 dispatch123
               </BodySmall>
-              <BodySmall className="text-muted-foreground">
+              <BodySmall color="muted">
                 <Label>{t('login.demo.driver')}:</Label> driver / driver123
               </BodySmall>
             </div>

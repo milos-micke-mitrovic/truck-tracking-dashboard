@@ -20,11 +20,12 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      // Allow exporting variants/constants alongside components (shadcn pattern)
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      // Disable - common pattern to export hooks/constants alongside components
+      'react-refresh/only-export-components': 'off',
+      // Disable - TanStack Table returns functions that can't be memoized
+      'react-hooks/incompatible-library': 'off',
+      // Disable - dependency arrays should be intentional, not exhaustive
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 ])

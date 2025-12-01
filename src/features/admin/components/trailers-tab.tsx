@@ -5,8 +5,8 @@ import { Plus } from 'lucide-react'
 import { useTrailers } from '../api'
 import type { Trailer, TrailerFilters } from '../types'
 import { AdminToolbar } from './admin-toolbar'
-import { Button, Input, Badge } from '@/shared/ui'
-import { FormSelect } from '@/shared/ui/form-fields'
+import { AddTrailerDialog } from './dialogs'
+import { Button, Input, Select, Badge, BodySmall, Caption } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function TrailersTab() {
@@ -28,9 +28,9 @@ export function TrailersTab() {
         <DataTableColumnHeader column={column} title={t('columns.company')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[180px] truncate">
+        <BodySmall as="span" truncate className="max-w-[180px]">
           {row.original.companyName}
-        </span>
+        </BodySmall>
       ),
     },
     {
@@ -45,7 +45,9 @@ export function TrailersTab() {
         <DataTableColumnHeader column={column} title={t('columns.type')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[200px] truncate">{row.original.type}</span>
+        <BodySmall as="span" truncate className="max-w-[200px]">
+          {row.original.type}
+        </BodySmall>
       ),
     },
     {
@@ -54,7 +56,9 @@ export function TrailersTab() {
         <DataTableColumnHeader column={column} title={t('columns.model')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[200px] truncate">{row.original.model}</span>
+        <BodySmall as="span" truncate className="max-w-[200px]">
+          {row.original.model}
+        </BodySmall>
       ),
     },
     {
@@ -63,9 +67,9 @@ export function TrailersTab() {
         <DataTableColumnHeader column={column} title={t('columns.vin')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[160px] truncate font-mono text-xs">
+        <Caption as="span" truncate className="max-w-[160px] font-mono">
           {row.original.vin}
-        </span>
+        </Caption>
       ),
     },
     {
@@ -98,12 +102,13 @@ export function TrailersTab() {
             <Input
               placeholder={t('filters.trailerId')}
               value={filters.trailerId || ''}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, trailerId: e.target.value }))
+              debounce={300}
+              onDebounceChange={(value) =>
+                setFilters((f) => ({ ...f, trailerId: value }))
               }
-              className="w-full sm:max-w-[150px]"
+              className="w-[150px]"
             />
-            <FormSelect
+            <Select
               options={[
                 { value: 'all', label: t('filters.all') },
                 { value: 'company', label: t('ownership.company') },
@@ -116,9 +121,10 @@ export function TrailersTab() {
                   ownership: value as TrailerFilters['ownership'],
                 }))
               }
-              label={t('filters.ownership')}
+              placeholder={t('filters.ownership')}
+              className="w-[130px]"
             />
-            <FormSelect
+            <Select
               options={[
                 { value: 'all', label: t('filters.all') },
                 { value: 'active', label: t('status.active') },
@@ -131,15 +137,20 @@ export function TrailersTab() {
                   status: value as TrailerFilters['status'],
                 }))
               }
-              label={t('filters.status')}
+              placeholder={t('filters.status')}
+              className="w-[130px]"
             />
           </>
         }
         addButton={
-          <Button size="sm">
-            <Plus className="size-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('actions.addTrailer')}</span>
-          </Button>
+          <AddTrailerDialog
+            trigger={
+              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+                <span className="hidden sm:inline">{t('actions.addTrailer')}</span>
+              </Button>
+            }
+            onSuccess={() => refetch()}
+          />
         }
         onExport={() => {}}
         onRefresh={() => refetch()}
@@ -150,6 +161,7 @@ export function TrailersTab() {
         isLoading={isLoading}
         manualPagination
         pageCount={data?.meta.totalPages}
+        totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={(state: PaginationState) =>

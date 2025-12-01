@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Download, RefreshCw, SlidersHorizontal } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/shared/ui'
+import { Button, IconButton } from '@/shared/ui'
 
 type AdminToolbarProps = {
   filters?: ReactNode
@@ -19,28 +19,32 @@ export function AdminToolbar({
   const { t } = useTranslation('admin')
 
   return (
-    <div className="flex flex-col gap-4 py-4 sm:flex-row sm:items-end sm:justify-between">
-      <div className="flex flex-wrap items-end gap-3">{filters}</div>
+    <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+      <div className="flex items-center gap-3">{filters}</div>
       <div className="flex items-center gap-2">
         {addButton}
         {onExport && (
-          <Button variant="outline" size="sm" onClick={onExport}>
-            <Download className="size-4 sm:mr-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            prefixIcon={<Download className="size-4" />}
+            onClick={onExport}
+          >
             <span className="hidden sm:inline">{t('actions.export')}</span>
           </Button>
         )}
-        <Button variant="outline" size="icon" className="size-9">
-          <SlidersHorizontal className="size-4" />
-        </Button>
+        <IconButton
+          variant="outline"
+          icon={<SlidersHorizontal className="size-4" />}
+          aria-label={t('actions.filters')}
+        />
         {onRefresh && (
-          <Button
+          <IconButton
             variant="outline"
-            size="icon"
-            className="size-9"
+            icon={<RefreshCw className="size-4" />}
             onClick={onRefresh}
-          >
-            <RefreshCw className="size-4" />
-          </Button>
+            aria-label={t('actions.refresh')}
+          />
         )}
       </div>
     </div>

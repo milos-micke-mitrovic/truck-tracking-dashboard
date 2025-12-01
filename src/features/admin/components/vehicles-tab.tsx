@@ -6,8 +6,8 @@ import { useVehicles } from '../api'
 import type { Vehicle, VehicleFilters } from '../types'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { Button, Input } from '@/shared/ui'
-import { FormSelect } from '@/shared/ui/form-fields'
+import { AddVehicleDialog } from './dialogs'
+import { Button, Input, Select, BodySmall, Caption } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function VehiclesTab() {
@@ -29,9 +29,9 @@ export function VehiclesTab() {
         <DataTableColumnHeader column={column} title={t('columns.company')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[180px] truncate">
+        <BodySmall as="span" truncate className="max-w-[180px]">
           {row.original.companyName}
-        </span>
+        </BodySmall>
       ),
     },
     {
@@ -58,9 +58,9 @@ export function VehiclesTab() {
         <DataTableColumnHeader column={column} title={t('columns.vin')} />
       ),
       cell: ({ row }) => (
-        <span className="max-w-[140px] truncate font-mono text-xs">
+        <Caption as="span" truncate className="max-w-[140px] font-mono">
           {row.original.vin}
-        </span>
+        </Caption>
       ),
     },
     {
@@ -113,12 +113,13 @@ export function VehiclesTab() {
             <Input
               placeholder={t('filters.unitNumber')}
               value={filters.unitNumber || ''}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, unitNumber: e.target.value }))
+              debounce={300}
+              onDebounceChange={(value) =>
+                setFilters((f) => ({ ...f, unitNumber: value }))
               }
-              className="w-full sm:max-w-[150px]"
+              className="w-[150px]"
             />
-            <FormSelect
+            <Select
               options={[
                 { value: 'all', label: t('filters.all') },
                 { value: 'active', label: t('status.active') },
@@ -131,15 +132,20 @@ export function VehiclesTab() {
                   status: value as VehicleFilters['status'],
                 }))
               }
-              label={t('filters.status')}
+              placeholder={t('filters.status')}
+              className="w-[130px]"
             />
           </>
         }
         addButton={
-          <Button size="sm">
-            <Plus className="size-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t('actions.addVehicle')}</span>
-          </Button>
+          <AddVehicleDialog
+            trigger={
+              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+                <span className="hidden sm:inline">{t('actions.addVehicle')}</span>
+              </Button>
+            }
+            onSuccess={() => refetch()}
+          />
         }
         onExport={() => {}}
         onRefresh={() => refetch()}
@@ -150,6 +156,7 @@ export function VehiclesTab() {
         isLoading={isLoading}
         manualPagination
         pageCount={data?.meta.totalPages}
+        totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={(state: PaginationState) =>
