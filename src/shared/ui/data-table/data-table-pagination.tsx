@@ -42,12 +42,12 @@ export function DataTablePagination<TData>({
   }
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-center justify-between gap-2">
       {/* Stats - left side */}
-      <BodySmall color="muted">{getStatsText()}</BodySmall>
+      <BodySmall color="muted" className="shrink-0">{getStatsText()}</BodySmall>
 
       {/* Controls - right side */}
-      <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+      <div className="flex items-center gap-2 sm:gap-6">
         {/* Rows per page */}
         <div className="flex items-center gap-2">
           <BodySmall color="muted" className="hidden sm:block">

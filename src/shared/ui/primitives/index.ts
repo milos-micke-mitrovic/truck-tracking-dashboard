@@ -22,3 +22,4 @@ export {
   TableRow,
 } from './table'
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
+export { ImageUpload } from './image-upload'

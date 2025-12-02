@@ -19,7 +19,7 @@ type InputProps = Omit<React.ComponentProps<'input'>, 'type'> & {
   label?: string
   helperText?: string
   error?: string
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search'
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' | 'datetime-local'
   prefixIcon?: React.ReactNode
   suffixIcon?: React.ReactNode
   clearable?: boolean
@@ -142,6 +142,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             inputStyles,
             prefixIcon && 'pl-10',
             hasRightElement && 'pr-10',
+            (type === 'time' || type === 'date' || type === 'datetime-local') && 'w-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer',
             className
           )}
           {...props}

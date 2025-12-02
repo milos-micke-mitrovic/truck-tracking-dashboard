@@ -6,7 +6,7 @@ import { useCompanies } from '../api'
 import type { Company, CompanyFilters } from '../types'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { AddCompanyDialog } from './dialogs'
+import { CompanyDialog } from './dialogs'
 import { Button, Input, Select } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
@@ -16,6 +16,8 @@ export function CompaniesTab() {
     status: 'active',
   })
   const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
 
   const { data, isLoading, refetch } = useCompanies({
     ...filters,
@@ -57,13 +59,6 @@ export function CompaniesTab() {
       ),
     },
     {
-      accessorKey: 'fleet',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.fleet')} />
-      ),
-      cell: ({ row }) => t(`fleet.${row.original.fleet}`),
-    },
-    {
       accessorKey: 'plan',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.plan')} />
@@ -87,6 +82,20 @@ export function CompaniesTab() {
       cell: ({ row }) => <StatusBadge status={row.original.status} />,
     },
   ]
+
+  const handleAddCompany = () => {
+    setSelectedCompany(null)
+    setDialogOpen(true)
+  }
+
+  const handleRowClick = (company: Company) => {
+    setSelectedCompany(company)
+    setDialogOpen(true)
+  }
+
+  const handleDialogSuccess = () => {
+    refetch()
+  }
 
   return (
     <div>
@@ -128,14 +137,9 @@ export function CompaniesTab() {
           </>
         }
         addButton={
-          <AddCompanyDialog
-            trigger={
-              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
-                <span className="hidden sm:inline">{t('actions.addCompany')}</span>
-              </Button>
-            }
-            onSuccess={() => refetch()}
-          />
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAddCompany}>
+            <span className="hidden sm:inline">{t('actions.addCompany')}</span>
+          </Button>
         }
         onExport={() => {}}
         onRefresh={() => refetch()}
@@ -152,6 +156,14 @@ export function CompaniesTab() {
         onPaginationChange={(state: PaginationState) =>
           setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
         }
+        onRowClick={handleRowClick}
+      />
+
+      <CompanyDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        company={selectedCompany}
+        onSuccess={handleDialogSuccess}
       />
     </div>
   )

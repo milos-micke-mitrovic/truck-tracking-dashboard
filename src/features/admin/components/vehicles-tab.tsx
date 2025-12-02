@@ -140,7 +140,7 @@ export function VehiclesTab() {
         addButton={
           <AddVehicleDialog
             trigger={
-              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+              <Button size="sm" prefixIcon={<Plus />}>
                 <span className="hidden sm:inline">{t('actions.addVehicle')}</span>
               </Button>
             }

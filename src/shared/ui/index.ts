@@ -28,6 +28,7 @@ export {
   TabsContent,
   TabsList,
   TabsTrigger,
+  ImageUpload,
   type SelectOption,
   type MultiSelectOption,
   type RadioOption,

@@ -154,7 +154,7 @@ export function UsersTab() {
         addButton={
           <AddUserDialog
             trigger={
-              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+              <Button size="sm" prefixIcon={<Plus />}>
                 <span className="hidden sm:inline">{t('actions.addUser')}</span>
               </Button>
             }

@@ -1,6 +1,8 @@
 export { AddDriverDialog } from './add-driver-dialog'
+export { DriverDialog } from './driver-dialog'
 export { AddUserDialog } from './add-user-dialog'
 export { AddCompanyDialog } from './add-company-dialog'
+export { CompanyDialog } from './company-dialog'
 export { AddVehicleDialog } from './add-vehicle-dialog'
 export { AddTrailerDialog } from './add-trailer-dialog'
 export { OrderDeviceDialog } from './order-device-dialog'

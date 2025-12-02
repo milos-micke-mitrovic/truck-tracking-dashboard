@@ -1,5 +1,8 @@
 {
   "title": "Admin Panel",
+  "validation": {
+    "required": "This field is required"
+  },
   "tabs": {
     "companies": "Companies",
     "drivers": "Drivers",
@@ -139,5 +142,123 @@
     "orderPortableDevice": "Order Portable Device",
     "orderGpsDevice": "Order GPS Device",
     "orderCameraDevice": "Order Camera Device"
+  },
+  "companyDialog": {
+    "addTitle": "Add Company",
+    "editTitle": "Edit Company",
+    "tabs": {
+      "general": "General",
+      "terminals": "Terminals",
+      "configurations": "Configurations",
+      "documents": "Documents"
+    },
+    "logo": "Logo",
+    "uploadLogo": "Upload Logo",
+    "logoHint": "PNG, JPG or SVG (max 2MB)",
+    "fullName": "Full Name",
+    "displayName": "Display Name",
+    "companyInfo": "Company Info",
+    "contact": "Contact",
+    "subscription": "Subscription",
+    "businessType": "Business Type",
+    "industry": {
+      "label": "Industry",
+      "transportation": "Transportation",
+      "logistics": "Logistics",
+      "manufacturing": "Manufacturing",
+      "retail": "Retail",
+      "construction": "Construction",
+      "agriculture": "Agriculture"
+    },
+    "cargoType": {
+      "label": "Cargo Type",
+      "property": "Property",
+      "passengers": "Passengers",
+      "hazmat": "Hazmat",
+      "householdGoods": "Household Goods"
+    },
+    "terminal": "Terminal",
+    "timezone": "Timezone",
+    "startingTime": "24 Hour Period Starting Time",
+    "addTerminal": "Add Terminal",
+    "eldConfig": "ELD Configuration",
+    "speedThreshold": "Vehicle Motion Speed Threshold",
+    "speedThresholdHint": "Speed in mph at which vehicle is considered in motion",
+    "hosConfig": "HoS Configuration",
+    "cycleRule": "Cycle Rule",
+    "constantExceptions": "Constant Exceptions",
+    "exceptions": {
+      "none": "None",
+      "shortHaul": "Short Haul",
+      "adverseConditions": "Adverse Conditions"
+    },
+    "appConfig": "App Configuration",
+    "accountingConfig": "Accounting Configuration",
+    "accountingConfigPlaceholder": "Accounting configuration fields will be added here.",
+    "joinHosClocks": "Join HoS Clocks",
+    "showTmsDashboard": "Show TMS Dashboard",
+    "requirePasscode": "Require Passcode to Exit Inspection",
+    "documentType": "Type",
+    "expirationDate": "Expiration Date",
+    "actions": "Actions",
+    "documentTypes": {
+      "info_page": "Info Page",
+      "mc_authority": "MC Authority",
+      "w9": "W9",
+      "notice_of_assignment": "Notice of Assignment",
+      "letter_of_release": "Letter of Release",
+      "certificate_of_liability_insurance": "Certificate of Liability Insurance",
+      "references": "References"
+    }
+  },
+  "driverDialog": {
+    "addTitle": "Add Driver",
+    "editTitle": "Edit Driver",
+    "tabs": {
+      "general": "General",
+      "configurations": "Configurations",
+      "accounting": "Accounting",
+      "documents": "Documents"
+    },
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "dateOfBirth": "Date of Birth",
+    "personalInfo": "Personal Info",
+    "contact": "Contact",
+    "comments": "Comments",
+    "settlement": "Settlement",
+    "exemptDriver": "Exempt Driver",
+    "compensation": "Compensation",
+    "type": "Type",
+    "rate": "Rate",
+    "selectType": "Select Type",
+    "compensationType": {
+      "perMile": "Per Mile",
+      "perHour": "Per Hour",
+      "percentage": "Percentage",
+      "flatRate": "Flat Rate"
+    },
+    "escrow": "Escrow",
+    "deposited": "Deposited",
+    "minimum": "Minimum",
+    "debt": "Debt",
+    "settlementMinimalAmount": "Settlement Minimal Amount",
+    "scheduledItems": {
+      "label": "Scheduled Items",
+      "weekly": "Weekly",
+      "biweekly": "Bi-weekly",
+      "monthly": "Monthly"
+    },
+    "selectScheduledItems": "Select Schedule",
+    "documentTypes": {
+      "cdl": "CDL",
+      "mvr": "MVR",
+      "ssn_card": "SSN Card",
+      "drug_test": "Drug Test",
+      "application": "Application",
+      "medical_card": "Medical Card",
+      "employment_verification": "Employment Verification",
+      "clearing_house": "Clearing House"
+    }
   }
 }

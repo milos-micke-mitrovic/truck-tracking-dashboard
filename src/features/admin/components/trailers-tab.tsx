@@ -145,7 +145,7 @@ export function TrailersTab() {
         addButton={
           <AddTrailerDialog
             trigger={
-              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
+              <Button size="sm" prefixIcon={<Plus />}>
                 <span className="hidden sm:inline">{t('actions.addTrailer')}</span>
               </Button>
             }

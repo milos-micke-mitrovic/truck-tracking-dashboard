@@ -6,7 +6,7 @@ import { useDrivers } from '../api'
 import type { Driver, DriverFilters } from '../types'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { AddDriverDialog } from './dialogs'
+import { DriverDialog } from './dialogs'
 import { Button, Input, Select, BodySmall } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
@@ -16,6 +16,8 @@ export function DriversTab() {
     status: 'active',
   })
   const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
 
   const { data, isLoading, refetch } = useDrivers({
     ...filters,
@@ -85,6 +87,20 @@ export function DriversTab() {
     },
   ]
 
+  const handleAddDriver = () => {
+    setSelectedDriver(null)
+    setDialogOpen(true)
+  }
+
+  const handleRowClick = (driver: Driver) => {
+    setSelectedDriver(driver)
+    setDialogOpen(true)
+  }
+
+  const handleDialogSuccess = () => {
+    refetch()
+  }
+
   return (
     <div>
       <AdminToolbar
@@ -123,14 +139,9 @@ export function DriversTab() {
           </>
         }
         addButton={
-          <AddDriverDialog
-            trigger={
-              <Button size="sm" prefixIcon={<Plus className="size-4" />}>
-                <span className="hidden sm:inline">{t('actions.addDriver')}</span>
-              </Button>
-            }
-            onSuccess={() => refetch()}
-          />
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAddDriver}>
+            <span className="hidden sm:inline">{t('actions.addDriver')}</span>
+          </Button>
         }
         onExport={() => {}}
         onRefresh={() => refetch()}
@@ -147,6 +158,14 @@ export function DriversTab() {
         onPaginationChange={(state: PaginationState) =>
           setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
         }
+        onRowClick={handleRowClick}
+      />
+
+      <DriverDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        driver={selectedDriver}
+        onSuccess={handleDialogSuccess}
       />
     </div>
   )

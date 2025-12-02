@@ -92,11 +92,8 @@ export function GpsDevicesTab() {
           <OrderDeviceDialog
             deviceType="gps"
             trigger={
-              <Button size="sm" variant="default">
-                <ShoppingCart className="size-4 sm:mr-2" />
-                <BodySmall as="span" className="hidden sm:inline">
-                  {t('actions.order')}
-                </BodySmall>
+              <Button size="sm" variant="default" prefixIcon={<ShoppingCart />}>
+                <span className="hidden sm:inline">{t('actions.order')}</span>
               </Button>
             }
             onSuccess={() => refetch()}

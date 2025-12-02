@@ -20,14 +20,14 @@ export function AdminToolbar({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 py-4">
-      <div className="flex items-center gap-3">{filters}</div>
+      <div className="flex flex-wrap items-center gap-3">{filters}</div>
       <div className="flex items-center gap-2">
         {addButton}
         {onExport && (
           <Button
             variant="outline"
             size="sm"
-            prefixIcon={<Download className="size-4" />}
+            prefixIcon={<Download />}
             onClick={onExport}
           >
             <span className="hidden sm:inline">{t('actions.export')}</span>
@@ -35,13 +35,13 @@ export function AdminToolbar({
         )}
         <IconButton
           variant="outline"
-          icon={<SlidersHorizontal className="size-4" />}
+          icon={<SlidersHorizontal />}
           aria-label={t('actions.filters')}
         />
         {onRefresh && (
           <IconButton
             variant="outline"
-            icon={<RefreshCw className="size-4" />}
+            icon={<RefreshCw />}
             onClick={onRefresh}
             aria-label={t('actions.refresh')}
           />
