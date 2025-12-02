@@ -21,6 +21,7 @@ import {
 } from '@/shared/ui/form'
 import { Input, Select } from '@/shared/ui/primitives'
 import type { TrailerOwnership } from '../../types'
+import { OWNERSHIP_VALUES, TRAILER_TYPE_OPTIONS } from '../../constants'
 
 type AddTrailerFormValues = {
   trailerId: string
@@ -51,18 +52,12 @@ export function AddTrailerDialog({ trigger, onSuccess }: AddTrailerDialogProps) 
     },
   })
 
-  const ownershipOptions = [
-    { value: 'company', label: t('ownership.company') },
-    { value: 'contractor', label: t('ownership.contractor') },
-  ]
+  const ownershipOptions = OWNERSHIP_VALUES.map((value) => ({
+    value,
+    label: t(`ownership.${value}`),
+  }))
 
-  const typeOptions = [
-    { value: 'Dry Van', label: 'Dry Van' },
-    { value: 'Flatbed', label: 'Flatbed' },
-    { value: 'Refrigerated', label: 'Refrigerated' },
-    { value: 'Tanker', label: 'Tanker' },
-    { value: 'Lowboy', label: 'Lowboy' },
-  ]
+  const typeOptions = [...TRAILER_TYPE_OPTIONS]
 
   const handleSubmit = async (values: AddTrailerFormValues) => {
     // Simulate API call

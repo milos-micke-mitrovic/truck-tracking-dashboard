@@ -1,21 +1,57 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { AuthLayout } from './layouts/auth-layout'
+import { lazy, Suspense } from 'react'
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom'
+import { RouteGuard } from './layouts/route-guard'
 import { DashboardLayout } from './layouts/dashboard-layout'
-import { AdminPage } from '@/features/admin/pages/admin-page'
-import { LoginPage } from '@/features/auth/pages/login-page'
+import { NotFoundPage } from './pages/not-found-page'
+import { ErrorBoundary } from '@/shared/components'
+import { Spinner } from '@/shared/ui'
+
+// Lazy load feature pages
+const AdminPage = lazy(() =>
+  import('@/features/admin/pages/admin-page').then((m) => ({ default: m.AdminPage }))
+)
+const LoginPage = lazy(() =>
+  import('@/features/auth/pages/login-page').then((m) => ({ default: m.LoginPage }))
+)
+
+// Loading fallback for lazy-loaded pages
+function PageLoadingFallback() {
+  return (
+    <div className="flex min-h-[400px] items-center justify-center">
+      <Spinner size="lg" />
+    </div>
+  )
+}
+
+// Wrapper for lazy-loaded pages with error boundary and suspense
+function LazyPage({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoadingFallback />}>{children}</Suspense>
+    </ErrorBoundary>
+  )
+}
 
 export const router = createBrowserRouter([
-  // Public routes (auth layout)
+  // Public routes (no auth required)
   {
-    element: <AuthLayout />,
+    element: (
+      <RouteGuard requireAuth={false}>
+        <Outlet />
+      </RouteGuard>
+    ),
     children: [
       {
         path: '/login',
-        element: <LoginPage />,
+        element: (
+          <LazyPage>
+            <LoginPage />
+          </LazyPage>
+        ),
       },
     ],
   },
-  // Protected routes (dashboard layout)
+  // Protected routes (auth required)
   {
     element: <DashboardLayout />,
     children: [
@@ -25,8 +61,17 @@ export const router = createBrowserRouter([
       },
       {
         path: '/admin',
-        element: <AdminPage />,
+        element: (
+          <LazyPage>
+            <AdminPage />
+          </LazyPage>
+        ),
       },
     ],
+  },
+  // 404 catch-all
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ])

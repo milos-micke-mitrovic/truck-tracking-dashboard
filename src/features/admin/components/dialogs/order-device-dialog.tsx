@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/shared/ui/form'
 import { Input, Select } from '@/shared/ui/primitives'
+import { DEVICE_MANUFACTURERS } from '../../constants'
 
 type DeviceType = 'eld' | 'portable' | 'gps' | 'camera'
 
@@ -54,29 +55,7 @@ export function OrderDeviceDialog({
   })
 
   const getManufacturerOptions = () => {
-    switch (deviceType) {
-      case 'eld':
-        return [
-          { value: 'samsara', label: 'Samsara' },
-          { value: 'keeptruckin', label: 'KeepTruckin' },
-          { value: 'geotab', label: 'Geotab' },
-          { value: 'omnitracs', label: 'Omnitracs' },
-        ]
-      case 'gps':
-        return [
-          { value: 'garmin', label: 'Garmin' },
-          { value: 'tomtom', label: 'TomTom' },
-          { value: 'calamp', label: 'CalAmp' },
-        ]
-      case 'camera':
-        return [
-          { value: 'lytx', label: 'Lytx' },
-          { value: 'samsara', label: 'Samsara' },
-          { value: 'motive', label: 'Motive' },
-        ]
-      default:
-        return []
-    }
+    return [...(DEVICE_MANUFACTURERS[deviceType] || [])]
   }
 
   const getDialogTitle = () => {

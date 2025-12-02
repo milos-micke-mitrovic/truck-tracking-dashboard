@@ -8,46 +8,43 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { H4 } from '@/shared/ui/typography'
+import { FormSection } from '@/shared/components'
 import type { CompanyFormValues } from '../../../types'
+import {
+  PLAN_VALUES,
+  STATUS_VALUES,
+  INDUSTRY_VALUES,
+  CARGO_TYPE_VALUES,
+} from '../../../constants'
 
 export function GeneralTab() {
   const { t } = useTranslation('admin')
   const { control } = useFormContext<CompanyFormValues>()
 
-  const planOptions = [
-    { value: 'basic', label: t('plan.basic') },
-    { value: 'premium', label: t('plan.premium') },
-    { value: 'enterprise', label: t('plan.enterprise') },
-  ]
+  const planOptions = PLAN_VALUES.map((value) => ({
+    value,
+    label: t(`plan.${value}`),
+  }))
 
-  const statusOptions = [
-    { value: 'active', label: t('status.active') },
-    { value: 'inactive', label: t('status.inactive') },
-  ]
+  const statusOptions = STATUS_VALUES.map((value) => ({
+    value,
+    label: t(`status.${value}`),
+  }))
 
-  const industryOptions = [
-    { value: 'transportation', label: t('companyDialog.industry.transportation') },
-    { value: 'logistics', label: t('companyDialog.industry.logistics') },
-    { value: 'manufacturing', label: t('companyDialog.industry.manufacturing') },
-    { value: 'retail', label: t('companyDialog.industry.retail') },
-    { value: 'construction', label: t('companyDialog.industry.construction') },
-    { value: 'agriculture', label: t('companyDialog.industry.agriculture') },
-  ]
+  const industryOptions = INDUSTRY_VALUES.map((value) => ({
+    value,
+    label: t(`companyDialog.industry.${value}`),
+  }))
 
-  const cargoTypeOptions = [
-    { value: 'property', label: t('companyDialog.cargoType.property') },
-    { value: 'passengers', label: t('companyDialog.cargoType.passengers') },
-    { value: 'hazmat', label: t('companyDialog.cargoType.hazmat') },
-    { value: 'household_goods', label: t('companyDialog.cargoType.householdGoods') },
-  ]
+  const cargoTypeOptions = CARGO_TYPE_VALUES.map((value) => ({
+    value,
+    label: t(`companyDialog.cargoType.${value === 'household_goods' ? 'householdGoods' : value}`),
+  }))
 
   return (
     <TabsContent value="general" className="mt-0 space-y-3">
       {/* Company Info */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('companyDialog.companyInfo')}</H4>
-
+      <FormSection title={t('companyDialog.companyInfo')}>
         {/* Logo upload */}
         <FormField
           control={control}
@@ -127,11 +124,10 @@ export function GeneralTab() {
             </FormItem>
           )}
         />
-      </div>
+      </FormSection>
 
       {/* Contact section */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('companyDialog.contact')}</H4>
+      <FormSection title={t('companyDialog.contact')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
             control={control}
@@ -161,11 +157,10 @@ export function GeneralTab() {
             )}
           />
         </div>
-      </div>
+      </FormSection>
 
       {/* Subscription section */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('companyDialog.subscription')}</H4>
+      <FormSection title={t('companyDialog.subscription')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
             control={control}
@@ -200,11 +195,10 @@ export function GeneralTab() {
             )}
           />
         </div>
-      </div>
+      </FormSection>
 
       {/* Business Type section */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('companyDialog.businessType')}</H4>
+      <FormSection title={t('companyDialog.businessType')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
             control={control}
@@ -237,7 +231,7 @@ export function GeneralTab() {
             )}
           />
         </div>
-      </div>
+      </FormSection>
     </TabsContent>
   )
 }

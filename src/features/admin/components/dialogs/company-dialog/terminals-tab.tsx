@@ -11,6 +11,7 @@ import {
 } from '@/shared/ui/form'
 import { H4 } from '@/shared/ui/typography'
 import type { CompanyFormValues } from '../../../types'
+import { TIMEZONE_OPTIONS, DEFAULT_TIMEZONE, DEFAULT_STARTING_TIME } from '../../../constants'
 
 export function TerminalsTab() {
   const { t } = useTranslation('admin')
@@ -21,21 +22,12 @@ export function TerminalsTab() {
     name: 'terminals',
   })
 
-  const timezoneOptions = [
-    { value: 'America/New_York', label: 'Eastern Time' },
-    { value: 'America/Chicago', label: 'Central Time' },
-    { value: 'America/Denver', label: 'Mountain Time' },
-    { value: 'America/Los_Angeles', label: 'Pacific Time' },
-    { value: 'America/Anchorage', label: 'Alaska Time' },
-    { value: 'Pacific/Honolulu', label: 'Hawaii Time' },
-  ]
-
   const addTerminal = () => {
     appendTerminal({
       id: `terminal-${Date.now()}`,
       address: '',
-      timezone: 'America/Chicago',
-      startingTime: '00:00:00',
+      timezone: DEFAULT_TIMEZONE,
+      startingTime: DEFAULT_STARTING_TIME,
     })
   }
 
@@ -82,7 +74,7 @@ export function TerminalsTab() {
                 <FormItem>
                   <FormLabel>{t('companyDialog.timezone')}</FormLabel>
                   <Select
-                    options={timezoneOptions}
+                    options={[...TIMEZONE_OPTIONS]}
                     value={field.value}
                     onChange={field.onChange}
                   />

@@ -1,15 +1,15 @@
-import type { Company, CompanyDocument, CompanyFormValues } from '../types'
-
-// Default documents for new company
-export const defaultCompanyDocuments: CompanyDocument[] = [
-  { id: 'doc-1', type: 'info_page', fileName: null, expirationDate: null },
-  { id: 'doc-2', type: 'mc_authority', fileName: null, expirationDate: null },
-  { id: 'doc-3', type: 'w9', fileName: null, expirationDate: null },
-  { id: 'doc-4', type: 'notice_of_assignment', fileName: null, expirationDate: null },
-  { id: 'doc-5', type: 'letter_of_release', fileName: null, expirationDate: null },
-  { id: 'doc-6', type: 'certificate_of_liability_insurance', fileName: null, expirationDate: null },
-  { id: 'doc-7', type: 'references', fileName: null, expirationDate: null },
-]
+import type { Company, CompanyFormValues } from '../types'
+import {
+  DEFAULT_COMPANY_DOCUMENTS,
+  DEFAULT_PLAN,
+  DEFAULT_INDUSTRY,
+  DEFAULT_CARGO_TYPE,
+  DEFAULT_TIMEZONE,
+  DEFAULT_STARTING_TIME,
+  DEFAULT_VEHICLE_MOTION_SPEED_THRESHOLD,
+  DEFAULT_CYCLE_RULE,
+  DEFAULT_CONSTANT_EXCEPTIONS,
+} from '../constants'
 
 // Helper to get default form values
 export function getCompanyFormDefaults(company?: Company | null): CompanyFormValues {
@@ -47,26 +47,26 @@ export function getCompanyFormDefaults(company?: Company | null): CompanyFormVal
     address: '',
     phone: '',
     emailDomain: '',
-    plan: 'basic',
+    plan: DEFAULT_PLAN,
     status: 'active',
-    industry: 'transportation',
-    cargoType: 'property',
+    industry: DEFAULT_INDUSTRY,
+    cargoType: DEFAULT_CARGO_TYPE,
     terminals: [
       {
         id: 'terminal-1',
         address: '',
-        timezone: 'America/Chicago',
-        startingTime: '00:00:00',
+        timezone: DEFAULT_TIMEZONE,
+        startingTime: DEFAULT_STARTING_TIME,
       },
     ],
-    vehicleMotionSpeedThreshold: 5,
-    cycleRule: 'usa_70_8',
-    constantExceptions: 'none',
+    vehicleMotionSpeedThreshold: DEFAULT_VEHICLE_MOTION_SPEED_THRESHOLD,
+    cycleRule: DEFAULT_CYCLE_RULE,
+    constantExceptions: DEFAULT_CONSTANT_EXCEPTIONS,
     personalUse: true,
     yardMoves: true,
     joinHosClocks: true,
     showTmsDashboard: true,
     requirePasscodeToExitInspection: true,
-    documents: defaultCompanyDocuments.map((d) => ({ ...d })),
+    documents: DEFAULT_COMPANY_DOCUMENTS.map((d) => ({ ...d })),
   }
 }

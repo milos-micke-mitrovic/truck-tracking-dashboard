@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useCompanies } from '../api'
+import { useAdminTab } from '../hooks'
 import type { Company, CompanyFilters } from '../types'
+import { STATUS_VALUES } from '../constants'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
 import { CompanyDialog } from './dialogs'
@@ -12,12 +13,19 @@ import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function CompaniesTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<CompanyFilters>({
-    status: 'active',
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    dialogOpen,
+    setDialogOpen,
+    selectedItem: selectedCompany,
+    handleAdd,
+    handleRowClick,
+    handlePaginationChange,
+  } = useAdminTab<CompanyFilters, Company>({
+    defaultFilters: { status: 'active' },
   })
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null)
 
   const { data, isLoading, refetch } = useCompanies({
     ...filters,
@@ -83,20 +91,6 @@ export function CompaniesTab() {
     },
   ]
 
-  const handleAddCompany = () => {
-    setSelectedCompany(null)
-    setDialogOpen(true)
-  }
-
-  const handleRowClick = (company: Company) => {
-    setSelectedCompany(company)
-    setDialogOpen(true)
-  }
-
-  const handleDialogSuccess = () => {
-    refetch()
-  }
-
   return (
     <div>
       <AdminToolbar
@@ -106,38 +100,30 @@ export function CompaniesTab() {
               placeholder={t('filters.name')}
               value={filters.name || ''}
               debounce={300}
-              onDebounceChange={(value) => setFilters((f) => ({ ...f, name: value }))}
+              onDebounceChange={(value) => updateFilter('name', value)}
               className="w-[200px]"
             />
             <Input
               placeholder={t('filters.dotNumber')}
               value={filters.dotNumber || ''}
               debounce={300}
-              onDebounceChange={(value) =>
-                setFilters((f) => ({ ...f, dotNumber: value }))
-              }
+              onDebounceChange={(value) => updateFilter('dotNumber', value)}
               className="w-[150px]"
             />
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                { value: 'active', label: t('status.active') },
-                { value: 'inactive', label: t('status.inactive') },
+                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
               ]}
               value={filters.status || 'active'}
-              onChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  status: value as CompanyFilters['status'],
-                }))
-              }
+              onChange={(value) => updateFilter('status', value as CompanyFilters['status'])}
               placeholder={t('filters.status')}
               className="w-[130px]"
             />
           </>
         }
         addButton={
-          <Button size="sm" prefixIcon={<Plus />} onClick={handleAddCompany}>
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
             <span className="hidden sm:inline">{t('actions.addCompany')}</span>
           </Button>
         }
@@ -153,9 +139,7 @@ export function CompaniesTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
         onRowClick={handleRowClick}
       />
 
@@ -163,7 +147,7 @@ export function CompaniesTab() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         company={selectedCompany}
-        onSuccess={handleDialogSuccess}
+        onSuccess={refetch}
       />
     </div>
   )

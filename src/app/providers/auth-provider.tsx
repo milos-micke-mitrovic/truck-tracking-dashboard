@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
-import type { User, AuthState } from '../types'
+import { AUTH_STORAGE_KEY } from '@/shared/utils'
+import type { User, AuthState } from '@/features/auth/types'
 
 type AuthContextType = AuthState & {
   login: (user: User, token: string) => void
@@ -7,8 +8,6 @@ type AuthContextType = AuthState & {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
-
-const AUTH_STORAGE_KEY = 'auth'
 
 function getStoredAuth(): { user: User; token: string } | null {
   try {
@@ -30,14 +29,12 @@ function getInitialState(): AuthState {
       user: stored.user,
       token: stored.token,
       isAuthenticated: true,
-      isLoading: false,
     }
   }
   return {
     user: null,
     token: null,
     isAuthenticated: false,
-    isLoading: false,
   }
 }
 
@@ -50,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       token,
       isAuthenticated: true,
-      isLoading: false,
     })
   }
 
@@ -60,7 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: null,
       token: null,
       isAuthenticated: false,
-      isLoading: false,
     })
   }
 

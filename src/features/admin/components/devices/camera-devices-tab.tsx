@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { ShoppingCart } from 'lucide-react'
 import { useCameraDevices } from '../../api'
+import { useAdminTab } from '../../hooks'
 import type { CameraDevice, CameraDeviceFilters } from '../../types'
 import { AdminToolbar } from '../admin-toolbar'
 import { StatusBadge } from '../status-badge'
@@ -13,8 +13,14 @@ import { vehicles } from '@/mocks/data'
 
 export function CameraDevicesTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<CameraDeviceFilters>({})
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    handlePaginationChange,
+  } = useAdminTab<CameraDeviceFilters, CameraDevice>({
+    defaultFilters: {},
+  })
 
   const { data, isLoading, refetch } = useCameraDevices({
     ...filters,
@@ -88,12 +94,7 @@ export function CameraDevicesTab() {
           <Select
             options={vehicleOptions}
             value={filters.vehicleId || 'all'}
-            onChange={(value) =>
-              setFilters((f) => ({
-                ...f,
-                vehicleId: value as CameraDeviceFilters['vehicleId'],
-              }))
-            }
+            onChange={(value) => updateFilter('vehicleId', value as CameraDeviceFilters['vehicleId'])}
             placeholder={t('filters.vehicle')}
             className="w-[150px]"
           />
@@ -121,9 +122,7 @@ export function CameraDevicesTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   )

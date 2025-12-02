@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useDrivers } from '../api'
+import { useAdminTab } from '../hooks'
 import type { Driver, DriverFilters } from '../types'
+import { STATUS_VALUES } from '../constants'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
 import { DriverDialog } from './dialogs'
@@ -12,12 +13,19 @@ import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function DriversTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<DriverFilters>({
-    status: 'active',
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    dialogOpen,
+    setDialogOpen,
+    selectedItem: selectedDriver,
+    handleAdd,
+    handleRowClick,
+    handlePaginationChange,
+  } = useAdminTab<DriverFilters, Driver>({
+    defaultFilters: { status: 'active' },
   })
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null)
 
   const { data, isLoading, refetch } = useDrivers({
     ...filters,
@@ -87,20 +95,6 @@ export function DriversTab() {
     },
   ]
 
-  const handleAddDriver = () => {
-    setSelectedDriver(null)
-    setDialogOpen(true)
-  }
-
-  const handleRowClick = (driver: Driver) => {
-    setSelectedDriver(driver)
-    setDialogOpen(true)
-  }
-
-  const handleDialogSuccess = () => {
-    refetch()
-  }
-
   return (
     <div>
       <AdminToolbar
@@ -110,36 +104,30 @@ export function DriversTab() {
               placeholder={t('filters.name')}
               value={filters.name || ''}
               debounce={300}
-              onDebounceChange={(value) => setFilters((f) => ({ ...f, name: value }))}
+              onDebounceChange={(value) => updateFilter('name', value)}
               className="w-[200px]"
             />
             <Input
               placeholder={t('filters.phone')}
               value={filters.phone || ''}
               debounce={300}
-              onDebounceChange={(value) => setFilters((f) => ({ ...f, phone: value }))}
+              onDebounceChange={(value) => updateFilter('phone', value)}
               className="w-[150px]"
             />
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                { value: 'active', label: t('status.active') },
-                { value: 'inactive', label: t('status.inactive') },
+                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
               ]}
               value={filters.status || 'active'}
-              onChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  status: value as DriverFilters['status'],
-                }))
-              }
+              onChange={(value) => updateFilter('status', value as DriverFilters['status'])}
               placeholder={t('filters.status')}
               className="w-[130px]"
             />
           </>
         }
         addButton={
-          <Button size="sm" prefixIcon={<Plus />} onClick={handleAddDriver}>
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
             <span className="hidden sm:inline">{t('actions.addDriver')}</span>
           </Button>
         }
@@ -155,9 +143,7 @@ export function DriversTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
         onRowClick={handleRowClick}
       />
 
@@ -165,7 +151,7 @@ export function DriversTab() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         driver={selectedDriver}
-        onSuccess={handleDialogSuccess}
+        onSuccess={refetch}
       />
     </div>
   )

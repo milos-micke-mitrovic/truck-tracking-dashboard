@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useTrailers } from '../api'
+import { useAdminTab } from '../hooks'
 import type { Trailer, TrailerFilters } from '../types'
+import { STATUS_VALUES, OWNERSHIP_VALUES } from '../constants'
 import { AdminToolbar } from './admin-toolbar'
 import { AddTrailerDialog } from './dialogs'
 import { Button, Input, Select, Badge, BodySmall, Caption } from '@/shared/ui'
@@ -11,10 +12,14 @@ import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function TrailersTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<TrailerFilters>({
-    status: 'active',
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    handlePaginationChange,
+  } = useAdminTab<TrailerFilters, Trailer>({
+    defaultFilters: { status: 'active' },
   })
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
 
   const { data, isLoading, refetch } = useTrailers({
     ...filters,
@@ -103,40 +108,26 @@ export function TrailersTab() {
               placeholder={t('filters.trailerId')}
               value={filters.trailerId || ''}
               debounce={300}
-              onDebounceChange={(value) =>
-                setFilters((f) => ({ ...f, trailerId: value }))
-              }
+              onDebounceChange={(value) => updateFilter('trailerId', value)}
               className="w-[150px]"
             />
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                { value: 'company', label: t('ownership.company') },
-                { value: 'contractor', label: t('ownership.contractor') },
+                ...OWNERSHIP_VALUES.map((value) => ({ value, label: t(`ownership.${value}`) })),
               ]}
               value={filters.ownership || 'all'}
-              onChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  ownership: value as TrailerFilters['ownership'],
-                }))
-              }
+              onChange={(value) => updateFilter('ownership', value as TrailerFilters['ownership'])}
               placeholder={t('filters.ownership')}
               className="w-[130px]"
             />
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                { value: 'active', label: t('status.active') },
-                { value: 'inactive', label: t('status.inactive') },
+                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
               ]}
               value={filters.status || 'active'}
-              onChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  status: value as TrailerFilters['status'],
-                }))
-              }
+              onChange={(value) => updateFilter('status', value as TrailerFilters['status'])}
               placeholder={t('filters.status')}
               className="w-[130px]"
             />
@@ -164,9 +155,7 @@ export function TrailersTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   )

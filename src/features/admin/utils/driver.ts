@@ -1,16 +1,9 @@
-import type { Driver, DriverDocument, DriverFormValues } from '../types'
-
-// Default documents for new driver
-export const defaultDriverDocuments: DriverDocument[] = [
-  { id: 'doc-1', type: 'cdl', fileName: null, expirationDate: null },
-  { id: 'doc-2', type: 'mvr', fileName: null, expirationDate: null },
-  { id: 'doc-3', type: 'ssn_card', fileName: null, expirationDate: null },
-  { id: 'doc-4', type: 'drug_test', fileName: null, expirationDate: null },
-  { id: 'doc-5', type: 'application', fileName: null, expirationDate: null },
-  { id: 'doc-6', type: 'medical_card', fileName: null, expirationDate: null },
-  { id: 'doc-7', type: 'employment_verification', fileName: null, expirationDate: null },
-  { id: 'doc-8', type: 'clearing_house', fileName: null, expirationDate: null },
-]
+import type { Driver, DriverFormValues } from '../types'
+import {
+  DEFAULT_DRIVER_DOCUMENTS,
+  DEFAULT_CYCLE_RULE,
+  DEFAULT_CONSTANT_EXCEPTIONS,
+} from '../constants'
 
 // Helper to get default form values
 export function getDriverFormDefaults(driver?: Driver | null): DriverFormValues {
@@ -52,8 +45,8 @@ export function getDriverFormDefaults(driver?: Driver | null): DriverFormValues 
     email: '',
     address: '',
     comments: '',
-    cycleRule: 'usa_70_8',
-    constantExceptions: 'none',
+    cycleRule: DEFAULT_CYCLE_RULE,
+    constantExceptions: DEFAULT_CONSTANT_EXCEPTIONS,
     personalUse: false,
     yardMoves: false,
     exempt: false,
@@ -67,6 +60,6 @@ export function getDriverFormDefaults(driver?: Driver | null): DriverFormValues 
     debt: '',
     settlementMinimalAmount: '',
     scheduledItems: '',
-    documents: defaultDriverDocuments.map((d) => ({ ...d })),
+    documents: DEFAULT_DRIVER_DOCUMENTS.map((d) => ({ ...d })),
   }
 }

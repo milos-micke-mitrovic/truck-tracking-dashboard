@@ -8,8 +8,9 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { H4 } from '@/shared/ui/typography'
+import { FormSection } from '@/shared/components'
 import type { DriverFormValues } from '../../../types'
+import { COMPENSATION_TYPE_VALUES, SCHEDULED_ITEMS_VALUES } from '../../../constants'
 
 export function AccountingTab() {
   const { t } = useTranslation('admin')
@@ -17,24 +18,24 @@ export function AccountingTab() {
 
   const compensationTypeOptions = [
     { value: '', label: t('driverDialog.selectType') },
-    { value: 'per_mile', label: t('driverDialog.compensationType.perMile') },
-    { value: 'per_hour', label: t('driverDialog.compensationType.perHour') },
-    { value: 'percentage', label: t('driverDialog.compensationType.percentage') },
-    { value: 'flat_rate', label: t('driverDialog.compensationType.flatRate') },
+    ...COMPENSATION_TYPE_VALUES.map((value) => ({
+      value,
+      label: t(`driverDialog.compensationType.${value === 'per_mile' ? 'perMile' : value === 'per_hour' ? 'perHour' : value === 'flat_rate' ? 'flatRate' : value}`),
+    })),
   ]
 
   const scheduledItemsOptions = [
     { value: '', label: t('driverDialog.selectScheduledItems') },
-    { value: 'weekly', label: t('driverDialog.scheduledItems.weekly') },
-    { value: 'biweekly', label: t('driverDialog.scheduledItems.biweekly') },
-    { value: 'monthly', label: t('driverDialog.scheduledItems.monthly') },
+    ...SCHEDULED_ITEMS_VALUES.map((value) => ({
+      value,
+      label: t(`driverDialog.scheduledItems.${value}`),
+    })),
   ]
 
   return (
     <TabsContent value="accounting" className="mt-0 space-y-3">
       {/* Compensation */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('driverDialog.compensation')}</H4>
+      <FormSection title={t('driverDialog.compensation')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
             control={control}
@@ -65,11 +66,10 @@ export function AccountingTab() {
             )}
           />
         </div>
-      </div>
+      </FormSection>
 
       {/* Escrow */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('driverDialog.escrow')}</H4>
+      <FormSection title={t('driverDialog.escrow')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
             control={control}
@@ -98,11 +98,10 @@ export function AccountingTab() {
             )}
           />
         </div>
-      </div>
+      </FormSection>
 
       {/* Settlement */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('driverDialog.settlement')}</H4>
+      <FormSection title={t('driverDialog.settlement')}>
         <FormField
           control={control}
           name="debt"
@@ -144,7 +143,7 @@ export function AccountingTab() {
             </FormItem>
           )}
         />
-      </div>
+      </FormSection>
     </TabsContent>
   )
 }

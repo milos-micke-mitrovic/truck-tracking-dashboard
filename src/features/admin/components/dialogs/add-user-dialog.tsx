@@ -21,6 +21,7 @@ import {
 } from '@/shared/ui/form'
 import { Input, Select } from '@/shared/ui/primitives'
 import type { Department, UserRole } from '../../types'
+import { DEPARTMENT_VALUES, ROLE_VALUES } from '../../constants'
 
 type AddUserFormValues = {
   name: string
@@ -51,19 +52,15 @@ export function AddUserDialog({ trigger, onSuccess }: AddUserDialogProps) {
     },
   })
 
-  const departmentOptions = [
-    { value: 'dispatch', label: t('departments.dispatch') },
-    { value: 'accounting', label: t('departments.accounting') },
-    { value: 'fleet_management', label: t('departments.fleet_management') },
-    { value: 'operations', label: t('departments.operations') },
-    { value: 'safety', label: t('departments.safety') },
-  ]
+  const departmentOptions = DEPARTMENT_VALUES.map((value) => ({
+    value,
+    label: t(`departments.${value}`),
+  }))
 
-  const roleOptions = [
-    { value: 'company_admin', label: t('roles.company_admin') },
-    { value: 'support_personnel', label: t('roles.support_personnel') },
-    { value: 'dispatcher', label: t('roles.dispatcher') },
-  ]
+  const roleOptions = ROLE_VALUES.map((value) => ({
+    value,
+    label: t(`roles.${value}`),
+  }))
 
   const handleSubmit = async (values: AddUserFormValues) => {
     // Simulate API call

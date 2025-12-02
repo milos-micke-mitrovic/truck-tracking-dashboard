@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { ShoppingCart } from 'lucide-react'
 import { useEldDevices } from '../../api'
+import { useAdminTab } from '../../hooks'
 import type { EldDevice, EldDeviceFilters } from '../../types'
 import { AdminToolbar } from '../admin-toolbar'
 import { StatusBadge } from '../status-badge'
@@ -12,8 +12,14 @@ import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function EldDevicesTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<EldDeviceFilters>({})
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    handlePaginationChange,
+  } = useAdminTab<EldDeviceFilters, EldDevice>({
+    defaultFilters: {},
+  })
 
   const { data, isLoading, refetch } = useEldDevices({
     ...filters,
@@ -118,18 +124,14 @@ export function EldDevicesTab() {
               placeholder={t('filters.serialNumber')}
               value={filters.serialNumber || ''}
               debounce={300}
-              onDebounceChange={(value) =>
-                setFilters((f) => ({ ...f, serialNumber: value }))
-              }
+              onDebounceChange={(value) => updateFilter('serialNumber', value)}
               className="w-[180px]"
             />
             <Input
               placeholder={t('filters.macAddress')}
               value={filters.macAddress || ''}
               debounce={300}
-              onDebounceChange={(value) =>
-                setFilters((f) => ({ ...f, macAddress: value }))
-              }
+              onDebounceChange={(value) => updateFilter('macAddress', value)}
               className="w-[180px]"
             />
           </>
@@ -157,9 +159,7 @@ export function EldDevicesTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   )

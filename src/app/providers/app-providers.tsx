@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'sonner'
+import { Toaster, toast } from 'sonner'
 import { AuthProvider } from '@/features/auth'
 
 const queryClient = new QueryClient({
@@ -9,6 +9,12 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 5,
       retry: 1,
       refetchOnWindowFocus: false,
+    },
+    mutations: {
+      onError: (error) => {
+        const message = error instanceof Error ? error.message : 'An unexpected error occurred'
+        toast.error(message)
+      },
     },
   },
 })

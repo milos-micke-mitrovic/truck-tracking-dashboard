@@ -8,24 +8,23 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { H4 } from '@/shared/ui/typography'
+import { FormSection } from '@/shared/components'
 import type { DriverFormValues } from '../../../types'
+import { STATUS_VALUES } from '../../../constants'
 
 export function GeneralTab() {
   const { t } = useTranslation('admin')
   const { control } = useFormContext<DriverFormValues>()
 
-  const statusOptions = [
-    { value: 'active', label: t('status.active') },
-    { value: 'inactive', label: t('status.inactive') },
-  ]
+  const statusOptions = STATUS_VALUES.map((value) => ({
+    value,
+    label: t(`status.${value}`),
+  }))
 
   return (
     <TabsContent value="general" className="mt-0 space-y-3">
       {/* Personal Info section */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('driverDialog.personalInfo')}</H4>
-
+      <FormSection title={t('driverDialog.personalInfo')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
             control={control}
@@ -87,11 +86,10 @@ export function GeneralTab() {
             </FormItem>
           )}
         />
-      </div>
+      </FormSection>
 
       {/* Contact section */}
-      <div className="space-y-3 p-3 border rounded-lg">
-        <H4 className="text-primary">{t('driverDialog.contact')}</H4>
+      <FormSection title={t('driverDialog.contact')}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
             control={control}
@@ -134,7 +132,7 @@ export function GeneralTab() {
             </FormItem>
           )}
         />
-      </div>
+      </FormSection>
 
       {/* Comments */}
       <FormField

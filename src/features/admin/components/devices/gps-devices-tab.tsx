@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { ShoppingCart } from 'lucide-react'
 import { useGpsDevices } from '../../api'
+import { useAdminTab } from '../../hooks'
 import type { GpsDevice, GpsDeviceFilters } from '../../types'
 import { AdminToolbar } from '../admin-toolbar'
 import { StatusBadge } from '../status-badge'
@@ -12,8 +12,14 @@ import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function GpsDevicesTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<GpsDeviceFilters>({})
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    handlePaginationChange,
+  } = useAdminTab<GpsDeviceFilters, GpsDevice>({
+    defaultFilters: {},
+  })
 
   const { data, isLoading, refetch } = useGpsDevices({
     ...filters,
@@ -82,9 +88,7 @@ export function GpsDevicesTab() {
             placeholder={t('filters.snNumber')}
             value={filters.serialNumber || ''}
             debounce={300}
-            onDebounceChange={(value) =>
-              setFilters((f) => ({ ...f, serialNumber: value }))
-            }
+            onDebounceChange={(value) => updateFilter('serialNumber', value)}
             className="w-[200px]"
           />
         }
@@ -111,9 +115,7 @@ export function GpsDevicesTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   )

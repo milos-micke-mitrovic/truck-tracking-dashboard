@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useVehicles } from '../api'
+import { useAdminTab } from '../hooks'
 import type { Vehicle, VehicleFilters } from '../types'
+import { STATUS_VALUES } from '../constants'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
 import { AddVehicleDialog } from './dialogs'
@@ -12,10 +13,14 @@ import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function VehiclesTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<VehicleFilters>({
-    status: 'active',
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    handlePaginationChange,
+  } = useAdminTab<VehicleFilters, Vehicle>({
+    defaultFilters: { status: 'active' },
   })
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
 
   const { data, isLoading, refetch } = useVehicles({
     ...filters,
@@ -114,24 +119,16 @@ export function VehiclesTab() {
               placeholder={t('filters.unitNumber')}
               value={filters.unitNumber || ''}
               debounce={300}
-              onDebounceChange={(value) =>
-                setFilters((f) => ({ ...f, unitNumber: value }))
-              }
+              onDebounceChange={(value) => updateFilter('unitNumber', value)}
               className="w-[150px]"
             />
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                { value: 'active', label: t('status.active') },
-                { value: 'inactive', label: t('status.inactive') },
+                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
               ]}
               value={filters.status || 'active'}
-              onChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  status: value as VehicleFilters['status'],
-                }))
-              }
+              onChange={(value) => updateFilter('status', value as VehicleFilters['status'])}
               placeholder={t('filters.status')}
               className="w-[130px]"
             />
@@ -159,9 +156,7 @@ export function VehiclesTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   )

@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useUsers } from '../api'
+import { useAdminTab } from '../hooks'
 import type { User, UserFilters } from '../types'
+import { STATUS_VALUES, DEPARTMENT_VALUES } from '../constants'
 import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
 import { AddUserDialog } from './dialogs'
@@ -12,10 +13,14 @@ import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
 export function UsersTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<UserFilters>({
-    status: 'active',
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    handlePaginationChange,
+  } = useAdminTab<UserFilters, User>({
+    defaultFilters: { status: 'active' },
   })
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
 
   const { data, isLoading, refetch } = useUsers({
     ...filters,
@@ -108,44 +113,26 @@ export function UsersTab() {
               placeholder={t('filters.name')}
               value={filters.name || ''}
               debounce={300}
-              onDebounceChange={(value) => setFilters((f) => ({ ...f, name: value }))}
+              onDebounceChange={(value) => updateFilter('name', value)}
               className="w-[200px]"
             />
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                { value: 'dispatch', label: t('departments.dispatch') },
-                { value: 'accounting', label: t('departments.accounting') },
-                {
-                  value: 'fleet_management',
-                  label: t('departments.fleet_management'),
-                },
-                { value: 'operations', label: t('departments.operations') },
-                { value: 'safety', label: t('departments.safety') },
+                ...DEPARTMENT_VALUES.map((value) => ({ value, label: t(`departments.${value}`) })),
               ]}
               value={filters.department || 'all'}
-              onChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  department: value as UserFilters['department'],
-                }))
-              }
+              onChange={(value) => updateFilter('department', value as UserFilters['department'])}
               placeholder={t('filters.department')}
               className="w-[160px]"
             />
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                { value: 'active', label: t('status.active') },
-                { value: 'inactive', label: t('status.inactive') },
+                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
               ]}
               value={filters.status || 'active'}
-              onChange={(value) =>
-                setFilters((f) => ({
-                  ...f,
-                  status: value as UserFilters['status'],
-                }))
-              }
+              onChange={(value) => updateFilter('status', value as UserFilters['status'])}
               placeholder={t('filters.status')}
               className="w-[130px]"
             />
@@ -173,9 +160,7 @@ export function UsersTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   )

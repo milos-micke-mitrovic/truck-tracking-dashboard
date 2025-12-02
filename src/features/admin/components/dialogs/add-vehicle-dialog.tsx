@@ -21,6 +21,7 @@ import {
 } from '@/shared/ui/form'
 import { Input, Select } from '@/shared/ui/primitives'
 import type { VehicleMake } from '../../types'
+import { VEHICLE_MAKE_OPTIONS } from '../../constants'
 
 type AddVehicleFormValues = {
   unitNumber: string
@@ -51,14 +52,7 @@ export function AddVehicleDialog({ trigger, onSuccess }: AddVehicleDialogProps) 
     },
   })
 
-  const makeOptions = [
-    { value: 'VOLVO TRUCK', label: 'Volvo Truck' },
-    { value: 'FREIGHTLINER', label: 'Freightliner' },
-    { value: 'INTERNATIONAL', label: 'International' },
-    { value: 'KENWORTH', label: 'Kenworth' },
-    { value: 'PETERBILT', label: 'Peterbilt' },
-    { value: 'MACK', label: 'Mack' },
-  ]
+  const makeOptions = [...VEHICLE_MAKE_OPTIONS]
 
   const handleSubmit = async (values: AddVehicleFormValues) => {
     // Simulate API call

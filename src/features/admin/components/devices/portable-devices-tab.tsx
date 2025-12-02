@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { ShoppingCart } from 'lucide-react'
 import { usePortableDevices } from '../../api'
+import { useAdminTab } from '../../hooks'
 import type { PortableDevice, PortableDeviceFilters } from '../../types'
 import { AdminToolbar } from '../admin-toolbar'
 import { StatusBadge } from '../status-badge'
@@ -13,8 +13,14 @@ import { drivers } from '@/mocks/data'
 
 export function PortableDevicesTab() {
   const { t } = useTranslation('admin')
-  const [filters, setFilters] = useState<PortableDeviceFilters>({})
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 20 })
+  const {
+    filters,
+    updateFilter,
+    pagination,
+    handlePaginationChange,
+  } = useAdminTab<PortableDeviceFilters, PortableDevice>({
+    defaultFilters: {},
+  })
 
   const { data, isLoading, refetch } = usePortableDevices({
     ...filters,
@@ -108,12 +114,7 @@ export function PortableDevicesTab() {
           <Select
             options={driverOptions}
             value={filters.driverId || 'all'}
-            onChange={(value) =>
-              setFilters((f) => ({
-                ...f,
-                driverId: value as PortableDeviceFilters['driverId'],
-              }))
-            }
+            onChange={(value) => updateFilter('driverId', value as PortableDeviceFilters['driverId'])}
             placeholder={t('filters.driver')}
             className="w-[150px]"
           />
@@ -141,9 +142,7 @@ export function PortableDevicesTab() {
         totalCount={data?.meta.total}
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
-        onPaginationChange={(state: PaginationState) =>
-          setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
-        }
+        onPaginationChange={handlePaginationChange}
       />
     </div>
   )

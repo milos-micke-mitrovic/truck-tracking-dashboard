@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '@/shared/ui/form'
 import { Input, Select } from '@/shared/ui/primitives'
+import { FLEET_OPTIONS, PLAN_VALUES } from '../../constants'
 
 type AddCompanyFormValues = {
   name: string
@@ -52,17 +53,15 @@ export function AddCompanyDialog({ trigger, onSuccess }: AddCompanyDialogProps) 
     },
   })
 
-  const fleetOptions = [
-    { value: 'starter', label: 'Starter' },
-    { value: 'established', label: t('fleet.established') },
-    { value: 'eminent', label: t('fleet.eminent') },
-  ]
+  const fleetOptions = FLEET_OPTIONS.map((opt) => ({
+    value: opt.value,
+    label: opt.value === 'starter' ? opt.label : t(`fleet.${opt.value}`),
+  }))
 
-  const planOptions = [
-    { value: 'basic', label: t('plan.basic') },
-    { value: 'premium', label: t('plan.premium') },
-    { value: 'enterprise', label: t('plan.enterprise') },
-  ]
+  const planOptions = PLAN_VALUES.map((value) => ({
+    value,
+    label: t(`plan.${value}`),
+  }))
 
   const handleSubmit = async (values: AddCompanyFormValues) => {
     // Simulate API call
