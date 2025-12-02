@@ -51,6 +51,26 @@ export type DriverAccounting = {
   scheduledItems: string | null
 }
 
+// License
+export type DriverLicense = {
+  country: string
+  state: string
+  number: string
+}
+
+// Assigned To
+export type DriverAssignment = {
+  homeTerminal: string
+  suggestedVehicles: string[]
+}
+
+// Custom Attribute
+export type DriverAttribute = {
+  id: string
+  attribute: string
+  value: string
+}
+
 // Driver entity
 export type Driver = {
   id: string
@@ -65,6 +85,15 @@ export type Driver = {
   email: string
   address: string
   comments: string
+  // Credentials
+  username: string
+  // License
+  license: DriverLicense
+  // Assigned To
+  assignment: DriverAssignment
+  // Tags & Attributes
+  tags: string[]
+  attributes: DriverAttribute[]
   // Configurations
   configurations: DriverConfigurations
   // Accounting
@@ -73,7 +102,6 @@ export type Driver = {
   documents: DriverDocument[]
   // Legacy fields for table display
   name: string
-  username: string
   personalUse: EnabledDisabled
   yardMoves: EnabledDisabled
   exempt: EnabledDisabled
@@ -89,7 +117,7 @@ export type DriverFilters = {
 
 // Form values for driver dialog
 export type DriverFormValues = {
-  // General
+  // General - Personal Info
   firstName: string
   lastName: string
   dateOfBirth: string | null
@@ -98,6 +126,23 @@ export type DriverFormValues = {
   email: string
   address: string
   comments: string
+  // General - Credentials
+  username: string
+  newPassword: string
+  // General - License
+  licenseCountry: string
+  licenseState: string
+  licenseNumber: string
+  // General - Assigned To
+  homeTerminal: string
+  suggestedVehicles: string[]
+  // General - Tags & Attributes
+  tags: string[]
+  attributes: {
+    id: string
+    attribute: string
+    value: string
+  }[]
   // Configurations - HoS
   cycleRule: string
   constantExceptions: string

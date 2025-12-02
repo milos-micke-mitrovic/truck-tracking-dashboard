@@ -1,4 +1,4 @@
-import type { Driver, DriverConfigurations, DriverAccounting, DriverDocument } from '@/features/admin/types'
+import type { Driver, DriverConfigurations, DriverAccounting, DriverDocument, DriverLicense, DriverAttribute } from '@/features/admin/types'
 
 const defaultConfigurations: DriverConfigurations = {
   hos: {
@@ -24,6 +24,13 @@ const defaultAccounting: DriverAccounting = {
   settlementMinimalAmount: null,
   scheduledItems: null,
 }
+
+const defaultLicense: DriverLicense = {
+  country: 'us',
+  state: 'NC',
+  number: '',
+}
+
 
 const defaultDocuments: DriverDocument[] = [
   { id: 'doc-1', type: 'cdl', fileName: null, expirationDate: null },
@@ -52,6 +59,12 @@ function createDriver(
     personalUse: boolean
     yardMoves: boolean
     exempt: boolean
+    licenseNumber: string
+    licenseState: string
+    homeTerminal: string
+    suggestedVehicles: string[]
+    tags: string[]
+    attributes: DriverAttribute[]
   }> = {}
 ): Driver {
   const name = `${firstName} ${lastName}`
@@ -71,6 +84,17 @@ function createDriver(
     email,
     address: options.address || '',
     comments: options.comments || '',
+    license: {
+      ...defaultLicense,
+      number: options.licenseNumber || `${Math.floor(10000000 + Math.random() * 90000000)}`,
+      state: options.licenseState || 'NC',
+    },
+    assignment: {
+      homeTerminal: options.homeTerminal || '',
+      suggestedVehicles: options.suggestedVehicles || [],
+    },
+    tags: options.tags || [],
+    attributes: options.attributes || [],
     configurations: {
       ...defaultConfigurations,
       hos: {

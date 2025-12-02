@@ -11,7 +11,12 @@ import {
 import { Caption } from '@/shared/ui/typography'
 import { FormSection } from '@/shared/components'
 import type { CompanyFormValues } from '../../../types'
-import { CYCLE_RULE_OPTIONS, CONSTANT_EXCEPTIONS_VALUES } from '../../../constants'
+import {
+  CYCLE_RULE_OPTIONS,
+  CONSTANT_EXCEPTIONS_VALUES,
+  WEEK_DAY_VALUES,
+  SETTLEMENT_TEMPLATE_VALUES,
+} from '../../../constants'
 
 export function ConfigurationsTab() {
   const { t } = useTranslation('admin')
@@ -49,37 +54,39 @@ export function ConfigurationsTab() {
 
       {/* HoS Configuration */}
       <FormSection title={t('companyDialog.hosConfig')}>
-        <FormField
-          control={control}
-          name="cycleRule"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('companyDialog.cycleRule')}</FormLabel>
-              <Select
-                options={[...CYCLE_RULE_OPTIONS]}
-                value={field.value}
-                onChange={field.onChange}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="constantExceptions"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('companyDialog.constantExceptions')}</FormLabel>
-              <Select
-                options={constantExceptionsOptions}
-                value={field.value}
-                onChange={field.onChange}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
+          <FormField
+            control={control}
+            name="cycleRule"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('companyDialog.cycleRule')}</FormLabel>
+                <Select
+                  options={[...CYCLE_RULE_OPTIONS]}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="constantExceptions"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('companyDialog.constantExceptions')}</FormLabel>
+                <Select
+                  options={constantExceptionsOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid md:grid-cols-2 gap-3">
           <FormField
             control={control}
             name="personalUse"
@@ -156,7 +163,45 @@ export function ConfigurationsTab() {
 
       {/* Accounting Configuration */}
       <FormSection title={t('companyDialog.accountingConfig')}>
-        <Caption color="muted">{t('companyDialog.accountingConfigPlaceholder')}</Caption>
+        <div className="grid md:grid-cols-2 gap-3">
+          <FormField
+            control={control}
+            name="settlementTemplate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('companyDialog.settlementTemplate')}</FormLabel>
+                <Select
+                  options={SETTLEMENT_TEMPLATE_VALUES.map((value) => ({
+                    value,
+                    label: t(`companyDialog.settlementTemplates.${value}`),
+                  }))}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={t('companyDialog.selectSettlementTemplate')}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="weekPeriodStartDay"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('companyDialog.weekPeriodStartDay')} *</FormLabel>
+                <Select
+                  options={WEEK_DAY_VALUES.map((value) => ({
+                    value,
+                    label: t(`companyDialog.weekDays.${value}`),
+                  }))}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </FormSection>
     </TabsContent>
   )

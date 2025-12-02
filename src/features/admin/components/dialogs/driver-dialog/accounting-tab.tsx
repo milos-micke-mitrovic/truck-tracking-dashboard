@@ -36,7 +36,7 @@ export function AccountingTab() {
     <TabsContent value="accounting" className="mt-0 space-y-3">
       {/* Compensation */}
       <FormSection title={t('driverDialog.compensation')}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
           <FormField
             control={control}
             name="compensationType"
@@ -70,7 +70,7 @@ export function AccountingTab() {
 
       {/* Escrow */}
       <FormSection title={t('driverDialog.escrow')}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
           <FormField
             control={control}
             name="escrowDeposited"
@@ -102,47 +102,49 @@ export function AccountingTab() {
 
       {/* Settlement */}
       <FormSection title={t('driverDialog.settlement')}>
-        <FormField
-          control={control}
-          name="debt"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('driverDialog.debt')}</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="settlementMinimalAmount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('driverDialog.settlementMinimalAmount')}</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={control}
-          name="scheduledItems"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('driverDialog.scheduledItems.label')}</FormLabel>
-              <Select
-                options={scheduledItemsOptions}
-                value={field.value}
-                onChange={field.onChange}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid md:grid-cols-3 gap-3">
+          <FormField
+            control={control}
+            name="debt"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('driverDialog.debt')}</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="settlementMinimalAmount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('driverDialog.settlementMinimalAmount')}</FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="scheduledItems"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('driverDialog.scheduledItems.label')}</FormLabel>
+                <Select
+                  options={scheduledItemsOptions}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </FormSection>
     </TabsContent>
   )

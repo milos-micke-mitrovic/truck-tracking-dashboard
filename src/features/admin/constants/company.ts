@@ -35,3 +35,14 @@ export const DEFAULT_CARGO_TYPE: CargoTypeValue = 'property'
 
 // ELD configuration defaults
 export const DEFAULT_VEHICLE_MOTION_SPEED_THRESHOLD = 5
+
+// Accounting configuration
+export const WEEK_DAY_VALUES = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
+export type WeekDayValue = (typeof WEEK_DAY_VALUES)[number]
+
+export const DEFAULT_WEEK_PERIOD_START_DAY: WeekDayValue = 'mon'
+
+export const SETTLEMENT_TEMPLATE_VALUES = ['standard', 'weekly', 'biweekly', 'monthly'] as const
+export type SettlementTemplateValue = (typeof SETTLEMENT_TEMPLATE_VALUES)[number]
+
+export const DEFAULT_SETTLEMENT_TEMPLATE: SettlementTemplateValue = 'standard'

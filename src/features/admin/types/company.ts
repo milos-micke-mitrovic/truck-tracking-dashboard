@@ -43,10 +43,16 @@ export type CompanyAppConfig = {
   requirePasscodeToExitInspection: boolean
 }
 
+export type CompanyAccountingConfig = {
+  settlementTemplate: string
+  weekPeriodStartDay: string
+}
+
 export type CompanyConfigurations = {
   eld: CompanyEldConfig
   hos: CompanyHosConfig
   app: CompanyAppConfig
+  accounting: CompanyAccountingConfig
 }
 
 // Company entity
@@ -122,6 +128,9 @@ export type CompanyFormValues = {
   joinHosClocks: boolean
   showTmsDashboard: boolean
   requirePasscodeToExitInspection: boolean
+  // Configurations - Accounting
+  settlementTemplate: string
+  weekPeriodStartDay: string
   // Documents
   documents: {
     id: string

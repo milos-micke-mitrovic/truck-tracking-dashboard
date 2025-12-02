@@ -9,6 +9,8 @@ import {
   DEFAULT_VEHICLE_MOTION_SPEED_THRESHOLD,
   DEFAULT_CYCLE_RULE,
   DEFAULT_CONSTANT_EXCEPTIONS,
+  DEFAULT_SETTLEMENT_TEMPLATE,
+  DEFAULT_WEEK_PERIOD_START_DAY,
 } from '../constants'
 
 // Helper to get default form values
@@ -35,6 +37,8 @@ export function getCompanyFormDefaults(company?: Company | null): CompanyFormVal
       joinHosClocks: company.configurations.app.joinHosClocks,
       showTmsDashboard: company.configurations.app.showTmsDashboard,
       requirePasscodeToExitInspection: company.configurations.app.requirePasscodeToExitInspection,
+      settlementTemplate: company.configurations.accounting.settlementTemplate,
+      weekPeriodStartDay: company.configurations.accounting.weekPeriodStartDay,
       documents: company.documents.map((d) => ({ ...d })),
     }
   }
@@ -67,6 +71,8 @@ export function getCompanyFormDefaults(company?: Company | null): CompanyFormVal
     joinHosClocks: true,
     showTmsDashboard: true,
     requirePasscodeToExitInspection: true,
+    settlementTemplate: DEFAULT_SETTLEMENT_TEMPLATE,
+    weekPeriodStartDay: DEFAULT_WEEK_PERIOD_START_DAY,
     documents: DEFAULT_COMPANY_DOCUMENTS.map((d) => ({ ...d })),
   }
 }

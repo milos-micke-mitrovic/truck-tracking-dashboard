@@ -62,7 +62,7 @@ export function GeneralTab() {
         />
 
         {/* Name fields */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
           <FormField
             control={control}
             name="name"
@@ -91,44 +91,40 @@ export function GeneralTab() {
               </FormItem>
             )}
           />
+          <FormField
+            control={control}
+            name="dotNumber"
+            rules={{ required: t('validation.required') }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('columns.dotNumber')}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="address"
+            rules={{ required: t('validation.required') }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('columns.address')}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-
-        {/* DOT Number */}
-        <FormField
-          control={control}
-          name="dotNumber"
-          rules={{ required: t('validation.required') }}
-          render={({ field }) => (
-            <FormItem className="sm:w-1/2">
-              <FormLabel>{t('columns.dotNumber')}</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Address */}
-        <FormField
-          control={control}
-          name="address"
-          rules={{ required: t('validation.required') }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('columns.address')}</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </FormSection>
 
       {/* Contact section */}
       <FormSection title={t('companyDialog.contact')}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
           <FormField
             control={control}
             name="phone"
@@ -161,7 +157,7 @@ export function GeneralTab() {
 
       {/* Subscription section */}
       <FormSection title={t('companyDialog.subscription')}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
           <FormField
             control={control}
             name="plan"
@@ -199,7 +195,7 @@ export function GeneralTab() {
 
       {/* Business Type section */}
       <FormSection title={t('companyDialog.businessType')}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid md:grid-cols-2 gap-3">
           <FormField
             control={control}
             name="industry"

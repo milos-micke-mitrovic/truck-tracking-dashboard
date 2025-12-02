@@ -15,6 +15,10 @@ const defaultConfigurations: CompanyConfigurations = {
     showTmsDashboard: true,
     requirePasscodeToExitInspection: true,
   },
+  accounting: {
+    settlementTemplate: 'standard',
+    weekPeriodStartDay: 'mon',
+  },
 }
 
 const defaultDocuments: CompanyDocument[] = [

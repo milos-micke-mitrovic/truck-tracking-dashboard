@@ -52,21 +52,20 @@ export function TerminalsTab() {
             )}
           </div>
 
-          <FormField
-            control={control}
-            name={`terminals.${index}.address`}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('columns.address')}</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid md:grid-cols-3 gap-3">
+            <FormField
+              control={control}
+              name={`terminals.${index}.address`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('columns.address')}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={control}
               name={`terminals.${index}.timezone`}
