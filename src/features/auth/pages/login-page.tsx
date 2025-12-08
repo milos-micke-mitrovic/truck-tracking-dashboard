@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
@@ -8,6 +8,7 @@ import type { TFunction } from 'i18next'
 import { toast } from 'sonner'
 import { Logo } from '@/shared/components'
 import { useLogin, useAuth } from '@/features/auth'
+import { Smartphone, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
 import {
   Button,
   H1,
@@ -26,6 +27,8 @@ import {
   Input,
 } from '@/shared/ui'
 
+const DRIVER_APP_URL = 'https://truck-drive.vercel.app'
+
 const createLoginSchema = (t: TFunction) =>
   z.object({
     username: z.string().min(1, t('login.validation.usernameRequired')),
@@ -39,6 +42,7 @@ export function LoginPage() {
   const navigate = useNavigate()
   const { login } = useAuth()
   const loginMutation = useLogin()
+  const [showInstallGuide, setShowInstallGuide] = useState(false)
 
   const loginSchema = useMemo(() => createLoginSchema(t), [t])
 
@@ -94,7 +98,7 @@ export function LoginPage() {
       </div>
 
       {/* Right side - Login form */}
-      <div className="flex w-full flex-col justify-center px-8 lg:w-1/2 lg:px-16">
+      <div className="flex w-full flex-col justify-center px-8 py-8 lg:w-1/2 lg:px-16 lg:py-0">
         <div className="mx-auto w-full max-w-sm">
           {/* Mobile logo */}
           <div className="mb-8 flex items-center gap-3 lg:hidden">
@@ -178,6 +182,70 @@ export function LoginPage() {
                 <Label>{t('login.demo.driver')}:</Label> driver / driver123
               </BodySmall>
             </div>
+          </div>
+
+          {/* Driver App section */}
+          <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Smartphone className="h-5 w-5 text-primary" />
+              <Label className="text-primary">{t('login.driverApp.title')}</Label>
+            </div>
+            <BodySmall color="muted" className="mb-3">
+              {t('login.driverApp.description')}
+            </BodySmall>
+
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => window.open(DRIVER_APP_URL, '_blank')}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                {t('login.driverApp.openApp')}
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => setShowInstallGuide(!showInstallGuide)}
+                className="flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t('login.driverApp.installGuide')}
+                {showInstallGuide ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+
+            {showInstallGuide && (
+              <div className="mt-4 space-y-4 pt-4 border-t border-primary/10">
+                {/* iOS Instructions */}
+                <div>
+                  <Label className="text-xs font-medium mb-2 block">
+                    {t('login.driverApp.ios.title')}
+                  </Label>
+                  <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>{t('login.driverApp.ios.step1')}</li>
+                    <li>{t('login.driverApp.ios.step2')}</li>
+                    <li>{t('login.driverApp.ios.step3')}</li>
+                  </ol>
+                </div>
+
+                {/* Android Instructions */}
+                <div>
+                  <Label className="text-xs font-medium mb-2 block">
+                    {t('login.driverApp.android.title')}
+                  </Label>
+                  <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>{t('login.driverApp.android.step1')}</li>
+                    <li>{t('login.driverApp.android.step2')}</li>
+                    <li>{t('login.driverApp.android.step3')}</li>
+                  </ol>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
