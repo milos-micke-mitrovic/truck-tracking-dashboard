@@ -38,7 +38,7 @@ export const Default: Story = {
           </SheetDescription>
         </SheetHeader>
         <div className="flex-1 p-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Sheet body content goes here.
           </p>
         </div>
@@ -67,7 +67,7 @@ export const LeftSide: Story = {
           </SheetDescription>
         </SheetHeader>
         <div className="flex-1 p-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Content for left side sheet.
           </p>
         </div>

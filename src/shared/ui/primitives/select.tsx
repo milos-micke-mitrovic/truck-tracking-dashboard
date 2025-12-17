@@ -7,11 +7,7 @@ import { cn } from '@/shared/utils'
 import { IconButton } from './button'
 import { Label } from './label'
 import { Caption } from '../typography'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../overlay/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '../overlay/popover'
 import {
   Command,
   CommandEmpty,
@@ -129,7 +125,9 @@ function Select({
                   }}
                 >
                   <span className="truncate">{option.label}</span>
-                  {value === option.value && <Check className="ml-auto size-4" />}
+                  {value === option.value && (
+                    <Check className="ml-auto size-4" />
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>

@@ -5,8 +5,7 @@ import { useTrailers } from '../api'
 import { useAdminTab } from '../hooks'
 import type { Trailer, TrailerFilters } from '../types'
 import { STATUS_VALUES, OWNERSHIP_VALUES } from '../constants'
-import { AdminToolbar } from './admin-toolbar'
-import { AddTrailerDialog } from './dialogs'
+import { TrailerSheet } from './dialogs'
 import { Button, Input, Select, Badge, BodySmall, Caption } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
@@ -17,6 +16,11 @@ export function TrailersTab() {
     updateFilter,
     pagination,
     handlePaginationChange,
+    dialogOpen,
+    setDialogOpen,
+    selectedItem,
+    handleRowClick,
+    handleAdd,
   } = useAdminTab<TrailerFilters, Trailer>({
     defaultFilters: { status: 'active' },
   })
@@ -101,51 +105,52 @@ export function TrailersTab() {
 
   return (
     <div>
-      <AdminToolbar
-        filters={
-          <>
-            <Input
-              placeholder={t('filters.trailerId')}
-              value={filters.trailerId || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('trailerId', value)}
-              className="w-[150px]"
-            />
-            <Select
-              options={[
-                { value: 'all', label: t('filters.all') },
-                ...OWNERSHIP_VALUES.map((value) => ({ value, label: t(`ownership.${value}`) })),
-              ]}
-              value={filters.ownership || 'all'}
-              onChange={(value) => updateFilter('ownership', value as TrailerFilters['ownership'])}
-              placeholder={t('filters.ownership')}
-              className="w-[130px]"
-            />
-            <Select
-              options={[
-                { value: 'all', label: t('filters.all') },
-                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
-              ]}
-              value={filters.status || 'active'}
-              onChange={(value) => updateFilter('status', value as TrailerFilters['status'])}
-              placeholder={t('filters.status')}
-              className="w-[130px]"
-            />
-          </>
-        }
-        addButton={
-          <AddTrailerDialog
-            trigger={
-              <Button size="sm" prefixIcon={<Plus />}>
-                <span className="hidden sm:inline">{t('actions.addTrailer')}</span>
-              </Button>
-            }
-            onSuccess={() => refetch()}
+      <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            placeholder={t('filters.trailerId')}
+            value={filters.trailerId || ''}
+            debounce={300}
+            onDebounceChange={(value) => updateFilter('trailerId', value)}
+            className="w-[150px]"
           />
-        }
-        onExport={() => {}}
-        onRefresh={() => refetch()}
-      />
+          <Select
+            options={[
+              { value: 'all', label: t('filters.all') },
+              ...OWNERSHIP_VALUES.map((value) => ({
+                value,
+                label: t(`ownership.${value}`),
+              })),
+            ]}
+            value={filters.ownership || 'all'}
+            onChange={(value) =>
+              updateFilter('ownership', value as TrailerFilters['ownership'])
+            }
+            placeholder={t('filters.ownership')}
+            className="w-[130px]"
+          />
+          <Select
+            options={[
+              { value: 'all', label: t('filters.all') },
+              ...STATUS_VALUES.map((value) => ({
+                value,
+                label: t(`status.${value}`),
+              })),
+            ]}
+            value={filters.status || 'active'}
+            onChange={(value) =>
+              updateFilter('status', value as TrailerFilters['status'])
+            }
+            placeholder={t('filters.status')}
+            className="w-[130px]"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
+            <span className="hidden sm:inline">{t('actions.addTrailer')}</span>
+          </Button>
+        </div>
+      </div>
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -156,6 +161,13 @@ export function TrailersTab() {
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={handlePaginationChange}
+        onRowClick={handleRowClick}
+      />
+      <TrailerSheet
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        trailer={selectedItem}
+        onSuccess={() => refetch()}
       />
     </div>
   )

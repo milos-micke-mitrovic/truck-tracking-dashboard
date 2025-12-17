@@ -24,14 +24,14 @@ export const Horizontal: Story = {
     <div className="w-[300px]">
       <div className="space-y-1">
         <h4 className="text-sm font-medium">Section Title</h4>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Description of this section.
         </p>
       </div>
       <Separator className="my-4" />
       <div className="space-y-1">
         <h4 className="text-sm font-medium">Another Section</h4>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           More content below the separator.
         </p>
       </div>

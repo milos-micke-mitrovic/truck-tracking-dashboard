@@ -6,7 +6,6 @@ import {
   VehiclesTab,
   TrailersTab,
   UsersTab,
-  DevicesTab,
 } from '../components'
 
 export function AdminPage() {
@@ -22,7 +21,6 @@ export function AdminPage() {
           <TabsTrigger value="drivers">{t('tabs.drivers')}</TabsTrigger>
           <TabsTrigger value="vehicles">{t('tabs.vehicles')}</TabsTrigger>
           <TabsTrigger value="trailers">{t('tabs.trailers')}</TabsTrigger>
-          <TabsTrigger value="devices">{t('tabs.devices')}</TabsTrigger>
           <TabsTrigger value="users">{t('tabs.users')}</TabsTrigger>
         </TabsList>
 
@@ -40,10 +38,6 @@ export function AdminPage() {
 
         <TabsContent value="trailers" className="mt-4">
           <TrailersTab />
-        </TabsContent>
-
-        <TabsContent value="devices" className="mt-4">
-          <DevicesTab />
         </TabsContent>
 
         <TabsContent value="users" className="mt-4">

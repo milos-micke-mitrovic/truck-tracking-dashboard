@@ -136,5 +136,7 @@ export const DRIVER_ATTRIBUTE_OPTIONS = [
   { value: 'custom', label: 'Custom' },
 ] as const
 
-export const DRIVER_ATTRIBUTE_VALUES = DRIVER_ATTRIBUTE_OPTIONS.map((a) => a.value)
+export const DRIVER_ATTRIBUTE_VALUES = DRIVER_ATTRIBUTE_OPTIONS.map(
+  (a) => a.value
+)
 export type DriverAttributeValue = (typeof DRIVER_ATTRIBUTE_VALUES)[number]

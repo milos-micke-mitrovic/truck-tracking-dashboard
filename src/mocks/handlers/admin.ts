@@ -1,15 +1,5 @@
 import { http, HttpResponse, delay } from 'msw'
-import {
-  companies,
-  drivers,
-  vehicles,
-  trailers,
-  users,
-  eldDevices,
-  portableDevices,
-  gpsDevices,
-  cameraDevices,
-} from '../data'
+import { companies, drivers, vehicles, trailers, users } from '../data'
 
 const API_BASE = '/api'
 
@@ -203,81 +193,5 @@ export const adminHandlers = [
       return new HttpResponse(null, { status: 404 })
     }
     return HttpResponse.json(await withDelay(user))
-  }),
-
-  // ELD Devices
-  http.get(`${API_BASE}/devices/eld`, async ({ request }) => {
-    const url = new URL(request.url)
-    const page = parseInt(url.searchParams.get('page') || '1')
-    const pageSize = parseInt(url.searchParams.get('pageSize') || '20')
-    const serialNumber = url.searchParams.get('serialNumber')
-    const macAddress = url.searchParams.get('macAddress')
-
-    let filtered = eldDevices
-
-    if (serialNumber) {
-      filtered = filtered.filter((d) => d.serialNumber.includes(serialNumber))
-    }
-    if (macAddress) {
-      filtered = filtered.filter((d) => d.macAddress.includes(macAddress))
-    }
-
-    return HttpResponse.json(
-      await withDelay(paginate(filtered, page, pageSize))
-    )
-  }),
-
-  // Portable Devices
-  http.get(`${API_BASE}/devices/portable`, async ({ request }) => {
-    const url = new URL(request.url)
-    const page = parseInt(url.searchParams.get('page') || '1')
-    const pageSize = parseInt(url.searchParams.get('pageSize') || '20')
-    const driverId = url.searchParams.get('driverId')
-
-    let filtered = portableDevices
-
-    if (driverId && driverId !== 'all') {
-      filtered = filtered.filter((d) => d.driverId === driverId)
-    }
-
-    return HttpResponse.json(
-      await withDelay(paginate(filtered, page, pageSize))
-    )
-  }),
-
-  // GPS Devices
-  http.get(`${API_BASE}/devices/gps`, async ({ request }) => {
-    const url = new URL(request.url)
-    const page = parseInt(url.searchParams.get('page') || '1')
-    const pageSize = parseInt(url.searchParams.get('pageSize') || '20')
-    const serialNumber = url.searchParams.get('serialNumber')
-
-    let filtered = gpsDevices
-
-    if (serialNumber) {
-      filtered = filtered.filter((d) => d.serialNumber.includes(serialNumber))
-    }
-
-    return HttpResponse.json(
-      await withDelay(paginate(filtered, page, pageSize))
-    )
-  }),
-
-  // Camera Devices
-  http.get(`${API_BASE}/devices/camera`, async ({ request }) => {
-    const url = new URL(request.url)
-    const page = parseInt(url.searchParams.get('page') || '1')
-    const pageSize = parseInt(url.searchParams.get('pageSize') || '20')
-    const vehicleId = url.searchParams.get('vehicleId')
-
-    let filtered = cameraDevices
-
-    if (vehicleId && vehicleId !== 'all') {
-      filtered = filtered.filter((d) => d.vehicleId === vehicleId)
-    }
-
-    return HttpResponse.json(
-      await withDelay(paginate(filtered, page, pageSize))
-    )
   }),
 ]

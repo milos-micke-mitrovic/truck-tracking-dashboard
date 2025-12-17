@@ -29,11 +29,7 @@ export const WithLabel: Story = {
   render: () => {
     const [checked, setChecked] = useState(false)
     return (
-      <Switch
-        label="Airplane Mode"
-        checked={checked}
-        onChange={setChecked}
-      />
+      <Switch label="Airplane Mode" checked={checked} onChange={setChecked} />
     )
   },
 }

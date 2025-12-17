@@ -9,7 +9,7 @@ type FormSectionProps = {
 
 export function FormSection({ title, children, className }: FormSectionProps) {
   return (
-    <div className={cn('space-y-3 p-3 border rounded-lg', className)}>
+    <div className={cn('space-y-3 rounded-lg border p-3', className)}>
       <H4 className="text-primary">{title}</H4>
       {children}
     </div>

@@ -110,9 +110,7 @@ export function LoginPage() {
 
           <div className="mb-8">
             <H1 className="mb-2">{t('login.title')}</H1>
-            <BodySmall color="muted">
-              {t('login.subtitle')}
-            </BodySmall>
+            <BodySmall color="muted">{t('login.subtitle')}</BodySmall>
           </div>
 
           <Form form={form} onSubmit={onSubmit} className="space-y-5">
@@ -185,10 +183,12 @@ export function LoginPage() {
           </div>
 
           {/* Driver App section */}
-          <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Smartphone className="h-5 w-5 text-primary" />
-              <Label className="text-primary">{t('login.driverApp.title')}</Label>
+          <div className="border-primary/20 bg-primary/5 mt-6 rounded-lg border p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <Smartphone className="text-primary h-5 w-5" />
+              <Label className="text-primary">
+                {t('login.driverApp.title')}
+              </Label>
             </div>
             <BodySmall color="muted" className="mb-3">
               {t('login.driverApp.description')}
@@ -201,14 +201,14 @@ export function LoginPage() {
                 className="w-full"
                 onClick={() => window.open(DRIVER_APP_URL, '_blank')}
               >
-                <ExternalLink className="h-4 w-4 mr-2" />
+                <ExternalLink className="mr-2 h-4 w-4" />
                 {t('login.driverApp.openApp')}
               </Button>
 
               <button
                 type="button"
                 onClick={() => setShowInstallGuide(!showInstallGuide)}
-                className="flex items-center justify-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 text-sm transition-colors"
               >
                 {t('login.driverApp.installGuide')}
                 {showInstallGuide ? (
@@ -220,13 +220,13 @@ export function LoginPage() {
             </div>
 
             {showInstallGuide && (
-              <div className="mt-4 space-y-4 pt-4 border-t border-primary/10">
+              <div className="border-primary/10 mt-4 space-y-4 border-t pt-4">
                 {/* iOS Instructions */}
                 <div>
-                  <Label className="text-xs font-medium mb-2 block">
+                  <Label className="mb-2 block text-xs font-medium">
                     {t('login.driverApp.ios.title')}
                   </Label>
-                  <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                  <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-xs">
                     <li>{t('login.driverApp.ios.step1')}</li>
                     <li>{t('login.driverApp.ios.step2')}</li>
                     <li>{t('login.driverApp.ios.step3')}</li>
@@ -235,10 +235,10 @@ export function LoginPage() {
 
                 {/* Android Instructions */}
                 <div>
-                  <Label className="text-xs font-medium mb-2 block">
+                  <Label className="mb-2 block text-xs font-medium">
                     {t('login.driverApp.android.title')}
                   </Label>
-                  <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                  <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-xs">
                     <li>{t('login.driverApp.android.step1')}</li>
                     <li>{t('login.driverApp.android.step2')}</li>
                     <li>{t('login.driverApp.android.step3')}</li>

@@ -84,10 +84,7 @@ const Checkbox = forwardRef<
               {label && (
                 <Label
                   htmlFor={checkboxId}
-                  className={cn(
-                    'leading-tight',
-                    error && 'text-destructive'
-                  )}
+                  className={cn('leading-tight', error && 'text-destructive')}
                 >
                   {label}
                 </Label>

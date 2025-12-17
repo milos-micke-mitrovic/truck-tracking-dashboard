@@ -72,15 +72,6 @@ export {
   type OwnershipValue,
 } from './trailer'
 
-// Devices
-export {
-  ELD_MANUFACTURER_OPTIONS,
-  GPS_MANUFACTURER_OPTIONS,
-  CAMERA_MANUFACTURER_OPTIONS,
-  DEVICE_MANUFACTURERS,
-  type DeviceType,
-} from './devices'
-
 // Timezones
 export {
   TIMEZONE_OPTIONS,

@@ -1,5 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { H1, H2, H3, H4, Body, BodySmall, Caption, Muted, Label } from '../index'
+import {
+  H1,
+  H2,
+  H3,
+  H4,
+  Body,
+  BodySmall,
+  Caption,
+  Muted,
+  Label,
+} from '../index'
 
 const meta: Meta = {
   title: 'Primitives/Typography',
@@ -25,7 +35,7 @@ export const Headings: Story = {
 
 export const BodyText: Story = {
   render: () => (
-    <div className="space-y-4 max-w-prose">
+    <div className="max-w-prose space-y-4">
       <Body>
         Body - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
         eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
@@ -96,7 +106,7 @@ export const SemanticTags: Story = {
 
 export const FullHierarchy: Story = {
   render: () => (
-    <div className="space-y-6 max-w-prose">
+    <div className="max-w-prose space-y-6">
       <div>
         <H1>Page Title</H1>
         <Muted>A brief description of the page content</Muted>
@@ -121,7 +131,7 @@ export const FullHierarchy: Story = {
 
       <div className="space-y-2">
         <Label>Form Label</Label>
-        <div className="h-9 rounded-md border bg-muted/20" />
+        <div className="bg-muted/20 h-9 rounded-md border" />
         <Muted>Helper text for the input field</Muted>
       </div>
     </div>
@@ -133,7 +143,9 @@ export const WithCustomClassName: Story = {
     <div className="space-y-4">
       <H1 className="text-primary">Custom colored H1</H1>
       <Body className="italic">Italic body text</Body>
-      <BodySmall className="font-bold underline">Bold underlined small text</BodySmall>
+      <BodySmall className="font-bold underline">
+        Bold underlined small text
+      </BodySmall>
     </div>
   ),
 }

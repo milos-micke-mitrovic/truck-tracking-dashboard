@@ -137,7 +137,13 @@ export const Clearable: Story = {
 
 export const WithMaxDisplay: Story = {
   render: () => {
-    const [value, setValue] = useState<string[]>(['react', 'vue', 'angular', 'svelte', 'next'])
+    const [value, setValue] = useState<string[]>([
+      'react',
+      'vue',
+      'angular',
+      'svelte',
+      'next',
+    ])
     return (
       <MultiSelect
         label="Frameworks (max 2 displayed)"

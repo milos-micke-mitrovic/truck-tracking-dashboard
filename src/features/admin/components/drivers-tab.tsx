@@ -5,9 +5,8 @@ import { useDrivers } from '../api'
 import { useAdminTab } from '../hooks'
 import type { Driver, DriverFilters } from '../types'
 import { STATUS_VALUES } from '../constants'
-import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { DriverDialog } from './dialogs'
+import { DriverSheet } from './dialogs'
 import { Button, Input, Select, BodySmall } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
@@ -97,43 +96,44 @@ export function DriversTab() {
 
   return (
     <div>
-      <AdminToolbar
-        filters={
-          <>
-            <Input
-              placeholder={t('filters.name')}
-              value={filters.name || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('name', value)}
-              className="w-[200px]"
-            />
-            <Input
-              placeholder={t('filters.phone')}
-              value={filters.phone || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('phone', value)}
-              className="w-[150px]"
-            />
-            <Select
-              options={[
-                { value: 'all', label: t('filters.all') },
-                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
-              ]}
-              value={filters.status || 'active'}
-              onChange={(value) => updateFilter('status', value as DriverFilters['status'])}
-              placeholder={t('filters.status')}
-              className="w-[130px]"
-            />
-          </>
-        }
-        addButton={
+      <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            placeholder={t('filters.name')}
+            value={filters.name || ''}
+            debounce={300}
+            onDebounceChange={(value) => updateFilter('name', value)}
+            className="w-[200px]"
+          />
+          <Input
+            placeholder={t('filters.phone')}
+            value={filters.phone || ''}
+            debounce={300}
+            onDebounceChange={(value) => updateFilter('phone', value)}
+            className="w-[150px]"
+          />
+          <Select
+            options={[
+              { value: 'all', label: t('filters.all') },
+              ...STATUS_VALUES.map((value) => ({
+                value,
+                label: t(`status.${value}`),
+              })),
+            ]}
+            value={filters.status || 'active'}
+            onChange={(value) =>
+              updateFilter('status', value as DriverFilters['status'])
+            }
+            placeholder={t('filters.status')}
+            className="w-[130px]"
+          />
+        </div>
+        <div className="flex items-center gap-2">
           <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
             <span className="hidden sm:inline">{t('actions.addDriver')}</span>
           </Button>
-        }
-        onExport={() => {}}
-        onRefresh={() => refetch()}
-      />
+        </div>
+      </div>
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -147,7 +147,7 @@ export function DriversTab() {
         onRowClick={handleRowClick}
       />
 
-      <DriverDialog
+      <DriverSheet
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         driver={selectedDriver}

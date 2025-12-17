@@ -5,9 +5,8 @@ import { useUsers } from '../api'
 import { useAdminTab } from '../hooks'
 import type { User, UserFilters } from '../types'
 import { STATUS_VALUES, DEPARTMENT_VALUES } from '../constants'
-import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { AddUserDialog } from './dialogs'
+import { UserSheet } from './dialogs'
 import { Button, Input, Select, Badge, BodySmall } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
@@ -18,6 +17,11 @@ export function UsersTab() {
     updateFilter,
     pagination,
     handlePaginationChange,
+    dialogOpen,
+    setDialogOpen,
+    selectedItem,
+    handleRowClick,
+    handleAdd,
   } = useAdminTab<UserFilters, User>({
     defaultFilters: { status: 'active' },
   })
@@ -106,51 +110,52 @@ export function UsersTab() {
 
   return (
     <div>
-      <AdminToolbar
-        filters={
-          <>
-            <Input
-              placeholder={t('filters.name')}
-              value={filters.name || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('name', value)}
-              className="w-[200px]"
-            />
-            <Select
-              options={[
-                { value: 'all', label: t('filters.all') },
-                ...DEPARTMENT_VALUES.map((value) => ({ value, label: t(`departments.${value}`) })),
-              ]}
-              value={filters.department || 'all'}
-              onChange={(value) => updateFilter('department', value as UserFilters['department'])}
-              placeholder={t('filters.department')}
-              className="w-[160px]"
-            />
-            <Select
-              options={[
-                { value: 'all', label: t('filters.all') },
-                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
-              ]}
-              value={filters.status || 'active'}
-              onChange={(value) => updateFilter('status', value as UserFilters['status'])}
-              placeholder={t('filters.status')}
-              className="w-[130px]"
-            />
-          </>
-        }
-        addButton={
-          <AddUserDialog
-            trigger={
-              <Button size="sm" prefixIcon={<Plus />}>
-                <span className="hidden sm:inline">{t('actions.addUser')}</span>
-              </Button>
-            }
-            onSuccess={() => refetch()}
+      <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            placeholder={t('filters.name')}
+            value={filters.name || ''}
+            debounce={300}
+            onDebounceChange={(value) => updateFilter('name', value)}
+            className="w-[200px]"
           />
-        }
-        onExport={() => {}}
-        onRefresh={() => refetch()}
-      />
+          <Select
+            options={[
+              { value: 'all', label: t('filters.all') },
+              ...DEPARTMENT_VALUES.map((value) => ({
+                value,
+                label: t(`departments.${value}`),
+              })),
+            ]}
+            value={filters.department || 'all'}
+            onChange={(value) =>
+              updateFilter('department', value as UserFilters['department'])
+            }
+            placeholder={t('filters.department')}
+            className="w-[160px]"
+          />
+          <Select
+            options={[
+              { value: 'all', label: t('filters.all') },
+              ...STATUS_VALUES.map((value) => ({
+                value,
+                label: t(`status.${value}`),
+              })),
+            ]}
+            value={filters.status || 'active'}
+            onChange={(value) =>
+              updateFilter('status', value as UserFilters['status'])
+            }
+            placeholder={t('filters.status')}
+            className="w-[130px]"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
+            <span className="hidden sm:inline">{t('actions.addUser')}</span>
+          </Button>
+        </div>
+      </div>
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -161,6 +166,13 @@ export function UsersTab() {
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={handlePaginationChange}
+        onRowClick={handleRowClick}
+      />
+      <UserSheet
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        user={selectedItem}
+        onSuccess={() => refetch()}
       />
     </div>
   )

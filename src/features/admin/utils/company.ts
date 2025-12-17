@@ -14,13 +14,16 @@ import {
 } from '../constants'
 
 // Helper to get default form values
-export function getCompanyFormDefaults(company?: Company | null): CompanyFormValues {
+export function getCompanyFormDefaults(
+  company?: Company | null
+): CompanyFormValues {
   if (company) {
     return {
       logo: company.logo,
       name: company.name,
       displayName: company.displayName,
       dotNumber: company.dotNumber,
+      mcNumber: company.mcNumber,
       address: company.address,
       phone: company.phone,
       emailDomain: company.emailDomain,
@@ -29,14 +32,16 @@ export function getCompanyFormDefaults(company?: Company | null): CompanyFormVal
       industry: company.industry,
       cargoType: company.cargoType,
       terminals: company.terminals.map((t) => ({ ...t })),
-      vehicleMotionSpeedThreshold: company.configurations.eld.vehicleMotionSpeedThreshold,
+      vehicleMotionSpeedThreshold:
+        company.configurations.eld.vehicleMotionSpeedThreshold,
       cycleRule: company.configurations.hos.cycleRule,
       constantExceptions: company.configurations.hos.constantExceptions,
       personalUse: company.configurations.hos.personalUse,
       yardMoves: company.configurations.hos.yardMoves,
       joinHosClocks: company.configurations.app.joinHosClocks,
       showTmsDashboard: company.configurations.app.showTmsDashboard,
-      requirePasscodeToExitInspection: company.configurations.app.requirePasscodeToExitInspection,
+      requirePasscodeToExitInspection:
+        company.configurations.app.requirePasscodeToExitInspection,
       settlementTemplate: company.configurations.accounting.settlementTemplate,
       weekPeriodStartDay: company.configurations.accounting.weekPeriodStartDay,
       documents: company.documents.map((d) => ({ ...d })),
@@ -48,6 +53,7 @@ export function getCompanyFormDefaults(company?: Company | null): CompanyFormVal
     name: '',
     displayName: '',
     dotNumber: '',
+    mcNumber: '',
     address: '',
     phone: '',
     emailDomain: '',

@@ -81,10 +81,7 @@ const Switch = forwardRef<
               {label && (
                 <Label
                   htmlFor={switchId}
-                  className={cn(
-                    'leading-tight',
-                    error && 'text-destructive'
-                  )}
+                  className={cn('leading-tight', error && 'text-destructive')}
                 >
                   {label}
                 </Label>

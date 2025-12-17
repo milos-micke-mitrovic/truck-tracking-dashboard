@@ -1,8 +1,6 @@
-export { AdminToolbar } from './admin-toolbar'
 export { StatusBadge } from './status-badge'
 export { CompaniesTab } from './companies-tab'
 export { DriversTab } from './drivers-tab'
 export { VehiclesTab } from './vehicles-tab'
 export { TrailersTab } from './trailers-tab'
 export { UsersTab } from './users-tab'
-export { DevicesTab } from './devices-tab'

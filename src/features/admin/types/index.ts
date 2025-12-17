@@ -15,7 +15,7 @@ export type {
   Company,
   CompanyFilters,
   CompanyFormValues,
-  CompanyDialogProps,
+  CompanySheetProps,
 } from './company'
 
 // Driver
@@ -33,7 +33,7 @@ export type {
   Driver,
   DriverFilters,
   DriverFormValues,
-  DriverDialogProps,
+  DriverSheetProps,
 } from './driver'
 
 // Vehicle
@@ -44,16 +44,3 @@ export type { TrailerOwnership, Trailer, TrailerFilters } from './trailer'
 
 // User
 export type { UserRole, Department, User, UserFilters } from './user'
-
-// Devices
-export type {
-  EldDevice,
-  EldDeviceFilters,
-  Platform,
-  PortableDevice,
-  PortableDeviceFilters,
-  GpsDevice,
-  GpsDeviceFilters,
-  CameraDevice,
-  CameraDeviceFilters,
-} from './devices'

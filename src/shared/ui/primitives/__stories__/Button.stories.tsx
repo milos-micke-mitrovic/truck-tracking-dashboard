@@ -12,7 +12,14 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+      options: [
+        'default',
+        'destructive',
+        'outline',
+        'secondary',
+        'ghost',
+        'link',
+      ],
     },
     size: {
       control: 'select',
@@ -59,8 +66,12 @@ export const WithPrefixIcon: Story = {
   render: () => (
     <div className="flex items-center gap-4">
       <Button prefixIcon={<Mail />}>Login with Email</Button>
-      <Button variant="secondary" prefixIcon={<Plus />}>Add Item</Button>
-      <Button variant="destructive" prefixIcon={<Trash2 />}>Delete</Button>
+      <Button variant="secondary" prefixIcon={<Plus />}>
+        Add Item
+      </Button>
+      <Button variant="destructive" prefixIcon={<Trash2 />}>
+        Delete
+      </Button>
     </div>
   ),
 }
@@ -77,8 +88,12 @@ export const Loading: Story = {
   render: () => (
     <div className="flex items-center gap-4">
       <Button loading>Loading</Button>
-      <Button loading variant="secondary">Processing</Button>
-      <Button loading variant="outline">Please wait</Button>
+      <Button loading variant="secondary">
+        Processing
+      </Button>
+      <Button loading variant="outline">
+        Please wait
+      </Button>
     </div>
   ),
 }
@@ -87,8 +102,12 @@ export const Disabled: Story = {
   render: () => (
     <div className="flex items-center gap-4">
       <Button disabled>Disabled</Button>
-      <Button disabled variant="secondary">Disabled</Button>
-      <Button disabled variant="outline">Disabled</Button>
+      <Button disabled variant="secondary">
+        Disabled
+      </Button>
+      <Button disabled variant="outline">
+        Disabled
+      </Button>
     </div>
   ),
 }
@@ -108,7 +127,11 @@ export const IconButtonVariants: Story = {
   render: () => (
     <div className="flex items-center gap-4">
       <IconButton icon={<Settings />} aria-label="Settings" variant="default" />
-      <IconButton icon={<Settings />} aria-label="Settings" variant="secondary" />
+      <IconButton
+        icon={<Settings />}
+        aria-label="Settings"
+        variant="secondary"
+      />
       <IconButton icon={<Settings />} aria-label="Settings" variant="outline" />
       <IconButton icon={<Settings />} aria-label="Settings" variant="ghost" />
       <IconButton icon={<Trash2 />} aria-label="Delete" variant="destructive" />

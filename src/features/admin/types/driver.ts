@@ -39,7 +39,11 @@ export type DriverConfigurations = {
 }
 
 // Accounting
-export type CompensationType = 'per_mile' | 'per_hour' | 'percentage' | 'flat_rate'
+export type CompensationType =
+  | 'per_mile'
+  | 'per_hour'
+  | 'percentage'
+  | 'flat_rate'
 
 export type DriverAccounting = {
   compensationType: CompensationType | null
@@ -170,8 +174,8 @@ export type DriverFormValues = {
   }[]
 }
 
-// Dialog props
-export type DriverDialogProps = {
+// Sheet props
+export type DriverSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   driver?: Driver | null

@@ -13,9 +13,9 @@ function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
   const { t } = useTranslation('common')
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
-      <div className="rounded-full bg-destructive/10 p-4 mb-4">
-        <AlertTriangle className="h-8 w-8 text-destructive" />
+    <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+      <div className="bg-destructive/10 mb-4 rounded-full p-4">
+        <AlertTriangle className="text-destructive h-8 w-8" />
       </div>
       <H2 className="mb-2">{t('errorBoundary.title')}</H2>
       <Body color="muted" className="mb-6 max-w-md">
@@ -25,7 +25,7 @@ function ErrorFallback({ error, onRetry }: ErrorFallbackProps) {
         {t('errorBoundary.retry')}
       </Button>
       {import.meta.env.DEV && error && (
-        <pre className="mt-6 p-4 bg-muted rounded-lg text-left text-xs overflow-auto max-w-full">
+        <pre className="bg-muted mt-6 max-w-full overflow-auto rounded-lg p-4 text-left text-xs">
           {error.message}
           {'\n'}
           {error.stack}
@@ -45,7 +45,10 @@ type ErrorBoundaryState = {
   error: Error | null
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props)
     this.state = { hasError: false, error: null }
@@ -65,7 +68,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         return this.props.fallback
       }
 
-      return <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />
+      return (
+        <ErrorFallback error={this.state.error} onRetry={this.handleRetry} />
+      )
     }
 
     return this.props.children

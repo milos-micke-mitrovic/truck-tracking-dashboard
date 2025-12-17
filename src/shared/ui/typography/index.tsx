@@ -1,13 +1,7 @@
 import type { ElementType, ReactNode } from 'react'
 import { cn } from '@/shared/utils'
 
-type TextColor =
-  | 'default'
-  | 'muted'
-  | 'error'
-  | 'success'
-  | 'warning'
-  | 'info'
+type TextColor = 'default' | 'muted' | 'error' | 'success' | 'warning' | 'info'
 
 const colorClasses: Record<TextColor, string> = {
   default: '',
@@ -149,7 +143,9 @@ export function Caption({
   ...props
 }: TextProps) {
   return (
-    <Tag className={cn('text-xs', getTextClasses({ color, ...props }), className)}>
+    <Tag
+      className={cn('text-xs', getTextClasses({ color, ...props }), className)}
+    >
       {children}
     </Tag>
   )
@@ -165,7 +161,11 @@ export function Muted({
   return (
     <Tag
       id={id}
-      className={cn('text-muted text-muted-foreground', getTextClasses(props), className)}
+      className={cn(
+        'text-muted text-muted-foreground',
+        getTextClasses(props),
+        className
+      )}
     >
       {children}
     </Tag>

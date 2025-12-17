@@ -39,7 +39,7 @@ export const Default: Story = {
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Dialog body content goes here.
           </p>
         </div>
@@ -138,7 +138,7 @@ export const Controlled: Story = {
       <div className="space-y-4">
         <div className="flex gap-2">
           <Button onClick={() => setOpen(true)}>Open Dialog</Button>
-          <span className="text-sm text-muted-foreground self-center">
+          <span className="text-muted-foreground self-center text-sm">
             Dialog is {open ? 'open' : 'closed'}
           </span>
         </div>
@@ -169,15 +169,17 @@ export const LongContent: Story = {
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
-          <DialogDescription>Please read the following terms carefully.</DialogDescription>
+          <DialogDescription>
+            Please read the following terms carefully.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <p key={i} className="text-sm text-muted-foreground">
+            <p key={i} className="text-muted-foreground text-sm">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-              ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-              aliquip ex ea commodo consequat.
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
             </p>
           ))}
         </div>

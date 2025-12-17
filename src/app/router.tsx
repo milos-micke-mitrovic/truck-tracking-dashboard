@@ -8,10 +8,19 @@ import { Spinner } from '@/shared/ui'
 
 // Lazy load feature pages
 const AdminPage = lazy(() =>
-  import('@/features/admin/pages/admin-page').then((m) => ({ default: m.AdminPage }))
+  import('@/features/admin/pages/admin-page').then((m) => ({
+    default: m.AdminPage,
+  }))
 )
 const LoginPage = lazy(() =>
-  import('@/features/auth/pages/login-page').then((m) => ({ default: m.LoginPage }))
+  import('@/features/auth/pages/login-page').then((m) => ({
+    default: m.LoginPage,
+  }))
+)
+const RoutesPage = lazy(() =>
+  import('@/features/routes/pages/routes-page').then((m) => ({
+    default: m.RoutesPage,
+  }))
 )
 
 // Loading fallback for lazy-loaded pages
@@ -64,6 +73,14 @@ export const router = createBrowserRouter([
         element: (
           <LazyPage>
             <AdminPage />
+          </LazyPage>
+        ),
+      },
+      {
+        path: '/routes',
+        element: (
+          <LazyPage>
+            <RoutesPage />
           </LazyPage>
         ),
       },

@@ -22,7 +22,15 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: {
             'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-            'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs', '@radix-ui/react-select', '@radix-ui/react-checkbox', '@radix-ui/react-popover', '@radix-ui/react-tooltip'],
+            'vendor-ui': [
+              '@radix-ui/react-dialog',
+              '@radix-ui/react-dropdown-menu',
+              '@radix-ui/react-tabs',
+              '@radix-ui/react-select',
+              '@radix-ui/react-checkbox',
+              '@radix-ui/react-popover',
+              '@radix-ui/react-tooltip',
+            ],
             'vendor-table': ['@tanstack/react-table'],
             'vendor-query': ['@tanstack/react-query'],
             'vendor-form': ['react-hook-form', 'zod', '@hookform/resolvers'],

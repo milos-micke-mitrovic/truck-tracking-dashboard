@@ -36,7 +36,7 @@ export const WithForm: Story = {
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
-          <h4 className="font-medium text-sm">Dimensions</h4>
+          <h4 className="text-sm font-medium">Dimensions</h4>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Width" defaultValue="100%" />
             <Input label="Height" defaultValue="auto" />
@@ -131,14 +131,14 @@ export const WithRichContent: Story = {
       <PopoverContent className="w-80">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-full bg-muted" />
+            <div className="bg-muted size-10 rounded-full" />
             <div>
               <p className="text-sm font-medium">John Doe</p>
-              <p className="text-xs text-muted-foreground">john@example.com</p>
+              <p className="text-muted-foreground text-xs">john@example.com</p>
             </div>
           </div>
           <div className="border-t pt-3">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Member since January 2024
             </p>
           </div>

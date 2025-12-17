@@ -19,7 +19,17 @@ type InputProps = Omit<React.ComponentProps<'input'>, 'type'> & {
   label?: string
   helperText?: string
   error?: string
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' | 'datetime-local'
+  type?:
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'number'
+    | 'tel'
+    | 'url'
+    | 'search'
+    | 'date'
+    | 'time'
+    | 'datetime-local'
   prefixIcon?: React.ReactNode
   suffixIcon?: React.ReactNode
   clearable?: boolean
@@ -142,7 +152,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             inputStyles,
             prefixIcon && 'pl-10',
             hasRightElement && 'pr-10',
-            (type === 'time' || type === 'date' || type === 'datetime-local') && 'w-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer',
+            (type === 'time' || type === 'date' || type === 'datetime-local') &&
+              'w-auto [&::-webkit-calendar-picker-indicator]:cursor-pointer',
             className
           )}
           {...props}
@@ -158,7 +169,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             onClick={() => setShowPassword(!showPassword)}
             icon={showPassword ? <EyeOff /> : <Eye />}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
-            className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
           />
         )}
 
@@ -171,7 +182,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             onClick={handleClear}
             icon={<X />}
             aria-label="Clear input"
-            className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
           />
         )}
 

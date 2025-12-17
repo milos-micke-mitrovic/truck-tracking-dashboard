@@ -128,7 +128,10 @@ export const WithKeyboardShortcut: Story = {
           <Button variant="outline">Save</Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Save changes <kbd className="ml-1 rounded bg-muted px-1">Ctrl+S</kbd></p>
+          <p>
+            Save changes{' '}
+            <kbd className="bg-muted ml-1 rounded px-1">Ctrl+S</kbd>
+          </p>
         </TooltipContent>
       </Tooltip>
 
@@ -137,7 +140,9 @@ export const WithKeyboardShortcut: Story = {
           <Button variant="outline">Undo</Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Undo <kbd className="ml-1 rounded bg-muted px-1">Ctrl+Z</kbd></p>
+          <p>
+            Undo <kbd className="bg-muted ml-1 rounded px-1">Ctrl+Z</kbd>
+          </p>
         </TooltipContent>
       </Tooltip>
     </div>

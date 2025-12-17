@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LogOut, Settings } from 'lucide-react'
+import { LogOut, Settings, Route } from 'lucide-react'
 import { Logo } from './logo'
 import {
   Sidebar,
@@ -52,6 +52,19 @@ export function AppSidebar() {
                   >
                     <Settings className="size-4" />
                     <BodySmall as="span">{t('sidebar.admin')}</BodySmall>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={t('sidebar.routes')}>
+                  <NavLink
+                    to="/routes"
+                    className={({ isActive }) =>
+                      cn(isActive && 'bg-sidebar-accent')
+                    }
+                  >
+                    <Route className="size-4" />
+                    <BodySmall as="span">{t('sidebar.routes')}</BodySmall>
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>

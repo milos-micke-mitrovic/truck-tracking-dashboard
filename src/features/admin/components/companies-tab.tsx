@@ -5,9 +5,8 @@ import { useCompanies } from '../api'
 import { useAdminTab } from '../hooks'
 import type { Company, CompanyFilters } from '../types'
 import { STATUS_VALUES } from '../constants'
-import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { CompanyDialog } from './dialogs'
+import { CompanySheet } from './dialogs'
 import { Button, Input, Select } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
@@ -46,6 +45,12 @@ export function CompaniesTab() {
       ),
     },
     {
+      accessorKey: 'mcNumber',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('columns.mcNumber')} />
+      ),
+    },
+    {
       accessorKey: 'address',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.address')} />
@@ -74,15 +79,6 @@ export function CompaniesTab() {
       cell: ({ row }) => t(`plan.${row.original.plan}`),
     },
     {
-      accessorKey: 'terminalCount',
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t('columns.terminalCount')}
-        />
-      ),
-    },
-    {
       accessorKey: 'status',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.status')} />
@@ -93,43 +89,44 @@ export function CompaniesTab() {
 
   return (
     <div>
-      <AdminToolbar
-        filters={
-          <>
-            <Input
-              placeholder={t('filters.name')}
-              value={filters.name || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('name', value)}
-              className="w-[200px]"
-            />
-            <Input
-              placeholder={t('filters.dotNumber')}
-              value={filters.dotNumber || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('dotNumber', value)}
-              className="w-[150px]"
-            />
-            <Select
-              options={[
-                { value: 'all', label: t('filters.all') },
-                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
-              ]}
-              value={filters.status || 'active'}
-              onChange={(value) => updateFilter('status', value as CompanyFilters['status'])}
-              placeholder={t('filters.status')}
-              className="w-[130px]"
-            />
-          </>
-        }
-        addButton={
+      <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            placeholder={t('filters.name')}
+            value={filters.name || ''}
+            debounce={300}
+            onDebounceChange={(value) => updateFilter('name', value)}
+            className="w-[200px]"
+          />
+          <Input
+            placeholder={t('filters.dotNumber')}
+            value={filters.dotNumber || ''}
+            debounce={300}
+            onDebounceChange={(value) => updateFilter('dotNumber', value)}
+            className="w-[150px]"
+          />
+          <Select
+            options={[
+              { value: 'all', label: t('filters.all') },
+              ...STATUS_VALUES.map((value) => ({
+                value,
+                label: t(`status.${value}`),
+              })),
+            ]}
+            value={filters.status || 'active'}
+            onChange={(value) =>
+              updateFilter('status', value as CompanyFilters['status'])
+            }
+            placeholder={t('filters.status')}
+            className="w-[130px]"
+          />
+        </div>
+        <div className="flex items-center gap-2">
           <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
             <span className="hidden sm:inline">{t('actions.addCompany')}</span>
           </Button>
-        }
-        onExport={() => {}}
-        onRefresh={() => refetch()}
-      />
+        </div>
+      </div>
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -143,7 +140,7 @@ export function CompaniesTab() {
         onRowClick={handleRowClick}
       />
 
-      <CompanyDialog
+      <CompanySheet
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         company={selectedCompany}

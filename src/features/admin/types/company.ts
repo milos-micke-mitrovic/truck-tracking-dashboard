@@ -73,6 +73,7 @@ export type Company = {
   name: string
   displayName: string
   dotNumber: string
+  mcNumber: string
   address: string
   phone: string
   emailDomain: string
@@ -103,6 +104,7 @@ export type CompanyFormValues = {
   name: string
   displayName: string
   dotNumber: string
+  mcNumber: string
   address: string
   phone: string
   emailDomain: string
@@ -140,8 +142,8 @@ export type CompanyFormValues = {
   }[]
 }
 
-// Dialog props
-export type CompanyDialogProps = {
+// Sheet props
+export type CompanySheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   company?: Company | null

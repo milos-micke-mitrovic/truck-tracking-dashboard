@@ -1,0 +1,150 @@
+{
+  "title": "Routes",
+  "columns": {
+    "company": "Company",
+    "identifier": "Identifier",
+    "rate": "Rate",
+    "trip": "Trip",
+    "origin": "Origin",
+    "destination": "Destination",
+    "unit": "Unit",
+    "dispatcher": "Dispatcher",
+    "status": "Status"
+  },
+  "filters": {
+    "all": "All",
+    "company": "Company",
+    "identifier": "Identifier",
+    "rate": "Rate",
+    "trip": "Trip",
+    "status": "Status"
+  },
+  "status": {
+    "assigned": "Assigned",
+    "in_transit": "In Transit",
+    "completed": "Completed"
+  },
+  "actions": {
+    "addRoute": "Add Route",
+    "export": "Export",
+    "refresh": "Refresh"
+  },
+  "validation": {
+    "required": "This field is required"
+  },
+  "sheet": {
+    "addTitle": "Add Route",
+    "editTitle": "Edit Route",
+    "cancel": "Cancel",
+    "save": "Save",
+    "tabs": {
+      "carrier": "Carrier",
+      "broker": "Broker",
+      "stops": "Stops",
+      "route": "Route",
+      "load": "Load"
+    },
+    "carrier": {
+      "company": "Company",
+      "selectCompany": "Select company",
+      "dispatcher": "Dispatcher",
+      "selectDispatcher": "Select dispatcher",
+      "tags": "Tags",
+      "selectTags": "Select tags",
+      "vehicle": "Vehicle",
+      "selectVehicle": "Select vehicle",
+      "driver": "Driver",
+      "selectDriver": "Select driver",
+      "coDriver": "Co-Driver",
+      "selectCoDriver": "Select co-driver",
+      "autoDispatch": "Automatically dispatch after creation"
+    },
+    "broker": {
+      "title": "Broker",
+      "company": "Company",
+      "selectCompany": "Select broker",
+      "addCompany": "Add company",
+      "representative": "Representative",
+      "selectRep": "Select representative",
+      "addRepresentative": "Add representative",
+      "identifier": "Identifier",
+      "brokerIdentifier": "Broker ID",
+      "internalIdentifier": "Internal ID",
+      "rate": "Rate",
+      "brokerRate": "Broker Rate",
+      "driverRate": "Driver Rate",
+      "rateConfirmation": "Rate Confirmation",
+      "driverRateConfirmation": "Driver Rate Confirmation",
+      "uploadFile": "Upload file"
+    },
+    "stops": {
+      "type": "Type",
+      "location": "Location",
+      "arrivalSlot": "Arrival Slot",
+      "add": "Add stop",
+      "remove": "Remove stop",
+      "missing": "Missing",
+      "noStops": "No stops added yet",
+      "types": {
+        "pickup": "Pickup",
+        "delivery": "Delivery"
+      }
+    },
+    "stopSheet": {
+      "addTitle": "Add Stop",
+      "editTitle": "Edit Stop",
+      "cancel": "Cancel",
+      "type": "Type",
+      "customerLocation": "Customer Location",
+      "selectLocation": "Select location",
+      "addLocation": "Add location",
+      "arrivalSlot": "Arrival Slot",
+      "slotType": "Type",
+      "slotTypes": {
+        "window": "Window",
+        "appointment": "Appointment",
+        "fcfs": "FCFS"
+      },
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "referenceNumbers": "Reference Numbers",
+      "refType": "Type",
+      "refValue": "Value",
+      "addRef": "Add Reference",
+      "removeRef": "Remove reference",
+      "other": "Other",
+      "accessories": "Accessories",
+      "selectAccessories": "Select accessories",
+      "requiredDocuments": "Required Documents",
+      "selectDocuments": "Select documents",
+      "instructions": "Instructions",
+      "create": "Create",
+      "update": "Update"
+    },
+    "route": {
+      "selectRoute": "Route",
+      "mapPlaceholder": "Map will be displayed here",
+      "emptyMiles": "Empty Miles",
+      "loadedMiles": "Loaded Miles",
+      "calculated": "Calculated",
+      "manual": "Manual"
+    },
+    "load": {
+      "weight": "Weight",
+      "length": "Length",
+      "selectLength": "Select length",
+      "commodity": "Commodity",
+      "capacity": "Capacity",
+      "selectCapacity": "Select capacity",
+      "temperature": "Temperature",
+      "units": "Units",
+      "unitType": "Unit Type",
+      "selectUnit": "Select unit",
+      "unitTypes": {
+        "pallets": "Pallets",
+        "cases": "Cases",
+        "pieces": "Pieces"
+      }
+    }
+  }
+}

@@ -122,7 +122,7 @@ export const WithDebounce: Story = {
           debounce={300}
           onDebounceChange={setDebouncedValue}
         />
-        <div className="text-sm text-muted-foreground">
+        <div className="text-muted-foreground text-sm">
           <p>Immediate value: {value}</p>
           <p>Debounced value: {debouncedValue}</p>
         </div>
@@ -157,7 +157,12 @@ export const Types: Story = {
       <Input label="Number" type="number" placeholder="42" />
       <Input label="Tel" type="tel" placeholder="+1 (555) 000-0000" />
       <Input label="URL" type="url" placeholder="https://example.com" />
-      <Input label="Search" type="search" placeholder="Search..." prefixIcon={<Search />} />
+      <Input
+        label="Search"
+        type="search"
+        placeholder="Search..."
+        prefixIcon={<Search />}
+      />
     </div>
   ),
 }

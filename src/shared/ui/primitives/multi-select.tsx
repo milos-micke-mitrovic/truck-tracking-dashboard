@@ -8,11 +8,7 @@ import { IconButton } from './button'
 import { Label } from './label'
 import { Badge } from './badge'
 import { Caption } from '../typography'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../overlay/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '../overlay/popover'
 import {
   Command,
   CommandEmpty,
@@ -122,7 +118,7 @@ function MultiSelect({
                   icon={<X className="size-3" />}
                   aria-label={`Remove ${option.label}`}
                   onClick={(e) => handleRemove(option.value, e)}
-                  className="size-4 hover:bg-muted"
+                  className="hover:bg-muted size-4"
                 />
               </Badge>
             ))}

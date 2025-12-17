@@ -1,7 +1,8 @@
 {
   "sidebar": {
     "dashboard": "Dashboard",
-    "admin": "Admin"
+    "admin": "Admin",
+    "routes": "Routes"
   },
   "breadcrumbs": {
     "home": "Home"

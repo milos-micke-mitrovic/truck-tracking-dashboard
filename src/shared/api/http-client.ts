@@ -60,7 +60,10 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return response.json()
 }
 
-function getHeaders(customHeaders?: Record<string, string>, skipAuth?: boolean): Headers {
+function getHeaders(
+  customHeaders?: Record<string, string>,
+  skipAuth?: boolean
+): Headers {
   const headers = new Headers({
     'Content-Type': 'application/json',
     ...customHeaders,

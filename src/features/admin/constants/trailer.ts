@@ -7,7 +7,13 @@ export const TRAILER_TYPE_OPTIONS = [
   { value: 'Lowboy', label: 'Lowboy' },
 ] as const
 
-export const TRAILER_TYPE_VALUES = ['Dry Van', 'Flatbed', 'Refrigerated', 'Tanker', 'Lowboy'] as const
+export const TRAILER_TYPE_VALUES = [
+  'Dry Van',
+  'Flatbed',
+  'Refrigerated',
+  'Tanker',
+  'Lowboy',
+] as const
 export type TrailerTypeValue = (typeof TRAILER_TYPE_VALUES)[number]
 
 // Ownership options (labels come from translations)

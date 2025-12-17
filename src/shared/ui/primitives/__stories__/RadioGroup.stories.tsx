@@ -40,11 +40,7 @@ export const Default: Story = {
   render: () => {
     const [value, setValue] = useState('')
     return (
-      <RadioGroup
-        options={planOptions}
-        value={value}
-        onChange={setValue}
-      />
+      <RadioGroup options={planOptions} value={value} onChange={setValue} />
     )
   },
 }

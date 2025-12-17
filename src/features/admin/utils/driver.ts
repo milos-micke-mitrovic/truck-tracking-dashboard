@@ -7,7 +7,9 @@ import {
 } from '../constants'
 
 // Helper to get default form values
-export function getDriverFormDefaults(driver?: Driver | null): DriverFormValues {
+export function getDriverFormDefaults(
+  driver?: Driver | null
+): DriverFormValues {
   if (driver) {
     return {
       // Personal Info
@@ -41,14 +43,16 @@ export function getDriverFormDefaults(driver?: Driver | null): DriverFormValues 
       // Configurations - App
       joinHosClocks: driver.configurations.app.joinHosClocks,
       showTmsDashboard: driver.configurations.app.showTmsDashboard,
-      requirePasscodeToExitInspection: driver.configurations.app.requirePasscodeToExitInspection,
+      requirePasscodeToExitInspection:
+        driver.configurations.app.requirePasscodeToExitInspection,
       // Accounting
       compensationType: driver.accounting.compensationType || '',
       compensationRate: driver.accounting.compensationRate?.toString() || '',
       escrowDeposited: driver.accounting.escrowDeposited?.toString() || '',
       escrowMinimum: driver.accounting.escrowMinimum?.toString() || '',
       debt: driver.accounting.debt?.toString() || '',
-      settlementMinimalAmount: driver.accounting.settlementMinimalAmount?.toString() || '',
+      settlementMinimalAmount:
+        driver.accounting.settlementMinimalAmount?.toString() || '',
       scheduledItems: driver.accounting.scheduledItems || '',
       // Documents
       documents: driver.documents.map((d) => ({ ...d })),

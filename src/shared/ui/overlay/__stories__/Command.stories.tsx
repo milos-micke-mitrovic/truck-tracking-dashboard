@@ -35,7 +35,7 @@ type Story = StoryObj<typeof Command>
 
 export const Default: Story = {
   render: () => (
-    <Command className="rounded-lg border shadow-md w-[350px]">
+    <Command className="w-[350px] rounded-lg border shadow-md">
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
@@ -82,10 +82,8 @@ export const InDialog: Story = {
 
     return (
       <>
-        <Button onClick={() => setOpen(true)}>
-          Open Command Palette
-        </Button>
-        <p className="text-xs text-muted-foreground mt-2">
+        <Button onClick={() => setOpen(true)}>Open Command Palette</Button>
+        <p className="text-muted-foreground mt-2 text-xs">
           Press Ctrl+K to open
         </p>
         <CommandDialog open={open} onOpenChange={setOpen}>
@@ -133,7 +131,7 @@ export const InDialog: Story = {
 
 export const WithDisabledItems: Story = {
   render: () => (
-    <Command className="rounded-lg border shadow-md w-[350px]">
+    <Command className="w-[350px] rounded-lg border shadow-md">
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
@@ -158,14 +156,14 @@ export const WithDisabledItems: Story = {
 
 export const Empty: Story = {
   render: () => (
-    <Command className="rounded-lg border shadow-md w-[350px]">
+    <Command className="w-[350px] rounded-lg border shadow-md">
       <CommandInput placeholder="Search..." />
       <CommandList>
         <CommandEmpty>
           <div className="flex flex-col items-center gap-2 py-4">
-            <SmileIcon className="size-8 text-muted-foreground" />
+            <SmileIcon className="text-muted-foreground size-8" />
             <p>No results found</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Try a different search term
             </p>
           </div>

@@ -5,9 +5,8 @@ import { useVehicles } from '../api'
 import { useAdminTab } from '../hooks'
 import type { Vehicle, VehicleFilters } from '../types'
 import { STATUS_VALUES } from '../constants'
-import { AdminToolbar } from './admin-toolbar'
 import { StatusBadge } from './status-badge'
-import { AddVehicleDialog } from './dialogs'
+import { VehicleSheet } from './dialogs'
 import { Button, Input, Select, BodySmall, Caption } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
 
@@ -18,6 +17,11 @@ export function VehiclesTab() {
     updateFilter,
     pagination,
     handlePaginationChange,
+    dialogOpen,
+    setDialogOpen,
+    selectedItem,
+    handleRowClick,
+    handleAdd,
   } = useAdminTab<VehicleFilters, Vehicle>({
     defaultFilters: { status: 'active' },
   })
@@ -112,41 +116,37 @@ export function VehiclesTab() {
 
   return (
     <div>
-      <AdminToolbar
-        filters={
-          <>
-            <Input
-              placeholder={t('filters.unitNumber')}
-              value={filters.unitNumber || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('unitNumber', value)}
-              className="w-[150px]"
-            />
-            <Select
-              options={[
-                { value: 'all', label: t('filters.all') },
-                ...STATUS_VALUES.map((value) => ({ value, label: t(`status.${value}`) })),
-              ]}
-              value={filters.status || 'active'}
-              onChange={(value) => updateFilter('status', value as VehicleFilters['status'])}
-              placeholder={t('filters.status')}
-              className="w-[130px]"
-            />
-          </>
-        }
-        addButton={
-          <AddVehicleDialog
-            trigger={
-              <Button size="sm" prefixIcon={<Plus />}>
-                <span className="hidden sm:inline">{t('actions.addVehicle')}</span>
-              </Button>
-            }
-            onSuccess={() => refetch()}
+      <div className="flex flex-wrap items-center justify-between gap-4 py-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            placeholder={t('filters.unitNumber')}
+            value={filters.unitNumber || ''}
+            debounce={300}
+            onDebounceChange={(value) => updateFilter('unitNumber', value)}
+            className="w-[150px]"
           />
-        }
-        onExport={() => {}}
-        onRefresh={() => refetch()}
-      />
+          <Select
+            options={[
+              { value: 'all', label: t('filters.all') },
+              ...STATUS_VALUES.map((value) => ({
+                value,
+                label: t(`status.${value}`),
+              })),
+            ]}
+            value={filters.status || 'active'}
+            onChange={(value) =>
+              updateFilter('status', value as VehicleFilters['status'])
+            }
+            placeholder={t('filters.status')}
+            className="w-[130px]"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
+            <span className="hidden sm:inline">{t('actions.addVehicle')}</span>
+          </Button>
+        </div>
+      </div>
       <DataTable
         columns={columns}
         data={data?.data || []}
@@ -157,6 +157,13 @@ export function VehiclesTab() {
         pageIndex={pagination.page - 1}
         pageSize={pagination.pageSize}
         onPaginationChange={handlePaginationChange}
+        onRowClick={handleRowClick}
+      />
+      <VehicleSheet
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        vehicle={selectedItem}
+        onSuccess={() => refetch()}
       />
     </div>
   )

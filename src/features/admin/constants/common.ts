@@ -9,7 +9,11 @@ export const CYCLE_RULE_OPTIONS = [
 export const DEFAULT_CYCLE_RULE = 'usa_70_8'
 
 // Constant exceptions values (labels come from translations)
-export const CONSTANT_EXCEPTIONS_VALUES = ['none', 'short_haul', 'adverse_conditions'] as const
+export const CONSTANT_EXCEPTIONS_VALUES = [
+  'none',
+  'short_haul',
+  'adverse_conditions',
+] as const
 export type ConstantExceptionValue = (typeof CONSTANT_EXCEPTIONS_VALUES)[number]
 
 export const DEFAULT_CONSTANT_EXCEPTIONS = 'none'

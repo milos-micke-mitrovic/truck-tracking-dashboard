@@ -37,7 +37,7 @@ export const WithLabel: Story = {
   render: () => (
     <div className="flex items-center gap-2">
       <Spinner size="sm" />
-      <span className="text-sm text-muted-foreground">Loading...</span>
+      <span className="text-muted-foreground text-sm">Loading...</span>
     </div>
   ),
 }

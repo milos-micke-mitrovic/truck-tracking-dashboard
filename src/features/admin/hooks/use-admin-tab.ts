@@ -11,7 +11,9 @@ type UseAdminTabReturn<TFilters, TItem> = {
   setFilters: React.Dispatch<React.SetStateAction<TFilters>>
   updateFilter: <K extends keyof TFilters>(key: K, value: TFilters[K]) => void
   pagination: { page: number; pageSize: number }
-  setPagination: React.Dispatch<React.SetStateAction<{ page: number; pageSize: number }>>
+  setPagination: React.Dispatch<
+    React.SetStateAction<{ page: number; pageSize: number }>
+  >
   dialogOpen: boolean
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
   selectedItem: TItem | null
@@ -30,9 +32,12 @@ export function useAdminTab<TFilters, TItem>({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<TItem | null>(null)
 
-  const updateFilter = useCallback(<K extends keyof TFilters>(key: K, value: TFilters[K]) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-  }, [])
+  const updateFilter = useCallback(
+    <K extends keyof TFilters>(key: K, value: TFilters[K]) => {
+      setFilters((prev) => ({ ...prev, [key]: value }))
+    },
+    []
+  )
 
   const handleAdd = useCallback(() => {
     setSelectedItem(null)

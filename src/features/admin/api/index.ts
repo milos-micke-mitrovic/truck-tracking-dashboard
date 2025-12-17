@@ -6,19 +6,11 @@ import type {
   Vehicle,
   Trailer,
   User,
-  EldDevice,
-  PortableDevice,
-  GpsDevice,
-  CameraDevice,
   CompanyFilters,
   DriverFilters,
   VehicleFilters,
   TrailerFilters,
   UserFilters,
-  EldDeviceFilters,
-  PortableDeviceFilters,
-  GpsDeviceFilters,
-  CameraDeviceFilters,
 } from '../types'
 
 // Paginated response type
@@ -38,7 +30,9 @@ type PaginationParams = {
 }
 
 // Generic fetch helper
-function buildSearchParams<T extends Record<string, unknown>>(params: T): URLSearchParams {
+function buildSearchParams<T extends Record<string, unknown>>(
+  params: T
+): URLSearchParams {
   const searchParams = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
@@ -73,30 +67,23 @@ export const adminKeys = {
   users: () => [...adminKeys.all, 'users'] as const,
   usersList: (filters: UserFilters & PaginationParams) =>
     [...adminKeys.users(), filters] as const,
-  eldDevices: () => [...adminKeys.all, 'eldDevices'] as const,
-  eldDevicesList: (filters: EldDeviceFilters & PaginationParams) =>
-    [...adminKeys.eldDevices(), filters] as const,
-  portableDevices: () => [...adminKeys.all, 'portableDevices'] as const,
-  portableDevicesList: (filters: PortableDeviceFilters & PaginationParams) =>
-    [...adminKeys.portableDevices(), filters] as const,
-  gpsDevices: () => [...adminKeys.all, 'gpsDevices'] as const,
-  gpsDevicesList: (filters: GpsDeviceFilters & PaginationParams) =>
-    [...adminKeys.gpsDevices(), filters] as const,
-  cameraDevices: () => [...adminKeys.all, 'cameraDevices'] as const,
-  cameraDevicesList: (filters: CameraDeviceFilters & PaginationParams) =>
-    [...adminKeys.cameraDevices(), filters] as const,
 }
 
 // API functions
-const fetchCompanies = createFetchFn<Company, CompanyFilters & PaginationParams>('/companies')
-const fetchDrivers = createFetchFn<Driver, DriverFilters & PaginationParams>('/drivers')
-const fetchVehicles = createFetchFn<Vehicle, VehicleFilters & PaginationParams>('/vehicles')
-const fetchTrailers = createFetchFn<Trailer, TrailerFilters & PaginationParams>('/trailers')
+const fetchCompanies = createFetchFn<
+  Company,
+  CompanyFilters & PaginationParams
+>('/companies')
+const fetchDrivers = createFetchFn<Driver, DriverFilters & PaginationParams>(
+  '/drivers'
+)
+const fetchVehicles = createFetchFn<Vehicle, VehicleFilters & PaginationParams>(
+  '/vehicles'
+)
+const fetchTrailers = createFetchFn<Trailer, TrailerFilters & PaginationParams>(
+  '/trailers'
+)
 const fetchUsers = createFetchFn<User, UserFilters & PaginationParams>('/users')
-const fetchEldDevices = createFetchFn<EldDevice, EldDeviceFilters & PaginationParams>('/devices/eld')
-const fetchPortableDevices = createFetchFn<PortableDevice, PortableDeviceFilters & PaginationParams>('/devices/portable')
-const fetchGpsDevices = createFetchFn<GpsDevice, GpsDeviceFilters & PaginationParams>('/devices/gps')
-const fetchCameraDevices = createFetchFn<CameraDevice, CameraDeviceFilters & PaginationParams>('/devices/camera')
 
 // Hooks
 export function useCompanies(params: CompanyFilters & PaginationParams = {}) {
@@ -131,41 +118,5 @@ export function useUsers(params: UserFilters & PaginationParams = {}) {
   return useQuery({
     queryKey: adminKeys.usersList(params),
     queryFn: () => fetchUsers(params),
-  })
-}
-
-export function useEldDevices(
-  params: EldDeviceFilters & PaginationParams = {}
-) {
-  return useQuery({
-    queryKey: adminKeys.eldDevicesList(params),
-    queryFn: () => fetchEldDevices(params),
-  })
-}
-
-export function usePortableDevices(
-  params: PortableDeviceFilters & PaginationParams = {}
-) {
-  return useQuery({
-    queryKey: adminKeys.portableDevicesList(params),
-    queryFn: () => fetchPortableDevices(params),
-  })
-}
-
-export function useGpsDevices(
-  params: GpsDeviceFilters & PaginationParams = {}
-) {
-  return useQuery({
-    queryKey: adminKeys.gpsDevicesList(params),
-    queryFn: () => fetchGpsDevices(params),
-  })
-}
-
-export function useCameraDevices(
-  params: CameraDeviceFilters & PaginationParams = {}
-) {
-  return useQuery({
-    queryKey: adminKeys.cameraDevicesList(params),
-    queryFn: () => fetchCameraDevices(params),
   })
 }
