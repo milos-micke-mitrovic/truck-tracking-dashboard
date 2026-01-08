@@ -1,20 +1,34 @@
 export type User = {
-  id: string
-  name: string
+  id: number
+  firstName: string
+  lastName: string
   email: string
-  username: string
-  role: 'admin' | 'dispatcher' | 'driver'
-  avatar?: string
+  role: 'ADMIN' | 'MANAGER' | 'DISPATCHER' | 'DRIVER' | 'ACCOUNTING' | 'USER'
+  tenantId: number
+  companyId?: number
+  department?: string
+  status: string
 }
 
 export type LoginCredentials = {
-  username: string
+  tenantId: number
+  email: string
   password: string
 }
 
 export type LoginResponse = {
-  user: User
   token: string
+}
+
+export type JwtPayload = {
+  sub: string
+  tenant_id: number
+  role: string
+  first_name: string
+  last_name: string
+  email: string
+  exp: number
+  iat: number
 }
 
 export type AuthState = {

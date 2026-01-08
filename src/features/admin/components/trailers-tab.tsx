@@ -3,8 +3,14 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useTrailers } from '../api'
 import { useAdminTab } from '../hooks'
-import type { Trailer, TrailerFilters } from '../types'
-import { STATUS_VALUES, OWNERSHIP_VALUES } from '../constants'
+import type {
+  TrailerListItem,
+  TrailerFilters,
+  TrailerStatus,
+  TrailerOwnership,
+} from '../types'
+import { TRAILER_STATUS_VALUES, TRAILER_OWNERSHIP_VALUES } from '../constants'
+import { StatusBadge } from './status-badge'
 import { TrailerSheet } from './dialogs'
 import { Button, Input, Select, Badge, BodySmall, Caption } from '@/shared/ui'
 import { DataTable, DataTableColumnHeader } from '@/shared/ui'
@@ -21,29 +27,18 @@ export function TrailersTab() {
     selectedItem,
     handleRowClick,
     handleAdd,
-  } = useAdminTab<TrailerFilters, Trailer>({
-    defaultFilters: { status: 'active' },
+  } = useAdminTab<TrailerFilters, TrailerListItem>({
+    defaultFilters: { status: 'ACTIVE' },
   })
 
-  const { data, isLoading, refetch } = useTrailers({
+  const { data, isLoading, isFetching } = useTrailers({
     ...filters,
     ...pagination,
   })
 
-  const columns: ColumnDef<Trailer>[] = [
+  const columns: ColumnDef<TrailerListItem>[] = [
     {
-      accessorKey: 'companyName',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.company')} />
-      ),
-      cell: ({ row }) => (
-        <BodySmall as="span" truncate className="max-w-[180px]">
-          {row.original.companyName}
-        </BodySmall>
-      ),
-    },
-    {
-      accessorKey: 'trailerId',
+      accessorKey: 'unitId',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.trailerId')} />
       ),
@@ -54,8 +49,8 @@ export function TrailersTab() {
         <DataTableColumnHeader column={column} title={t('columns.type')} />
       ),
       cell: ({ row }) => (
-        <BodySmall as="span" truncate className="max-w-[200px]">
-          {row.original.type}
+        <BodySmall as="span" truncate className="max-w-[150px]">
+          {row.original.type.replace(/_/g, ' ')}
         </BodySmall>
       ),
     },
@@ -65,7 +60,7 @@ export function TrailersTab() {
         <DataTableColumnHeader column={column} title={t('columns.model')} />
       ),
       cell: ({ row }) => (
-        <BodySmall as="span" truncate className="max-w-[200px]">
+        <BodySmall as="span" truncate className="max-w-[180px]">
           {row.original.model}
         </BodySmall>
       ),
@@ -97,8 +92,25 @@ export function TrailersTab() {
       ),
       cell: ({ row }) => (
         <Badge variant="outline">
-          {t(`ownership.${row.original.ownership}`)}
+          {t(`trailerOwnership.${row.original.ownership.toLowerCase()}`)}
         </Badge>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('columns.status')} />
+      ),
+      cell: ({ row }) => (
+        <StatusBadge
+          status={
+            (row.original.status?.toLowerCase() || 'inactive') as
+              | 'active'
+              | 'inactive'
+              | 'pending'
+              | 'suspended'
+          }
+        />
       ),
     },
   ]
@@ -109,37 +121,38 @@ export function TrailersTab() {
         <div className="flex flex-wrap items-center gap-3">
           <Input
             placeholder={t('filters.trailerId')}
-            value={filters.trailerId || ''}
+            value={filters.unitId || ''}
             debounce={300}
-            onDebounceChange={(value) => updateFilter('trailerId', value)}
+            onDebounceChange={(value) => updateFilter('unitId', value)}
+            clearable
             className="w-[150px]"
           />
           <Select
             options={[
               { value: 'all', label: t('filters.all') },
-              ...OWNERSHIP_VALUES.map((value) => ({
+              ...TRAILER_OWNERSHIP_VALUES.map((value) => ({
                 value,
-                label: t(`ownership.${value}`),
+                label: t(`trailerOwnership.${value.toLowerCase()}`),
               })),
             ]}
             value={filters.ownership || 'all'}
             onChange={(value) =>
-              updateFilter('ownership', value as TrailerFilters['ownership'])
+              updateFilter('ownership', value as TrailerOwnership | 'all')
             }
             placeholder={t('filters.ownership')}
-            className="w-[130px]"
+            className="w-[150px]"
           />
           <Select
             options={[
               { value: 'all', label: t('filters.all') },
-              ...STATUS_VALUES.map((value) => ({
+              ...TRAILER_STATUS_VALUES.map((value) => ({
                 value,
-                label: t(`status.${value}`),
+                label: t(`status.${value.toLowerCase()}`),
               })),
             ]}
-            value={filters.status || 'active'}
+            value={filters.status || 'ACTIVE'}
             onChange={(value) =>
-              updateFilter('status', value as TrailerFilters['status'])
+              updateFilter('status', value as TrailerStatus | 'all')
             }
             placeholder={t('filters.status')}
             className="w-[130px]"
@@ -153,21 +166,20 @@ export function TrailersTab() {
       </div>
       <DataTable
         columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
+        data={data?.content || []}
+        isLoading={isLoading || isFetching}
         manualPagination
-        pageCount={data?.meta.totalPages}
-        totalCount={data?.meta.total}
-        pageIndex={pagination.page - 1}
-        pageSize={pagination.pageSize}
+        pageCount={data?.totalPages}
+        totalCount={data?.totalElements}
+        pageIndex={pagination.page}
+        pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
         onRowClick={handleRowClick}
       />
       <TrailerSheet
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        trailer={selectedItem}
-        onSuccess={() => refetch()}
+        trailerId={selectedItem?.id}
       />
     </div>
   )

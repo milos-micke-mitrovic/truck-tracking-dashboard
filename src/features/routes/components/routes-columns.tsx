@@ -2,7 +2,14 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Copy, Check } from 'lucide-react'
 import type { Route } from '../types'
 import { RouteStatusBadge } from './route-status-badge'
-import { DataTableColumnHeader, BodySmall, Caption } from '@/shared/ui'
+import {
+  DataTableColumnHeader,
+  BodySmall,
+  Caption,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/shared/ui'
 
 type ColumnsConfig = {
   t: (key: string) => string
@@ -10,23 +17,15 @@ type ColumnsConfig = {
   onCopy: (id: string, text: string) => void
 }
 
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(amount)
-}
-
-const formatLocation = (city: string, state: string, date: string) => {
-  const formattedDate = new Date(date).toLocaleDateString('en-US', {
+const formatDate = (dateStr: string | null | undefined) => {
+  if (!dateStr) return '-'
+  return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
   })
-  return { location: `${city}, ${state}`, date: formattedDate }
 }
 
 export function getRoutesColumns({
@@ -36,157 +35,124 @@ export function getRoutesColumns({
 }: ColumnsConfig): ColumnDef<Route>[] {
   return [
     {
-      accessorKey: 'companyName',
+      accessorKey: 'routeNumber',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.company')} />
-      ),
-      cell: ({ row }) => (
-        <BodySmall as="span" truncate className="max-w-[160px]">
-          {row.original.companyName}
-        </BodySmall>
-      ),
-    },
-    {
-      accessorKey: 'identifier',
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t('columns.identifier')}
-        />
+        <DataTableColumnHeader column={column} title={t('columns.routeNumber')} />
       ),
       cell: ({ row }) => (
         <div className="flex flex-col gap-0.5">
           <div className="flex items-center gap-1">
             <BodySmall as="span" className="font-medium">
-              {row.original.identifier}
+              {row.original.routeNumber}
             </BodySmall>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                onCopy(row.original.id, row.original.identifier)
-              }}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {copiedId === row.original.id ? (
-                <Check className="h-3.5 w-3.5 text-green-600" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onCopy(String(row.original.id), row.original.routeNumber)
+                  }}
+                  className="cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {copiedId === String(row.original.id) ? (
+                    <Check className="h-3.5 w-3.5 text-green-600" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {copiedId === String(row.original.id)
+                  ? t('actions.copied')
+                  : t('actions.copyRouteNumber')}
+              </TooltipContent>
+            </Tooltip>
           </div>
           <Caption as="span" className="text-muted-foreground">
-            {row.original.referenceNumber}
+            {row.original.routeName}
           </Caption>
         </div>
       ),
     },
     {
-      accessorKey: 'rate',
+      accessorKey: 'origin',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.rate')} />
+        <DataTableColumnHeader column={column} title={t('columns.origin')} />
       ),
       cell: ({ row }) => (
         <div className="flex flex-col gap-0.5">
-          <BodySmall as="span" className="font-medium">
-            {formatCurrency(row.original.rate)}
+          <BodySmall as="span" className="max-w-[160px] truncate">
+            {row.original.origin}
           </BodySmall>
           <Caption as="span" className="text-muted-foreground">
-            {formatCurrency(row.original.ratePerMile)}/mi
+            {formatDate(row.original.scheduledStartDate)}
           </Caption>
         </div>
       ),
     },
     {
-      accessorKey: 'distance',
+      accessorKey: 'destination',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.trip')} />
+        <DataTableColumnHeader column={column} title={t('columns.destination')} />
+      ),
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-0.5">
+          <BodySmall as="span" className="max-w-[160px] truncate">
+            {row.original.destination}
+          </BodySmall>
+          <Caption as="span" className="text-muted-foreground">
+            {formatDate(row.original.scheduledEndDate)}
+          </Caption>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'distanceMiles',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('columns.distance')} />
       ),
       cell: ({ row }) => (
         <div className="flex flex-col gap-0.5">
           <BodySmall as="span">
-            {row.original.distance.toLocaleString()}mi
+            {row.original.distanceMiles?.toLocaleString() || 0} mi
           </BodySmall>
           <Caption as="span" className="text-muted-foreground">
-            {row.original.stops} {row.original.stops === 1 ? 'stop' : 'stops'}
+            ~{row.original.estimatedDurationHours?.toFixed(1) || 0}h
           </Caption>
         </div>
       ),
     },
     {
-      accessorKey: 'originCity',
+      accessorKey: 'vehicle',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.origin')} />
-      ),
-      cell: ({ row }) => {
-        const { location, date } = formatLocation(
-          row.original.originCity,
-          row.original.originState,
-          row.original.originDate
-        )
-        return (
-          <div className="flex flex-col gap-0.5">
-            <BodySmall as="span">{location}</BodySmall>
-            <Caption as="span" className="text-muted-foreground">
-              {date}
-            </Caption>
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: 'destinationCity',
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t('columns.destination')}
-        />
-      ),
-      cell: ({ row }) => {
-        const { location, date } = formatLocation(
-          row.original.destinationCity,
-          row.original.destinationState,
-          row.original.destinationDate
-        )
-        return (
-          <div className="flex flex-col gap-0.5">
-            <BodySmall as="span">{location}</BodySmall>
-            <Caption as="span" className="text-muted-foreground">
-              {date}
-            </Caption>
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: 'unitNumber',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.unit')} />
+        <DataTableColumnHeader column={column} title={t('columns.vehicle')} />
       ),
       cell: ({ row }) => (
         <div className="flex flex-col gap-0.5">
           <BodySmall as="span" className="font-medium">
-            {row.original.unitNumber}
+            {row.original.vehicle?.unitId || '-'}
           </BodySmall>
-          <Caption
-            as="span"
-            className="text-muted-foreground max-w-[120px] truncate"
-          >
-            {row.original.driverName}
+          <Caption as="span" className="text-muted-foreground max-w-[120px] truncate">
+            {row.original.vehicle?.make} {row.original.vehicle?.model}
           </Caption>
         </div>
       ),
     },
     {
-      accessorKey: 'dispatcher',
+      accessorKey: 'driver',
       header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t('columns.dispatcher')}
-        />
+        <DataTableColumnHeader column={column} title={t('columns.driver')} />
       ),
       cell: ({ row }) => (
-        <BodySmall as="span">{row.original.dispatcher}</BodySmall>
+        <div className="flex flex-col gap-0.5">
+          <BodySmall as="span" className="max-w-[120px] truncate">
+            {row.original.driver?.name || '-'}
+          </BodySmall>
+          <Caption as="span" className="text-muted-foreground">
+            {row.original.driver?.phoneNumber || ''}
+          </Caption>
+        </div>
       ),
     },
     {
@@ -197,7 +163,7 @@ export function getRoutesColumns({
       cell: ({ row }) => (
         <RouteStatusBadge
           status={row.original.status}
-          date={row.original.statusDate}
+          date={row.original.updatedAt}
         />
       ),
     },

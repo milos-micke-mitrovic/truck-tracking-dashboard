@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useMemo } from 'react'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
   Sheet,
   SheetContent,
@@ -8,6 +9,10 @@ import {
   SheetTitle,
   SheetClose,
   Button,
+  Input,
+  Select,
+  Spinner,
+  DatePicker,
 } from '@/shared/ui'
 import {
   Form,
@@ -17,225 +22,410 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { Input, Select } from '@/shared/ui/primitives'
-import { FormSection } from '@/shared/components'
-import type { Trailer, TrailerOwnership } from '../../types'
+import { FormSection, DocumentsSection } from '@/shared/components'
+import { getApiErrorMessage } from '@/shared/utils'
+import { useAuth } from '@/features/auth'
+import { useUploadTempFile } from '@/shared/api/documents'
 import {
-  OWNERSHIP_VALUES,
-  TRAILER_TYPE_OPTIONS,
-  STATUS_VALUES,
+  useTrailer,
+  useCreateTrailer,
+  useUpdateTrailer,
+  useCompanies,
+  useVehicles,
+} from '../../api'
+import type {
+  Trailer,
+  TrailerFormValues,
+  TrailerSheetProps,
+  TrailerStatus,
+  TrailerOwnership,
+  TrailerType,
+  TrailerDocumentFormValue,
+} from '../../types'
+import {
+  TRAILER_STATUS_VALUES,
+  TRAILER_OWNERSHIP_VALUES,
+  TRAILER_TYPE_VALUES,
+  TRAILER_DOCUMENT_TYPES,
 } from '../../constants'
 
-type TrailerFormValues = {
-  trailerId: string
-  type: string
-  model: string
-  vin: string
-  licensePlate: string
-  ownership: TrailerOwnership | ''
-  status: string
-}
-
-type TrailerSheetProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  trailer?: Trailer | null
-  onSuccess?: () => void
-}
+const getFormDefaults = (trailer?: Trailer | null): TrailerFormValues => ({
+  companyId: trailer?.companyId || null,
+  currentVehicleId: trailer?.currentVehicleId || null,
+  unitId: trailer?.unitId || '',
+  vin: trailer?.vin || '',
+  type: trailer?.type || '',
+  model: trailer?.model || '',
+  year: trailer?.year?.toString() || '',
+  lengthFeet: trailer?.lengthFeet?.toString() || '',
+  licensePlate: trailer?.licensePlate || '',
+  state: trailer?.state || '',
+  registrationExpiry: trailer?.registrationExpiry || '',
+  ownership: trailer?.ownership || '',
+  homeTerminal: trailer?.homeTerminal || '',
+  status: trailer?.status || 'ACTIVE',
+  documents:
+    trailer?.documents?.map((doc) => ({
+      id: doc.id,
+      type: doc.type,
+      originalFileName: doc.name,
+      expirationDate: doc.expirationDate || undefined,
+      isNew: false,
+    })) || [],
+})
 
 export function TrailerSheet({
   open,
   onOpenChange,
-  trailer,
+  trailerId,
   onSuccess,
 }: TrailerSheetProps) {
   const { t } = useTranslation('admin')
-  const isEdit = !!trailer
+  const { user } = useAuth()
+  const isEdit = !!trailerId
+
+  // Fetch full trailer data when editing
+  const { data: trailer, isLoading: isLoadingTrailer } = useTrailer(
+    trailerId || 0
+  )
+
+  // Fetch companies and vehicles for selectors
+  const { data: companiesData } = useCompanies({ size: 100 })
+  const { data: vehiclesData } = useVehicles({ size: 100 })
+
+  const createMutation = useCreateTrailer()
+  const updateMutation = useUpdateTrailer()
+  const uploadMutation = useUploadTempFile()
 
   const form = useForm<TrailerFormValues>({
-    defaultValues: {
-      trailerId: '',
-      type: '',
-      model: '',
-      vin: '',
-      licensePlate: '',
-      ownership: '',
-      status: 'active',
-    },
+    defaultValues: getFormDefaults(),
   })
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'documents',
+  })
+
+  // Reset form when sheet opens or trailer data loads
   useEffect(() => {
     if (open) {
-      if (trailer) {
-        form.reset({
-          trailerId: trailer.trailerId,
-          type: trailer.type,
-          model: trailer.model,
-          vin: trailer.vin,
-          licensePlate: trailer.licensePlate,
-          ownership: trailer.ownership,
-          status: trailer.status,
-        })
-      } else {
-        form.reset({
-          trailerId: '',
-          type: '',
-          model: '',
-          vin: '',
-          licensePlate: '',
-          ownership: '',
-          status: 'active',
-        })
+      if (isEdit && trailer) {
+        form.reset(getFormDefaults(trailer))
+      } else if (!isEdit) {
+        form.reset(getFormDefaults())
       }
     }
-  }, [open, trailer, form])
+  }, [open, isEdit, trailer, form])
 
-  const ownershipOptions = OWNERSHIP_VALUES.map((value) => ({
-    value,
-    label: t(`ownership.${value}`),
+  // Company options
+  const companyOptions = useMemo(
+    () => [
+      { value: '', label: t('vehicleSheet.selectCompany') },
+      ...(companiesData?.content || []).map((c) => ({
+        value: String(c.id),
+        label: c.displayName || c.fullName,
+      })),
+    ],
+    [companiesData, t]
+  )
+
+  // Vehicle options
+  const vehicleOptions = useMemo(
+    () => [
+      { value: '', label: t('filters.vehicle') },
+      ...(vehiclesData?.content || []).map((v) => ({
+        value: String(v.id),
+        label: v.unitId,
+      })),
+    ],
+    [vehiclesData, t]
+  )
+
+  // Document type options
+  const documentTypeOptions = TRAILER_DOCUMENT_TYPES.map((type) => ({
+    value: type,
+    label: t(`vehicleSheet.documentTypes.${type}`),
   }))
 
-  const typeOptions = [...TRAILER_TYPE_OPTIONS]
+  // Handle file upload for a document
+  const handleFileUpload = async (index: number, file: File) => {
+    try {
+      const result = await uploadMutation.mutateAsync(file)
+      form.setValue(`documents.${index}.tempFileName`, result.tempFileName)
+      form.setValue(
+        `documents.${index}.originalFileName`,
+        result.originalFileName
+      )
+      form.setValue(`documents.${index}.isNew`, true)
+    } catch {
+      toast.error(t('driverDialog.uploadError') || 'Upload failed')
+    }
+  }
 
-  const statusOptions = STATUS_VALUES.map((value) => ({
-    value,
-    label: t(`status.${value}`),
-  }))
+  // Add new document row
+  const handleAddDocument = () => {
+    append({
+      type: '',
+      isNew: true,
+    } as TrailerDocumentFormValue)
+  }
 
   const handleSubmit = async (values: TrailerFormValues) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    console.log(isEdit ? 'Trailer updated:' : 'Trailer created:', values)
+    try {
+      // Prepare documents for submission (only new ones with uploads)
+      const documentRequests = values.documents
+        .filter((doc) => doc.isNew && doc.tempFileName && doc.type)
+        .map((doc) => ({
+          type: doc.type,
+          tempFileName: doc.tempFileName!,
+          originalFileName: doc.originalFileName!,
+          expirationDate: doc.expirationDate,
+        }))
 
-    onOpenChange(false)
-    form.reset()
-    onSuccess?.()
+      const requestData = {
+        tenantId: user?.tenantId || 1,
+        companyId: values.companyId || 1,
+        currentVehicleId: values.currentVehicleId || undefined,
+        unitId: values.unitId,
+        vin: values.vin,
+        type: values.type as TrailerType,
+        model: values.model,
+        year: values.year ? parseInt(values.year) : undefined,
+        lengthFeet: values.lengthFeet ? parseInt(values.lengthFeet) : undefined,
+        licensePlate: values.licensePlate,
+        state: values.state || undefined,
+        registrationExpiry: values.registrationExpiry || undefined,
+        ownership: values.ownership as TrailerOwnership,
+        homeTerminal: values.homeTerminal || undefined,
+        status: values.status,
+        documents: documentRequests.length > 0 ? documentRequests : undefined,
+      }
+
+      if (isEdit && trailerId) {
+        await updateMutation.mutateAsync({ id: trailerId, data: requestData })
+        toast.success(t('trailerSheet.updateSuccess'))
+      } else {
+        await createMutation.mutateAsync(requestData)
+        toast.success(t('trailerSheet.createSuccess'))
+      }
+
+      onOpenChange(false)
+      form.reset()
+      onSuccess?.()
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, t('trailerSheet.error')))
+    }
   }
+
+  const isLoading = createMutation.isPending || updateMutation.isPending
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent size="xl" className="flex flex-col overflow-hidden p-0">
-        <Form
-          form={form}
-          onSubmit={handleSubmit}
-          className="flex flex-1 flex-col overflow-hidden"
-        >
-          <SheetHeader
-            className="border-b px-6 py-3"
-            actions={
-              <>
-                <SheetClose asChild>
-                  <Button type="button" variant="outline" size="sm">
-                    {t('dialogs.cancel')}
-                  </Button>
-                </SheetClose>
-                <Button
-                  type="submit"
-                  size="sm"
-                  loading={form.formState.isSubmitting}
-                >
-                  {t('dialogs.save')}
-                </Button>
-              </>
-            }
+      <SheetContent size="lg" className="flex flex-col overflow-hidden p-0">
+        {isEdit && isLoadingTrailer ? (
+          <>
+            <SheetHeader className="border-b px-6 py-3">
+              <SheetTitle>{t('trailerSheet.editTitle')}</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-1 items-center justify-center">
+              <Spinner size="lg" />
+            </div>
+          </>
+        ) : (
+          <Form
+            form={form}
+            onSubmit={handleSubmit}
+            className="flex flex-1 flex-col overflow-hidden"
           >
-            <SheetTitle>
-              {isEdit ? t('trailerSheet.editTitle') : t('actions.addTrailer')}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="space-y-3 overflow-y-auto px-6 py-4">
-            <FormSection title={t('trailerSheet.identification')}>
-              <div className="grid gap-3 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="trailerId"
-                  rules={{ required: t('validation.required') }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('columns.trailerId')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="licensePlate"
-                  rules={{ required: t('validation.required') }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('columns.licensePlate')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="vin"
-                  rules={{ required: t('validation.required') }}
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>{t('columns.vin')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </FormSection>
+            <SheetHeader
+              className="border-b px-6 py-3"
+              actions={
+                <>
+                  <SheetClose asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      {t('dialogs.cancel')}
+                    </Button>
+                  </SheetClose>
+                  <Button type="submit" size="sm" loading={isLoading}>
+                    {t('dialogs.save')}
+                  </Button>
+                </>
+              }
+            >
+              <SheetTitle>
+                {isEdit ? t('trailerSheet.editTitle') : t('actions.addTrailer')}
+              </SheetTitle>
+            </SheetHeader>
 
-            <FormSection title={t('trailerSheet.specifications')}>
-              <div className="grid gap-3 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('columns.type')}</FormLabel>
-                      <Select
-                        options={typeOptions}
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="model"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('columns.model')}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="ownership"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('columns.ownership')}</FormLabel>
-                      <Select
-                        options={ownershipOptions}
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {isEdit && (
+            <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
+              <FormSection title={t('trailerSheet.identification')}>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="unitId"
+                    rules={{ required: t('validation.required') }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>{t('columns.trailerId')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="licensePlate"
+                    rules={{ required: t('validation.required') }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>
+                          {t('columns.licensePlate')}
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vin"
+                    rules={{ required: t('validation.required') }}
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel required>{t('columns.vin')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </FormSection>
+
+              <FormSection title={t('vehicleSheet.assignment')}>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="companyId"
+                    rules={{ required: t('validation.required') }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>{t('columns.company')}</FormLabel>
+                        <Select
+                          options={companyOptions}
+                          value={field.value ? String(field.value) : ''}
+                          onChange={(v) =>
+                            field.onChange(v ? parseInt(v, 10) : null)
+                          }
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="currentVehicleId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('columns.vehicle')}</FormLabel>
+                        <Select
+                          options={vehicleOptions}
+                          value={field.value ? String(field.value) : ''}
+                          onChange={(v) =>
+                            field.onChange(v ? parseInt(v, 10) : null)
+                          }
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </FormSection>
+
+              <FormSection title={t('trailerSheet.specifications')}>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    rules={{ required: t('validation.required') }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>{t('columns.type')}</FormLabel>
+                        <Select
+                          options={TRAILER_TYPE_VALUES.map((value) => ({
+                            value,
+                            label: t(`trailerType.${value.toLowerCase()}`),
+                          }))}
+                          value={field.value}
+                          onChange={(v) => field.onChange(v as TrailerType)}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="model"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('columns.model')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('columns.year')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="lengthFeet"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('trailerSheet.lengthFeet')}</FormLabel>
+                        <FormControl>
+                          <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="ownership"
+                    rules={{ required: t('validation.required') }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>{t('columns.ownership')}</FormLabel>
+                        <Select
+                          options={TRAILER_OWNERSHIP_VALUES.map((value) => ({
+                            value,
+                            label: t(`trailerOwnership.${value.toLowerCase()}`),
+                          }))}
+                          value={field.value}
+                          onChange={(v) => field.onChange(v as TrailerOwnership)}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="status"
@@ -243,19 +433,85 @@ export function TrailerSheet({
                       <FormItem>
                         <FormLabel>{t('columns.status')}</FormLabel>
                         <Select
-                          options={statusOptions}
+                          options={TRAILER_STATUS_VALUES.map((value) => ({
+                            value,
+                            label: t(`status.${value.toLowerCase()}`),
+                          }))}
                           value={field.value}
-                          onChange={field.onChange}
+                          onChange={(v) => field.onChange(v as TrailerStatus)}
                         />
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                )}
-              </div>
-            </FormSection>
-          </div>
-        </Form>
+                </div>
+              </FormSection>
+
+              <FormSection title={t('trailerSheet.registration')}>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('driverDialog.state')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="registrationExpiry"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {t('trailerSheet.registrationExpiry')}
+                        </FormLabel>
+                        <DatePicker
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder={t('common:selectDate')}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="homeTerminal"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('driverDialog.homeTerminal')}</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </FormSection>
+
+              <DocumentsSection
+                control={form.control}
+                fields={fields}
+                getDocument={(index) => form.watch(`documents.${index}`)}
+                documentTypeOptions={documentTypeOptions}
+                onFileUpload={handleFileUpload}
+                onRemove={remove}
+                onAdd={handleAddDocument}
+                onFileClear={(index) => {
+                  form.setValue(`documents.${index}.tempFileName`, undefined)
+                  form.setValue(`documents.${index}.originalFileName`, undefined)
+                }}
+                isUploading={uploadMutation.isPending}
+              />
+            </div>
+          </Form>
+        )}
       </SheetContent>
     </Sheet>
   )

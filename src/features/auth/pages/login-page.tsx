@@ -7,8 +7,14 @@ import { z } from 'zod'
 import type { TFunction } from 'i18next'
 import { toast } from 'sonner'
 import { Logo } from '@/shared/components'
-import { useLogin, useAuth } from '@/features/auth'
-import { Smartphone, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react'
+import {
+  useLogin,
+  useAuth,
+  getUserDisplayName,
+  decodeJwt,
+  jwtPayloadToUser,
+} from '@/features/auth'
+import { Smartphone, ChevronDown, ChevronUp, ExternalLink, Building2, Mail, Lock } from 'lucide-react'
 import {
   Button,
   H1,
@@ -17,7 +23,6 @@ import {
   Body,
   BodySmall,
   Caption,
-  Label,
   Form,
   FormField,
   FormItem,
@@ -25,13 +30,15 @@ import {
   FormControl,
   FormMessage,
   Input,
+  Label,
 } from '@/shared/ui'
 
 const DRIVER_APP_URL = 'https://truck-drive.vercel.app'
 
 const createLoginSchema = (t: TFunction) =>
   z.object({
-    username: z.string().min(1, t('login.validation.usernameRequired')),
+    tenantId: z.string().min(1, t('login.validation.tenantIdRequired')),
+    email: z.string().email(t('login.validation.emailInvalid')),
     password: z.string().min(1, t('login.validation.passwordRequired')),
   })
 
@@ -49,7 +56,8 @@ export function LoginPage() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      tenantId: '',
+      email: '',
       password: '',
     },
   })
@@ -57,15 +65,29 @@ export function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     try {
       const response = await loginMutation.mutateAsync({
-        username: values.username.trim(),
+        tenantId: parseInt(values.tenantId.trim(), 10),
+        email: values.email.trim(),
         password: values.password,
       })
 
-      login(response.user, response.token)
-      toast.success(`Welcome back, ${response.user.name}!`)
+      // Decode JWT to get user info directly (no extra API call needed)
+      const payload = decodeJwt(response.token)
+      if (!payload) {
+        toast.error(t('login.error.generic'))
+        return
+      }
+
+      const user = jwtPayloadToUser(payload)
+      login(user, response.token)
+      toast.success(`Welcome back, ${getUserDisplayName(user)}!`)
       navigate('/admin')
-    } catch {
-      toast.error(t('login.error.invalidCredentials'))
+    } catch (error) {
+      // Check if it's a network error (server down)
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        toast.error(t('login.error.networkError'))
+      } else {
+        toast.error(t('login.error.invalidCredentials'))
+      }
     }
   }
 
@@ -101,14 +123,14 @@ export function LoginPage() {
       <div className="flex w-full flex-col justify-center px-8 py-8 lg:w-1/2 lg:px-16 lg:py-0">
         <div className="mx-auto w-full max-w-sm">
           {/* Mobile logo */}
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
+          <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
             <div className="bg-primary flex size-10 items-center justify-center rounded-lg">
               <Logo size="md" className="text-primary-foreground" />
             </div>
             <H4>{t('common:app.name')}</H4>
           </div>
 
-          <div className="mb-8">
+          <div className="mb-8 text-center">
             <H1 className="mb-2">{t('login.title')}</H1>
             <BodySmall color="muted">{t('login.subtitle')}</BodySmall>
           </div>
@@ -116,15 +138,35 @@ export function LoginPage() {
           <Form form={form} onSubmit={onSubmit} className="space-y-5">
             <FormField
               control={form.control}
-              name="username"
+              name="tenantId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('login.username')}</FormLabel>
+                  <FormLabel>{t('login.tenantId')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t('login.usernamePlaceholder')}
-                      autoComplete="username"
+                      placeholder={t('login.tenantIdPlaceholder')}
+                      prefixIcon={<Building2 />}
                       autoFocus
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('login.email')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder={t('login.emailPlaceholder')}
+                      prefixIcon={<Mail />}
+                      autoComplete="email"
                       {...field}
                     />
                   </FormControl>
@@ -143,6 +185,7 @@ export function LoginPage() {
                     <Input
                       type="password"
                       placeholder={t('login.passwordPlaceholder')}
+                      prefixIcon={<Lock />}
                       autoComplete="current-password"
                       {...field}
                     />
@@ -163,23 +206,9 @@ export function LoginPage() {
             </Button>
           </Form>
 
-          {/* Demo credentials hint */}
+          {/* Info hint */}
           <div className="bg-muted/50 mt-8 rounded-lg border p-4">
-            <Label color="muted" className="mb-2 block">
-              {t('login.demo.title')}
-            </Label>
-            <div className="space-y-1">
-              <BodySmall color="muted">
-                <Label>{t('login.demo.admin')}:</Label> admin / admin123
-              </BodySmall>
-              <BodySmall color="muted">
-                <Label>{t('login.demo.dispatcher')}:</Label> dispatcher /
-                dispatch123
-              </BodySmall>
-              <BodySmall color="muted">
-                <Label>{t('login.demo.driver')}:</Label> driver / driver123
-              </BodySmall>
-            </div>
+            <BodySmall color="muted">{t('login.info.hint')}</BodySmall>
           </div>
 
           {/* Driver App section */}

@@ -1,17 +1,19 @@
-// Department options (labels come from translations)
-export const DEPARTMENT_VALUES = [
-  'dispatch',
-  'accounting',
-  'fleet_management',
-  'operations',
-  'safety',
+// User status values (matches backend enum)
+export const USER_STATUS_VALUES = [
+  'ACTIVE',
+  'INACTIVE',
+  'PENDING',
+  'SUSPENDED',
 ] as const
-export type DepartmentValue = (typeof DEPARTMENT_VALUES)[number]
+export type UserStatusValue = (typeof USER_STATUS_VALUES)[number]
 
-// Role options (labels come from translations)
+// Role options (matches backend enum)
 export const ROLE_VALUES = [
-  'company_admin',
-  'support_personnel',
-  'dispatcher',
+  'USER',
+  'ADMIN',
+  'MANAGER',
+  'DRIVER',
+  'DISPATCHER',
+  'ACCOUNTING',
 ] as const
 export type RoleValue = (typeof ROLE_VALUES)[number]

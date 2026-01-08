@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import './variables/index.css';
+@import 'leaflet/dist/leaflet.css';
 
 /*
  * Tailwind Theme Configuration

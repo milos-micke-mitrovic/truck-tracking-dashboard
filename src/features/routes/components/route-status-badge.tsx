@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/shared/utils'
+import { Caption } from '@/shared/ui'
 import type { RouteStatus } from '../types'
 import { ROUTE_STATUS_COLORS } from '../constants'
 
 type RouteStatusBadgeProps = {
-  status: RouteStatus
-  date?: string
+  status: RouteStatus | null | undefined
+  date?: string | null
   className?: string
 }
 
@@ -15,7 +16,8 @@ export function RouteStatusBadge({
   className,
 }: RouteStatusBadgeProps) {
   const { t } = useTranslation('routes')
-  const colors = ROUTE_STATUS_COLORS[status]
+  const actualStatus = status || 'INACTIVE'
+  const colors = ROUTE_STATUS_COLORS[actualStatus]
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString('en-US', {
@@ -36,11 +38,9 @@ export function RouteStatusBadge({
           colors.text
         )}
       >
-        {t(`status.${status}`)}
+        {t(`status.${actualStatus.toLowerCase()}`)}
       </span>
-      {formattedDate && (
-        <span className="text-muted-foreground text-xs">{formattedDate}</span>
-      )}
+      {formattedDate && <Caption>{formattedDate}</Caption>}
     </div>
   )
 }

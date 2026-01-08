@@ -1,151 +1,108 @@
-import type { Status } from './common'
+// Company status from backend
+export type CompanyStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED'
 
-// Terminal
-export type CompanyTerminal = {
-  id: string
-  address: string
-  timezone: string
-  startingTime: string // 24 Hour Period Starting Time (HH:mm:ss)
-}
+// Subscription plans (backend format)
+export type SubscriptionPlan = 'BASIC' | 'STANDARD' | 'PREMIUM' | 'ENTERPRISE'
 
-// Documents
-export type CompanyDocumentType =
-  | 'info_page'
-  | 'mc_authority'
-  | 'w9'
-  | 'notice_of_assignment'
-  | 'letter_of_release'
-  | 'certificate_of_liability_insurance'
-  | 'references'
-
+// Document from backend
 export type CompanyDocument = {
-  id: string
-  type: CompanyDocumentType
-  fileName: string | null
-  expirationDate: string | null // ISO date string
-}
-
-// Configurations
-export type CompanyEldConfig = {
-  vehicleMotionSpeedThreshold: number // mph
-}
-
-export type CompanyHosConfig = {
-  cycleRule: string
-  constantExceptions: string
-  personalUse: boolean
-  yardMoves: boolean
-}
-
-export type CompanyAppConfig = {
-  joinHosClocks: boolean
-  showTmsDashboard: boolean
-  requirePasscodeToExitInspection: boolean
-}
-
-export type CompanyAccountingConfig = {
-  settlementTemplate: string
-  weekPeriodStartDay: string
-}
-
-export type CompanyConfigurations = {
-  eld: CompanyEldConfig
-  hos: CompanyHosConfig
-  app: CompanyAppConfig
-  accounting: CompanyAccountingConfig
-}
-
-// Company entity
-export type Industry =
-  | 'transportation'
-  | 'logistics'
-  | 'manufacturing'
-  | 'retail'
-  | 'construction'
-  | 'agriculture'
-
-export type CargoType = 'property' | 'passengers' | 'hazmat' | 'household_goods'
-
-export type Company = {
-  id: string
-  // General
-  logo: string | null
+  id: number
+  type: string
   name: string
+  path: string
+  expirationDate: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+// List item - what /api/companies returns (summary for table)
+export type CompanyListItem = {
+  id: number
+  fullName: string
   displayName: string
   dotNumber: string
   mcNumber: string
   address: string
-  phone: string
+  phoneNumber: string
   emailDomain: string
-  plan: 'basic' | 'premium' | 'enterprise'
-  status: Status
-  industry: Industry
-  cargoType: CargoType
-  // Related data
-  terminals: CompanyTerminal[]
-  configurations: CompanyConfigurations
-  documents: CompanyDocument[]
-  // Legacy/computed
-  fleet: 'eminent' | 'established' | 'starter'
-  terminalCount: number
+  status: CompanyStatus
 }
 
-// Filters
+// Full company entity - what /api/companies/{id} returns (for edit form)
+export type Company = {
+  id: number
+  tenantId: number
+  fullName: string
+  displayName: string
+  dotNumber: string
+  mcNumber: string
+  address: string
+  phoneNumber: string
+  emailDomain: string
+  status: CompanyStatus
+  documents: CompanyDocument[]
+}
+
+// Request body for create/update
+export type CompanyRequest = {
+  tenantId: number
+  fullName: string
+  displayName: string
+  dotNumber: string
+  mcNumber: string
+  address: string
+  phoneNumber: string
+  emailDomain: string
+  subscriptionPlan: SubscriptionPlan
+  status: CompanyStatus
+  subscriptionStartedAt?: string
+  subscriptionEndsAt?: string
+  autoRenew?: boolean
+  monthlyPrice?: number
+  createdBy?: number
+  documents?: {
+    type: string
+    tempFileName: string
+    originalFileName: string
+    expirationDate?: string
+  }[]
+}
+
+// Filters for list
 export type CompanyFilters = {
   name?: string
   dotNumber?: string
-  status?: Status | 'all'
+  status?: CompanyStatus | 'all'
 }
 
-// Form values for company dialog
+// Document form value for creating/editing
+export type CompanyDocumentFormValue = {
+  id?: number
+  type: string
+  tempFileName?: string
+  originalFileName?: string
+  expirationDate?: string
+  isNew?: boolean
+}
+
+// Form values for company sheet
 export type CompanyFormValues = {
-  // General
-  logo: string | null
-  name: string
+  fullName: string
   displayName: string
   dotNumber: string
   mcNumber: string
   address: string
-  phone: string
+  phoneNumber: string
   emailDomain: string
-  plan: string
-  status: string
-  industry: string
-  cargoType: string
-  // Terminals
-  terminals: {
-    id: string
-    address: string
-    timezone: string
-    startingTime: string
-  }[]
-  // Configurations - ELD
-  vehicleMotionSpeedThreshold: number
-  // Configurations - HoS
-  cycleRule: string
-  constantExceptions: string
-  personalUse: boolean
-  yardMoves: boolean
-  // Configurations - App
-  joinHosClocks: boolean
-  showTmsDashboard: boolean
-  requirePasscodeToExitInspection: boolean
-  // Configurations - Accounting
-  settlementTemplate: string
-  weekPeriodStartDay: string
-  // Documents
-  documents: {
-    id: string
-    type: string
-    fileName: string | null
-    expirationDate: string | null
-  }[]
+  status: CompanyStatus
+  subscriptionPlan: SubscriptionPlan
+  documents: CompanyDocumentFormValue[]
 }
 
 // Sheet props
 export type CompanySheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  company?: Company | null
+  companyId?: number // Pass ID, sheet will fetch full data
   onSuccess?: () => void
 }

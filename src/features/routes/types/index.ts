@@ -1,99 +1,132 @@
-export type RouteStatus = 'assigned' | 'in_transit' | 'completed'
+// Route status from backend
+export type RouteStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED'
 
-export type Route = {
-  id: string
-  companyId: string
-  companyName: string
-  identifier: string
-  referenceNumber: string
-  rate: number
-  ratePerMile: number
-  distance: number
-  stops: number
-  originCity: string
-  originState: string
-  originDate: string
-  destinationCity: string
-  destinationState: string
-  destinationDate: string
-  unitNumber: string
-  driverName: string
-  dispatcher: string
-  status: RouteStatus
-  statusDate: string
+// Nested vehicle info in route response
+export type RouteVehicle = {
+  id: number
+  company: string
+  unitId: string
+  licensePlate: string
+  vin: string
+  model: string
+  make: string
+  year: number
+  driver: string
+  status: string
 }
 
+// Nested driver info in route response
+export type RouteDriver = {
+  id: number
+  companyId: number
+  companyName: string
+  name: string
+  username: string
+  phoneNumber: string
+  vehicleId: number
+  status: string
+}
+
+// Document attached to route
+export type RouteDocument = {
+  id: number
+  type: string
+  name: string
+  path: string
+  expirationDate: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+// Route entity from backend
+export type Route = {
+  id: number
+  tenantId: number
+  routeNumber: string
+  routeName: string
+  status: RouteStatus
+  origin: string
+  destination: string
+  distanceMiles: number
+  estimatedDurationHours: number
+  vehicle?: RouteVehicle | null
+  driver?: RouteDriver | null
+  vehicleId?: number
+  driverId?: number
+  scheduledStartDate: string
+  scheduledEndDate: string
+  actualStartDate?: string | null
+  actualEndDate?: string | null
+  notes?: string | null
+  createdAt: string
+  updatedAt: string
+  documents?: RouteDocument[]
+}
+
+// Request body for create/update
+export type RouteRequest = {
+  tenantId: number
+  routeNumber: string
+  routeName: string
+  status: RouteStatus
+  origin: string
+  destination: string
+  distanceMiles: number
+  estimatedDurationHours: number
+  vehicleId?: number
+  driverId?: number
+  scheduledStartDate: string
+  scheduledEndDate: string
+  actualStartDate?: string
+  actualEndDate?: string
+  notes?: string
+  documents?: {
+    type: string
+    tempFileName: string
+    originalFileName: string
+    expirationDate?: string
+  }[]
+}
+
+// Filters for list
 export type RouteFilters = {
   status?: RouteStatus | 'all'
-  company?: string
-  identifier?: string
-  rate?: string
-  trip?: string
+  searchTerm?: string
 }
 
-// Route Sheet Form Types
-export type StopType = 'pickup' | 'delivery'
-export type ArrivalSlotType = 'window' | 'appointment' | 'fcfs'
-export type UnitType = 'pallets' | 'cases' | 'pieces'
-
-export type StopReferenceNumber = {
-  type: string
-  value: string
-}
-
-export type RouteStop = {
-  id: string
-  type: StopType
-  locationId: string
-  locationName?: string
-  arrivalSlotType: ArrivalSlotType
-  startDate: string
-  endDate: string
-  referenceNumbers: StopReferenceNumber[]
-  accessories: string[]
-  requiredDocuments: string[]
-  instructions: string
-}
-
-export type RouteFormValues = {
-  // Carrier Section
-  companyId: string
-  dispatcherId: string
-  tags: string[]
-  vehicleId: string
-  driverId: string
-  coDriverId: string
-  autoDispatch: boolean
-  // Broker Section
-  brokerCompanyId: string
-  brokerRepresentativeId: string
-  brokerIdentifier: string
-  internalIdentifier: string
-  brokerRate: string
-  driverRate: string
-  rateConfirmation: File | null
-  driverRateConfirmation: File | null
-  // Stops Section
-  stops: RouteStop[]
-  // Route Section
-  routeId: string
-  emptyMilesCalculated: number
-  emptyMilesManual: string
-  loadedMilesCalculated: number
-  loadedMilesManual: string
-  // Load Section
-  weight: string
-  length: string
-  commodity: string
-  capacity: string
-  temperature: string
-  units: string
-  unitType: UnitType | ''
-}
-
+// Route sheet props
 export type RouteSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   route?: Route | null
   onSuccess?: () => void
+}
+
+// Document form value for creating/editing
+export type RouteDocumentFormValue = {
+  id?: number
+  type: string
+  tempFileName?: string
+  originalFileName?: string
+  expirationDate?: string
+  isNew?: boolean
+}
+
+// Form values for route sheet
+export type RouteFormValues = {
+  routeNumber: string
+  routeName: string
+  status: RouteStatus
+  origin: string
+  destination: string
+  distanceMiles: number
+  estimatedDurationHours: number
+  vehicleId?: number
+  driverId?: number
+  scheduledStartDate: string
+  scheduledEndDate: string
+  actualStartDate?: string
+  actualEndDate?: string
+  notes?: string
+  documents: RouteDocumentFormValue[]
 }

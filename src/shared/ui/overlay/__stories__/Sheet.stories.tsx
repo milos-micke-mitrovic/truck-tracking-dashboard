@@ -9,8 +9,8 @@ import {
   SheetDescription,
   SheetClose,
 } from '../sheet'
-import { Button } from '@/shared/ui/primitives/button'
-import { Input } from '@/shared/ui/primitives/input'
+import { Button } from '../../button'
+import { Input } from '../../input'
 
 const meta: Meta<typeof Sheet> = {
   title: 'Overlay/Sheet',

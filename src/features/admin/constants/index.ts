@@ -1,6 +1,8 @@
 // Status
 export {
   STATUS_VALUES,
+  COMPANY_STATUS_VALUES,
+  DRIVER_STATUS_VALUES,
   ENABLED_DISABLED_VALUES,
   ONLINE_STATUS_VALUES,
   type StatusValue,
@@ -50,24 +52,30 @@ export {
 
 // User
 export {
-  DEPARTMENT_VALUES,
+  USER_STATUS_VALUES,
   ROLE_VALUES,
-  type DepartmentValue,
+  type UserStatusValue,
   type RoleValue,
 } from './user'
 
 // Vehicle
 export {
+  VEHICLE_STATUS_VALUES,
+  VEHICLE_OWNERSHIP_VALUES,
+  FUEL_TYPE_VALUES,
   VEHICLE_MAKE_OPTIONS,
   VEHICLE_MAKE_VALUES,
+  type VehicleStatusValue,
+  type VehicleOwnershipValue,
+  type FuelTypeValue,
   type VehicleMakeValue,
 } from './vehicle'
 
 // Trailer
 export {
-  TRAILER_TYPE_OPTIONS,
+  TRAILER_STATUS_VALUES,
   TRAILER_TYPE_VALUES,
-  OWNERSHIP_VALUES,
+  TRAILER_OWNERSHIP_VALUES,
   type TrailerTypeValue,
   type OwnershipValue,
 } from './trailer'
@@ -85,8 +93,10 @@ export {
 export {
   COMPANY_DOCUMENT_TYPES,
   DRIVER_DOCUMENT_TYPES,
-  DEFAULT_COMPANY_DOCUMENTS,
-  DEFAULT_DRIVER_DOCUMENTS,
+  VEHICLE_DOCUMENT_TYPES,
+  TRAILER_DOCUMENT_TYPES,
+  USER_DOCUMENT_TYPES,
+  ROUTE_DOCUMENT_TYPES,
 } from './documents'
 
 // Location (countries, states)

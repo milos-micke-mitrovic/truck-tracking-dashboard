@@ -1,183 +1,129 @@
-import type { Status, EnabledDisabled } from './common'
+// Driver status (backend format)
+export type DriverStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED'
 
-// Documents
-export type DriverDocumentType =
-  | 'cdl'
-  | 'mvr'
-  | 'ssn_card'
-  | 'drug_test'
-  | 'application'
-  | 'medical_card'
-  | 'employment_verification'
-  | 'clearing_house'
-
+// Document type for drivers (from API response)
 export type DriverDocument = {
-  id: string
-  type: DriverDocumentType
-  fileName: string | null
-  expirationDate: string | null
+  id: number
+  documentType: string
+  fileName: string
+  fileSize: number
+  uploadedAt: string
 }
 
-// Configurations
-export type DriverHosConfig = {
-  cycleRule: string
-  constantExceptions: string
-  personalUse: boolean
-  yardMoves: boolean
-  exempt: boolean
+// Document request for create/update
+export type DriverDocumentRequest = {
+  type: string
+  tempFileName: string
+  originalFileName: string
+  expirationDate?: string
 }
 
-export type DriverAppConfig = {
-  joinHosClocks: boolean
-  showTmsDashboard: boolean
-  requirePasscodeToExitInspection: boolean
+// Document form value (UI state during editing)
+export type DriverDocumentFormValue = {
+  id?: number // Only present for existing documents
+  type: string
+  tempFileName?: string // For new uploads
+  originalFileName?: string
+  expirationDate?: string
+  isNew?: boolean // Flag to distinguish new vs existing
 }
 
-export type DriverConfigurations = {
-  hos: DriverHosConfig
-  app: DriverAppConfig
-}
-
-// Accounting
-export type CompensationType =
-  | 'per_mile'
-  | 'per_hour'
-  | 'percentage'
-  | 'flat_rate'
-
-export type DriverAccounting = {
-  compensationType: CompensationType | null
-  compensationRate: number | null
-  escrowDeposited: number | null
-  escrowMinimum: number | null
-  debt: number | null
-  settlementMinimalAmount: number | null
-  scheduledItems: string | null
-}
-
-// License
-export type DriverLicense = {
-  country: string
-  state: string
-  number: string
-}
-
-// Assigned To
-export type DriverAssignment = {
-  homeTerminal: string
-  suggestedVehicles: string[]
-}
-
-// Custom Attribute
-export type DriverAttribute = {
-  id: string
-  attribute: string
-  value: string
-}
-
-// Driver entity
-export type Driver = {
-  id: string
-  companyId: string
+// List item - what /api/drivers returns (summary for table)
+export type DriverListItem = {
+  id: number
+  companyId: number
   companyName: string
-  // General
+  name: string // Combined firstName + lastName
+  phoneNumber: string | null
+  status: DriverStatus
+  username: string
+  vehicleId: number | null
+}
+
+// Full driver entity - what /api/drivers/{id} returns (for edit form)
+export type Driver = {
+  id: number
+  tenantId: number
+  companyId: number
+  vehicleId: number | null
+  // Personal info
   firstName: string
   lastName: string
-  dateOfBirth: string | null
-  status: Status
-  phone: string
+  birthDate: string | null
+  // Contact
+  phoneNumber: string
   email: string
   address: string
-  comments: string
   // Credentials
   username: string
   // License
-  license: DriverLicense
-  // Assigned To
-  assignment: DriverAssignment
-  // Tags & Attributes
-  tags: string[]
-  attributes: DriverAttribute[]
-  // Configurations
-  configurations: DriverConfigurations
-  // Accounting
-  accounting: DriverAccounting
+  country: string
+  state: string
+  licenseNumber: string
+  // Assignment
+  homeTerminal: string
+  // Status
+  status: DriverStatus
+  // Timestamps
+  createdAt: string
+  updatedAt: string
   // Documents
   documents: DriverDocument[]
-  // Legacy fields for table display
-  name: string
-  personalUse: EnabledDisabled
-  yardMoves: EnabledDisabled
-  exempt: EnabledDisabled
-  cycle: EnabledDisabled
+}
+
+// Request type for create/update
+export type DriverRequest = {
+  tenantId: number
+  companyId: number
+  vehicleId?: number | null
+  firstName: string
+  lastName: string
+  birthDate?: string | null
+  phoneNumber?: string
+  email?: string
+  address?: string
+  username: string
+  password?: string // Only for create or password change
+  country?: string
+  state?: string
+  licenseNumber?: string
+  homeTerminal?: string
+  status: DriverStatus
+  documents?: DriverDocumentRequest[]
 }
 
 // Filters
 export type DriverFilters = {
   name?: string
-  phone?: string
-  status?: Status | 'all'
+  phoneNumber?: string
+  status?: DriverStatus | 'all'
+  companyId?: number
 }
 
 // Form values for driver dialog
 export type DriverFormValues = {
-  // General - Personal Info
+  companyId: number | null
+  vehicleId: number | null
   firstName: string
   lastName: string
-  dateOfBirth: string | null
-  status: string
-  phone: string
+  birthDate: string
+  phoneNumber: string
   email: string
   address: string
-  comments: string
-  // General - Credentials
   username: string
-  newPassword: string
-  // General - License
-  licenseCountry: string
-  licenseState: string
+  password: string
+  country: string
+  state: string
   licenseNumber: string
-  // General - Assigned To
   homeTerminal: string
-  suggestedVehicles: string[]
-  // General - Tags & Attributes
-  tags: string[]
-  attributes: {
-    id: string
-    attribute: string
-    value: string
-  }[]
-  // Configurations - HoS
-  cycleRule: string
-  constantExceptions: string
-  personalUse: boolean
-  yardMoves: boolean
-  exempt: boolean
-  // Configurations - App
-  joinHosClocks: boolean
-  showTmsDashboard: boolean
-  requirePasscodeToExitInspection: boolean
-  // Accounting
-  compensationType: string
-  compensationRate: string
-  escrowDeposited: string
-  escrowMinimum: string
-  debt: string
-  settlementMinimalAmount: string
-  scheduledItems: string
-  // Documents
-  documents: {
-    id: string
-    type: string
-    fileName: string | null
-    expirationDate: string | null
-  }[]
+  status: DriverStatus
+  documents: DriverDocumentFormValue[]
 }
 
 // Sheet props
 export type DriverSheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  driver?: Driver | null
+  driverId?: number // Pass ID, sheet will fetch full data
   onSuccess?: () => void
 }

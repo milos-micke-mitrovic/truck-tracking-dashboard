@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Tooltip, TooltipTrigger, TooltipContent } from '../tooltip'
-import { Button } from '@/shared/ui/primitives/button'
+import { Button } from '../../button'
 import { PlusIcon, TrashIcon, PencilIcon, CopyIcon } from 'lucide-react'
 
 const meta: Meta<typeof Tooltip> = {

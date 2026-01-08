@@ -3,8 +3,8 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useUsers } from '../api'
 import { useAdminTab } from '../hooks'
-import type { User, UserFilters } from '../types'
-import { STATUS_VALUES, DEPARTMENT_VALUES } from '../constants'
+import type { UserListItem, UserFilters } from '../types'
+import { USER_STATUS_VALUES, ROLE_VALUES } from '../constants'
 import { StatusBadge } from './status-badge'
 import { UserSheet } from './dialogs'
 import { Button, Input, Select, Badge, BodySmall } from '@/shared/ui'
@@ -22,44 +22,33 @@ export function UsersTab() {
     selectedItem,
     handleRowClick,
     handleAdd,
-  } = useAdminTab<UserFilters, User>({
-    defaultFilters: { status: 'active' },
+  } = useAdminTab<UserFilters, UserListItem>({
+    defaultFilters: { status: 'ACTIVE' },
   })
 
-  const { data, isLoading, refetch } = useUsers({
+  const { data, isLoading, isFetching } = useUsers({
     ...filters,
     ...pagination,
   })
 
-  const columns: ColumnDef<User>[] = [
+  const columns: ColumnDef<UserListItem>[] = [
     {
-      accessorKey: 'companyNames',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.companies')} />
-      ),
-      cell: ({ row }) => {
-        const companies = row.original.companyNames
-        if (companies.length === 1) return companies[0]
-        return `${companies.length} companies`
-      },
-    },
-    {
-      accessorKey: 'name',
+      accessorKey: 'firstName',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.name')} />
       ),
+      cell: ({ row }) => {
+        const firstName = row.original.firstName || ''
+        const lastName = row.original.lastName || ''
+        return `${firstName} ${lastName}`.trim() || '-'
+      },
     },
     {
       accessorKey: 'username',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.username')} />
       ),
-    },
-    {
-      accessorKey: 'extension',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.extension')} />
-      ),
+      cell: ({ row }) => row.original.username || '-',
     },
     {
       accessorKey: 'email',
@@ -80,7 +69,7 @@ export function UsersTab() {
           title={t('columns.department')}
         />
       ),
-      cell: ({ row }) => t(`departments.${row.original.department}`),
+      cell: ({ row }) => row.original.department || '-',
     },
     {
       accessorKey: 'role',
@@ -88,23 +77,27 @@ export function UsersTab() {
         <DataTableColumnHeader column={column} title={t('columns.role')} />
       ),
       cell: ({ row }) => (
-        <Badge variant="outline">{t(`roles.${row.original.role}`)}</Badge>
+        <Badge variant="outline">
+          {t(`roles.${row.original.role.toLowerCase()}`)}
+        </Badge>
       ),
-    },
-    {
-      accessorKey: 'tags',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.tags')} />
-      ),
-      cell: ({ row }) =>
-        row.original.tags.length > 0 ? row.original.tags.join(', ') : '-',
     },
     {
       accessorKey: 'status',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.status')} />
       ),
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      cell: ({ row }) => (
+        <StatusBadge
+          status={
+            (row.original.status?.toLowerCase() || 'inactive') as
+              | 'active'
+              | 'inactive'
+              | 'pending'
+              | 'suspended'
+          }
+        />
+      ),
     },
   ]
 
@@ -114,35 +107,36 @@ export function UsersTab() {
         <div className="flex flex-wrap items-center gap-3">
           <Input
             placeholder={t('filters.name')}
-            value={filters.name || ''}
+            value={filters.firstName || ''}
             debounce={300}
-            onDebounceChange={(value) => updateFilter('name', value)}
+            onDebounceChange={(value) => updateFilter('firstName', value)}
+            clearable
             className="w-[200px]"
           />
           <Select
             options={[
               { value: 'all', label: t('filters.all') },
-              ...DEPARTMENT_VALUES.map((value) => ({
+              ...ROLE_VALUES.map((value) => ({
                 value,
-                label: t(`departments.${value}`),
+                label: t(`roles.${value.toLowerCase()}`),
               })),
             ]}
-            value={filters.department || 'all'}
+            value={filters.role || 'all'}
             onChange={(value) =>
-              updateFilter('department', value as UserFilters['department'])
+              updateFilter('role', value as UserFilters['role'])
             }
-            placeholder={t('filters.department')}
+            placeholder={t('columns.role')}
             className="w-[160px]"
           />
           <Select
             options={[
               { value: 'all', label: t('filters.all') },
-              ...STATUS_VALUES.map((value) => ({
+              ...USER_STATUS_VALUES.map((value) => ({
                 value,
-                label: t(`status.${value}`),
+                label: t(`status.${value.toLowerCase()}`),
               })),
             ]}
-            value={filters.status || 'active'}
+            value={filters.status || 'ACTIVE'}
             onChange={(value) =>
               updateFilter('status', value as UserFilters['status'])
             }
@@ -158,21 +152,20 @@ export function UsersTab() {
       </div>
       <DataTable
         columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
+        data={data?.content || []}
+        isLoading={isLoading || isFetching}
         manualPagination
-        pageCount={data?.meta.totalPages}
-        totalCount={data?.meta.total}
-        pageIndex={pagination.page - 1}
-        pageSize={pagination.pageSize}
+        pageCount={data?.totalPages}
+        totalCount={data?.totalElements}
+        pageIndex={pagination.page}
+        pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
         onRowClick={handleRowClick}
       />
       <UserSheet
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        user={selectedItem}
-        onSuccess={() => refetch()}
+        userId={selectedItem?.id}
       />
     </div>
   )

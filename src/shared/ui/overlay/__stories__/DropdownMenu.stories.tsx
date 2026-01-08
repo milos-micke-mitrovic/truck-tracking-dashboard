@@ -16,7 +16,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from '../dropdown-menu'
-import { Button } from '@/shared/ui/primitives/button'
+import { Button } from '../../button'
 import {
   UserIcon,
   CreditCardIcon,

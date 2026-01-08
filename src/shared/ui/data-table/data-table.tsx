@@ -10,7 +10,7 @@ import {
   type ColumnFiltersState,
   type PaginationState,
 } from '@tanstack/react-table'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   Table,
   TableBody,
@@ -18,9 +18,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/ui/primitives/table'
-import { Spinner } from '@/shared/ui/primitives/spinner'
-import { BodySmall } from '@/shared/ui/typography'
+} from '../table'
+import { Spinner } from '../spinner'
+import { BodySmall } from '../typography'
 import { DataTablePagination } from './data-table-pagination'
 
 type DataTableProps<TData, TValue> = {
@@ -69,8 +69,19 @@ export function DataTable<TData, TValue>({
 
   const isTableLoading = loading || isLoading
 
+  // Keep previous data visible during loading
+  const previousDataRef = useRef<TData[]>(data)
+  useEffect(() => {
+    if (!isTableLoading && data.length > 0) {
+      previousDataRef.current = data
+    }
+  }, [data, isTableLoading])
+
+  // Use previous data while loading, current data otherwise
+  const displayData = isTableLoading && data.length === 0 ? previousDataRef.current : data
+
   const table = useReactTable({
-    data,
+    data: displayData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: pagination ? getPaginationRowModel() : undefined,
@@ -149,13 +160,16 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-        {(isTableLoading || showEmptyState) && (
+        {/* Loading overlay with backdrop */}
+        {isTableLoading && (
+          <div className="absolute inset-0 top-10 flex items-center justify-center bg-background/60 backdrop-blur-[1px]">
+            <Spinner />
+          </div>
+        )}
+        {/* Empty state */}
+        {showEmptyState && (
           <div className="pointer-events-none absolute inset-0 top-10 flex items-center justify-center">
-            {isTableLoading ? (
-              <Spinner />
-            ) : (
-              <BodySmall color="muted">{emptyText}</BodySmall>
-            )}
+            <BodySmall color="muted">{emptyText}</BodySmall>
           </div>
         )}
       </div>

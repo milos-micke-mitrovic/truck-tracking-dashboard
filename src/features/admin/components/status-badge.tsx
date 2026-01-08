@@ -4,6 +4,8 @@ import { Badge } from '@/shared/ui'
 type Status =
   | 'active'
   | 'inactive'
+  | 'pending'
+  | 'suspended'
   | 'online'
   | 'offline'
   | 'enabled'
@@ -13,9 +15,11 @@ type StatusBadgeProps = {
   status: Status
 }
 
-const statusColors: Record<Status, 'success' | 'muted'> = {
+const statusColors: Record<Status, 'success' | 'muted' | 'warning' | 'info'> = {
   active: 'success',
   inactive: 'muted',
+  pending: 'info',
+  suspended: 'warning',
   online: 'success',
   offline: 'muted',
   enabled: 'success',

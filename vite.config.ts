@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
             'vendor-table': ['@tanstack/react-table'],
             'vendor-query': ['@tanstack/react-query'],
             'vendor-form': ['react-hook-form', 'zod', '@hookform/resolvers'],
+            'vendor-map': ['leaflet', 'react-leaflet'],
           },
         },
       },

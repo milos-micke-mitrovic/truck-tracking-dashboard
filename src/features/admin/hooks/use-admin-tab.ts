@@ -3,16 +3,16 @@ import type { PaginationState } from '@tanstack/react-table'
 
 type UseAdminTabOptions<TFilters> = {
   defaultFilters: TFilters
-  defaultPagination?: { page: number; pageSize: number }
+  defaultPagination?: { page: number; size: number }
 }
 
 type UseAdminTabReturn<TFilters, TItem> = {
   filters: TFilters
   setFilters: React.Dispatch<React.SetStateAction<TFilters>>
   updateFilter: <K extends keyof TFilters>(key: K, value: TFilters[K]) => void
-  pagination: { page: number; pageSize: number }
+  pagination: { page: number; size: number } // 0-based page for Spring Boot
   setPagination: React.Dispatch<
-    React.SetStateAction<{ page: number; pageSize: number }>
+    React.SetStateAction<{ page: number; size: number }>
   >
   dialogOpen: boolean
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -25,7 +25,7 @@ type UseAdminTabReturn<TFilters, TItem> = {
 
 export function useAdminTab<TFilters, TItem>({
   defaultFilters,
-  defaultPagination = { page: 1, pageSize: 20 },
+  defaultPagination = { page: 0, size: 20 },
 }: UseAdminTabOptions<TFilters>): UseAdminTabReturn<TFilters, TItem> {
   const [filters, setFilters] = useState<TFilters>(defaultFilters)
   const [pagination, setPagination] = useState(defaultPagination)
@@ -35,6 +35,7 @@ export function useAdminTab<TFilters, TItem>({
   const updateFilter = useCallback(
     <K extends keyof TFilters>(key: K, value: TFilters[K]) => {
       setFilters((prev) => ({ ...prev, [key]: value }))
+      setPagination((prev) => ({ ...prev, page: 0 })) // Reset to first page
     },
     []
   )
@@ -50,7 +51,7 @@ export function useAdminTab<TFilters, TItem>({
   }, [])
 
   const handlePaginationChange = useCallback((state: PaginationState) => {
-    setPagination({ page: state.pageIndex + 1, pageSize: state.pageSize })
+    setPagination({ page: state.pageIndex, size: state.pageSize })
   }, [])
 
   return {

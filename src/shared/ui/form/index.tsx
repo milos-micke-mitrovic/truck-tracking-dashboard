@@ -15,7 +15,8 @@ import {
 } from 'react-hook-form'
 
 import { cn } from '@/shared/utils'
-import { Label } from '@/shared/ui/primitives/label'
+import { Label } from '../label'
+import { Caption } from '../typography'
 
 type FormProps<TFieldValues extends FieldValues = FieldValues> = Omit<
   React.ComponentProps<'form'>,
@@ -154,36 +155,34 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
   )
 }
 
-function FormDescription({ className, ...props }: React.ComponentProps<'p'>) {
+function FormDescription({
+  className,
+  children,
+}: React.ComponentProps<'p'>) {
   const { formDescriptionId } = useFormField()
 
   return (
-    <p
-      data-slot="form-description"
-      id={formDescriptionId}
-      className={cn('text-muted-foreground text-[11px]', className)}
-      {...props}
-    />
+    <Caption data-slot="form-description" id={formDescriptionId} className={className}>
+      {children}
+    </Caption>
   )
 }
 
-function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
+function FormMessage({
+  className,
+  children,
+}: React.ComponentProps<'p'>) {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? '') : props.children
+  const body = error ? String(error?.message ?? '') : children
 
   if (!body) {
     return null
   }
 
   return (
-    <p
-      data-slot="form-message"
-      id={formMessageId}
-      className={cn('text-destructive text-[11px]', className)}
-      {...props}
-    >
+    <Caption data-slot="form-message" id={formMessageId} color="error" className={className}>
       {body}
-    </p>
+    </Caption>
   )
 }
 

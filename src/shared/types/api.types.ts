@@ -1,31 +1,21 @@
-export type ApiResponse<T> = {
-  data: T
-  message?: string
+// Spring Boot Page response format
+export type PageResponse<T> = {
+  content: T[]
+  totalPages: number
+  totalElements: number
+  size: number
+  number: number // 0-based page index
+  first: boolean
+  last: boolean
+  empty: boolean
 }
 
-export type PaginatedResponse<T> = {
-  data: T[]
-  pagination: {
-    page: number
-    pageSize: number
-    totalCount: number
-    totalPages: number
-  }
+// Pagination params for Spring Boot
+export type PageParams = {
+  page?: number // 0-based
+  size?: number
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
 }
 
 export type SortDirection = 'asc' | 'desc'
-
-export type SortConfig<T> = {
-  field: keyof T
-  direction: SortDirection
-}
-
-export type PaginationParams = {
-  page?: number
-  pageSize?: number
-}
-
-export type FilterParams = {
-  search?: string
-  [key: string]: unknown
-}

@@ -11,7 +11,7 @@ import {
   CommandShortcut,
   CommandSeparator,
 } from '../command'
-import { Button } from '@/shared/ui/primitives/button'
+import { Button } from '../../button'
 import {
   CalendarIcon,
   SmileIcon,

@@ -2,8 +2,8 @@ import { useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { PaginationState } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
-import { useRoutes, useCompaniesForRoutes } from '../api'
-import type { Route, RouteFilters } from '../types'
+import { useRoutes } from '../api'
+import type { Route, RouteFilters, RouteStatus } from '../types'
 import { ROUTE_STATUS_VALUES } from '../constants'
 import { RouteSheet } from '../components/route-sheet'
 import { getRoutesColumns } from '../components/routes-columns'
@@ -17,33 +17,30 @@ export function RoutesPage() {
 
   const [filters, setFilters] = useState<RouteFilters>({
     status: 'all',
-    company: 'all',
   })
 
   const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 20,
+    page: 0,
+    size: 20,
   })
 
-  const { data, isLoading, refetch } = useRoutes({
+  const { data, isLoading, isFetching } = useRoutes({
     ...filters,
     ...pagination,
   })
-
-  const { data: companies } = useCompaniesForRoutes()
 
   const updateFilter = <K extends keyof RouteFilters>(
     key: K,
     value: RouteFilters[K]
   ) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
-    setPagination((prev) => ({ ...prev, page: 1 }))
+    setPagination((prev) => ({ ...prev, page: 0 }))
   }
 
   const handlePaginationChange = useCallback((state: PaginationState) => {
     setPagination({
-      page: state.pageIndex + 1,
-      pageSize: state.pageSize,
+      page: state.pageIndex,
+      size: state.pageSize,
     })
   }, [])
 
@@ -65,16 +62,11 @@ export function RoutesPage() {
     }
   }
 
-  const companyOptions = [
-    { value: 'all', label: t('filters.all') },
-    ...(companies?.map((c) => ({ value: c.id, label: c.name })) || []),
-  ]
-
   const statusOptions = [
     { value: 'all', label: t('filters.all') },
     ...ROUTE_STATUS_VALUES.map((value) => ({
       value,
-      label: t(`status.${value}`),
+      label: t(`status.${value.toLowerCase()}`),
     })),
   ]
 
@@ -89,38 +81,19 @@ export function RoutesPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2 py-3">
-          <Select
-            options={companyOptions}
-            value={filters.company || 'all'}
-            onChange={(value) => updateFilter('company', value)}
-            className="w-[160px]"
-          />
           <Input
-            placeholder={t('filters.identifier')}
-            value={filters.identifier || ''}
+            placeholder={t('filters.search')}
+            value={filters.searchTerm || ''}
             debounce={300}
-            onDebounceChange={(value) => updateFilter('identifier', value)}
-            className="w-[140px]"
-          />
-          <Input
-            placeholder={t('filters.rate')}
-            value={filters.rate || ''}
-            debounce={300}
-            onDebounceChange={(value) => updateFilter('rate', value)}
-            className="w-[120px]"
-          />
-          <Input
-            placeholder={t('filters.trip')}
-            value={filters.trip || ''}
-            debounce={300}
-            onDebounceChange={(value) => updateFilter('trip', value)}
-            className="w-[100px]"
+            onDebounceChange={(value) => updateFilter('searchTerm', value)}
+            clearable
+            className="w-[200px]"
           />
           <Select
             options={statusOptions}
             value={filters.status || 'all'}
             onChange={(value) =>
-              updateFilter('status', value as RouteFilters['status'])
+              updateFilter('status', value as RouteStatus | 'all')
             }
             className="w-[140px]"
           />
@@ -141,13 +114,13 @@ export function RoutesPage() {
 
         <DataTable
           columns={columns}
-          data={data?.data || []}
-          isLoading={isLoading}
+          data={data?.content || []}
+          isLoading={isLoading || isFetching}
           manualPagination
-          pageCount={data?.meta.totalPages}
-          totalCount={data?.meta.total}
-          pageIndex={pagination.page - 1}
-          pageSize={pagination.pageSize}
+          pageCount={data?.totalPages}
+          totalCount={data?.totalElements}
+          pageIndex={pagination.page}
+          pageSize={pagination.size}
           onPaginationChange={handlePaginationChange}
           onRowClick={handleRowClick}
         />
@@ -157,7 +130,6 @@ export function RoutesPage() {
         open={routeSheetOpen}
         onOpenChange={handleSheetOpenChange}
         route={selectedRoute}
-        onSuccess={() => refetch()}
       />
     </div>
   )

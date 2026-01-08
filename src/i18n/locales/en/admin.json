@@ -3,6 +3,15 @@
   "validation": {
     "required": "This field is required"
   },
+  "documents": {
+    "title": "Documents",
+    "type": "Type",
+    "selectType": "Select document type",
+    "uploadPdf": "Upload PDF",
+    "expirationDate": "Expiration Date",
+    "addDocument": "Add Document",
+    "selectDate": "Select date"
+  },
   "tabs": {
     "companies": "Companies",
     "drivers": "Drivers",
@@ -90,11 +99,15 @@
     "sequenceId": "Sequence ID",
     "online": "Online",
     "snNumber": "S/N",
-    "asset": "Asset"
+    "asset": "Asset",
+    "licenseNumber": "License #",
+    "homeTerminal": "Home Terminal"
   },
   "status": {
     "active": "Active",
     "inactive": "Inactive",
+    "pending": "Pending",
+    "suspended": "Suspended",
     "online": "Online",
     "offline": "Offline",
     "enabled": "Enabled",
@@ -105,9 +118,12 @@
     "contractor": "Contractor"
   },
   "roles": {
-    "company_admin": "Company Admin",
-    "support_personnel": "Support Personnel",
-    "dispatcher": "Dispatcher"
+    "user": "User",
+    "admin": "Admin",
+    "manager": "Manager",
+    "driver": "Driver",
+    "dispatcher": "Dispatcher",
+    "accounting": "Accounting"
   },
   "departments": {
     "dispatch": "Dispatch",
@@ -122,6 +138,7 @@
   },
   "plan": {
     "basic": "Basic",
+    "standard": "Standard",
     "premium": "Premium",
     "enterprise": "Enterprise"
   },
@@ -158,6 +175,11 @@
     "logoHint": "PNG, JPG or SVG (max 2MB)",
     "fullName": "Full Name",
     "displayName": "Display Name",
+    "dotNumber": "DOT Number",
+    "mcNumber": "MC Number",
+    "address": "Address",
+    "phoneNumber": "Phone Number",
+    "emailDomain": "Email Domain",
     "companyInfo": "Company Info",
     "contact": "Contact",
     "subscription": "Subscription",
@@ -236,29 +258,108 @@
     "deleteConfirmTitle": "Delete Document",
     "deleteConfirmMessage": "Are you sure you want to delete this document?",
     "removeWholeDocument": "Remove whole document",
-    "confirmDelete": "Delete"
+    "confirmDelete": "Delete",
+    "createSuccess": "Company created successfully",
+    "updateSuccess": "Company updated successfully",
+    "error": "An error occurred. Please try again.",
+    "sections": {
+      "general": "General",
+      "contact": "Contact",
+      "settings": "Settings"
+    },
+    "status": "Status",
+    "subscriptionPlan": "Subscription Plan"
   },
   "vehicleSheet": {
     "editTitle": "Edit Vehicle",
     "editDescription": "Update the vehicle details.",
     "identification": "Identification",
-    "specifications": "Specifications"
+    "specifications": "Specifications",
+    "registration": "Registration",
+    "insurance": "Insurance",
+    "cargo": "Cargo & Capabilities",
+    "assignment": "Assignment",
+    "documents": "Documents",
+    "fuelType": "Fuel Type",
+    "odometer": "Odometer (miles)",
+    "currentLocation": "Current Location",
+    "insurancePolicyNumber": "Policy Number",
+    "insuranceExpiry": "Insurance Expiry",
+    "cargoCapacityCubicFt": "Cargo Capacity (cu ft)",
+    "cargoCapacityLbs": "Cargo Capacity (lbs)",
+    "hasRefrigeration": "Has Refrigeration",
+    "isHazmatCertified": "Hazmat Certified",
+    "selectCompany": "Select company",
+    "selectDriver": "Select driver",
+    "documentType": "Type",
+    "expirationDate": "Expiration Date",
+    "addDocument": "Add Document",
+    "selectDocumentType": "Select document type",
+    "uploadPdf": "Upload PDF",
+    "documentTypes": {
+      "registration": "Registration",
+      "insurance": "Insurance",
+      "inspection": "Inspection",
+      "title": "Title",
+      "lease_agreement": "Lease Agreement",
+      "maintenance_record": "Maintenance Record"
+    },
+    "createSuccess": "Vehicle created successfully",
+    "updateSuccess": "Vehicle updated successfully",
+    "error": "An error occurred. Please try again."
   },
   "trailerSheet": {
     "editTitle": "Edit Trailer",
     "editDescription": "Update the trailer details.",
     "identification": "Identification",
-    "specifications": "Specifications"
+    "specifications": "Specifications",
+    "registration": "Registration",
+    "lengthFeet": "Length (ft)",
+    "registrationExpiry": "Registration Expiry",
+    "createSuccess": "Trailer created successfully",
+    "updateSuccess": "Trailer updated successfully",
+    "error": "An error occurred. Please try again."
+  },
+  "trailerType": {
+    "dry_van": "Dry Van",
+    "refrigerated": "Refrigerated",
+    "flatbed": "Flatbed",
+    "tanker": "Tanker",
+    "container": "Container"
+  },
+  "trailerOwnership": {
+    "company_owned": "Company Owned",
+    "leased": "Leased",
+    "owner_operator": "Owner Operator"
   },
   "userSheet": {
     "editTitle": "Edit User",
     "editDescription": "Update the user account details.",
     "accountInfo": "Account Info",
-    "roleAndAccess": "Role & Access"
+    "roleAndAccess": "Role & Access",
+    "assignment": "Assignment",
+    "documents": "Documents",
+    "documentType": "Type",
+    "expirationDate": "Expiration Date",
+    "addDocument": "Add Document",
+    "selectDocumentType": "Select document type",
+    "uploadPdf": "Upload PDF",
+    "documentTypes": {
+      "id_card": "ID Card",
+      "passport": "Passport",
+      "contract": "Contract",
+      "certification": "Certification",
+      "background_check": "Background Check"
+    },
+    "selectCompany": "Select company",
+    "createSuccess": "User created successfully",
+    "updateSuccess": "User updated successfully",
+    "error": "An error occurred. Please try again."
   },
   "driverDialog": {
     "addTitle": "Add Driver",
     "editTitle": "Edit Driver",
+    "selectDate": "Select date",
     "tabs": {
       "general": "General",
       "configurations": "Configurations",
@@ -287,8 +388,10 @@
     "assignedTo": "Assigned To",
     "homeTerminal": "Home Terminal",
     "selectTerminal": "Select terminal",
+    "selectCompany": "Select company",
     "suggestedVehicles": "Suggested Vehicles",
     "selectVehicle": "Select vehicle",
+    "uploadError": "Failed to upload file",
     "section": "Section",
     "tags": "Tags",
     "selectTags": "Select tags",
@@ -339,6 +442,10 @@
     "deleteConfirmTitle": "Delete Document",
     "deleteConfirmMessage": "Are you sure you want to delete this document?",
     "removeWholeDocument": "Remove whole document",
-    "confirmDelete": "Delete"
+    "confirmDelete": "Delete",
+    "leaveBlank": "Leave blank to keep current",
+    "createSuccess": "Driver created successfully",
+    "updateSuccess": "Driver updated successfully",
+    "error": "An error occurred. Please try again."
   }
 }

@@ -3,8 +3,8 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useVehicles } from '../api'
 import { useAdminTab } from '../hooks'
-import type { Vehicle, VehicleFilters } from '../types'
-import { STATUS_VALUES } from '../constants'
+import type { VehicleListItem, VehicleFilters } from '../types'
+import { VEHICLE_STATUS_VALUES } from '../constants'
 import { StatusBadge } from './status-badge'
 import { VehicleSheet } from './dialogs'
 import { Button, Input, Select, BodySmall, Caption } from '@/shared/ui'
@@ -22,29 +22,18 @@ export function VehiclesTab() {
     selectedItem,
     handleRowClick,
     handleAdd,
-  } = useAdminTab<VehicleFilters, Vehicle>({
-    defaultFilters: { status: 'active' },
+  } = useAdminTab<VehicleFilters, VehicleListItem>({
+    defaultFilters: { status: 'ACTIVE' },
   })
 
-  const { data, isLoading, refetch } = useVehicles({
+  const { data, isLoading, isFetching } = useVehicles({
     ...filters,
     ...pagination,
   })
 
-  const columns: ColumnDef<Vehicle>[] = [
+  const columns: ColumnDef<VehicleListItem>[] = [
     {
-      accessorKey: 'companyName',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.company')} />
-      ),
-      cell: ({ row }) => (
-        <BodySmall as="span" truncate className="max-w-[180px]">
-          {row.original.companyName}
-        </BodySmall>
-      ),
-    },
-    {
-      accessorKey: 'unitNumber',
+      accessorKey: 'unitId',
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}
@@ -73,15 +62,15 @@ export function VehiclesTab() {
       ),
     },
     {
-      accessorKey: 'model',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.model')} />
-      ),
-    },
-    {
       accessorKey: 'make',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.make')} />
+      ),
+    },
+    {
+      accessorKey: 'model',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('columns.model')} />
       ),
     },
     {
@@ -91,26 +80,32 @@ export function VehiclesTab() {
       ),
     },
     {
-      accessorKey: 'driverName',
+      accessorKey: 'driver',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.driver')} />
       ),
-      cell: ({ row }) => row.original.driverName || '-',
-    },
-    {
-      accessorKey: 'tags',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.tags')} />
+      cell: ({ row }) => (
+        <BodySmall as="span" truncate className="max-w-[150px]">
+          {row.original.driver || '-'}
+        </BodySmall>
       ),
-      cell: ({ row }) =>
-        row.original.tags.length > 0 ? row.original.tags.join(', ') : '-',
     },
     {
       accessorKey: 'status',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.status')} />
       ),
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      cell: ({ row }) => (
+        <StatusBadge
+          status={
+            (row.original.status?.toLowerCase() || 'inactive') as
+              | 'active'
+              | 'inactive'
+              | 'pending'
+              | 'suspended'
+          }
+        />
+      ),
     },
   ]
 
@@ -120,20 +115,21 @@ export function VehiclesTab() {
         <div className="flex flex-wrap items-center gap-3">
           <Input
             placeholder={t('filters.unitNumber')}
-            value={filters.unitNumber || ''}
+            value={filters.unitId || ''}
             debounce={300}
-            onDebounceChange={(value) => updateFilter('unitNumber', value)}
+            onDebounceChange={(value) => updateFilter('unitId', value)}
+            clearable
             className="w-[150px]"
           />
           <Select
             options={[
               { value: 'all', label: t('filters.all') },
-              ...STATUS_VALUES.map((value) => ({
+              ...VEHICLE_STATUS_VALUES.map((value) => ({
                 value,
-                label: t(`status.${value}`),
+                label: t(`status.${value.toLowerCase()}`),
               })),
             ]}
-            value={filters.status || 'active'}
+            value={filters.status || 'ACTIVE'}
             onChange={(value) =>
               updateFilter('status', value as VehicleFilters['status'])
             }
@@ -149,21 +145,20 @@ export function VehiclesTab() {
       </div>
       <DataTable
         columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
+        data={data?.content || []}
+        isLoading={isLoading || isFetching}
         manualPagination
-        pageCount={data?.meta.totalPages}
-        totalCount={data?.meta.total}
-        pageIndex={pagination.page - 1}
-        pageSize={pagination.pageSize}
+        pageCount={data?.totalPages}
+        totalCount={data?.totalElements}
+        pageIndex={pagination.page}
+        pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
         onRowClick={handleRowClick}
       />
       <VehicleSheet
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        vehicle={selectedItem}
-        onSuccess={() => refetch()}
+        vehicleId={selectedItem?.id}
       />
     </div>
   )

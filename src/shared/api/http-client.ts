@@ -36,14 +36,15 @@ function getAuthToken(): string | null {
   return null
 }
 
-// Clear auth and redirect on 401
+// Clear auth and redirect on 401/403
 function handleUnauthorized() {
   localStorage.removeItem(AUTH_STORAGE_KEY)
   window.location.href = '/login'
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
-  if (response.status === 401) {
+  // Handle both 401 (Unauthorized) and 403 (Forbidden) as auth errors
+  if (response.status === 401 || response.status === 403) {
     handleUnauthorized()
     throw new HttpError(response.status, response.statusText)
   }

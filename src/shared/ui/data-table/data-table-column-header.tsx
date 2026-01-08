@@ -1,14 +1,7 @@
 import type { Column } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 import { cn } from '@/shared/utils'
-import { Button } from '@/shared/ui/primitives/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/ui/overlay/dropdown-menu'
+import { Button } from '../button'
 
 type DataTableColumnHeaderProps<TData, TValue> = {
   column: Column<TData, TValue>
@@ -25,45 +18,35 @@ export function DataTableColumnHeader<TData, TValue>({
     return <div className={cn(className)}>{title}</div>
   }
 
+  // Toggle sorting: unsorted → asc → desc → unsorted
+  const handleSort = () => {
+    const currentSort = column.getIsSorted()
+    if (currentSort === false) {
+      column.toggleSorting(false) // Set to asc
+    } else if (currentSort === 'asc') {
+      column.toggleSorting(true) // Set to desc
+    } else {
+      column.clearSorting() // Clear sorting
+    }
+  }
+
   return (
     <div className={cn('flex items-center space-x-2', className)}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="data-[state=open]:bg-accent -ml-3 h-8"
-          >
-            <span>{title}</span>
-            {column.getIsSorted() === 'desc' ? (
-              <ArrowDown className="ml-2 size-4" />
-            ) : column.getIsSorted() === 'asc' ? (
-              <ArrowUp className="ml-2 size-4" />
-            ) : (
-              <ChevronsUpDown className="ml-2 size-4" />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUp className="text-muted-foreground/70 mr-2 size-3.5" />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDown className="text-muted-foreground/70 mr-2 size-3.5" />
-            Desc
-          </DropdownMenuItem>
-          {column.getCanHide() && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-                <EyeOff className="text-muted-foreground/70 mr-2 size-3.5" />
-                Hide
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="-ml-3 h-8"
+        onClick={handleSort}
+      >
+        <span>{title}</span>
+        {column.getIsSorted() === 'desc' ? (
+          <ArrowDown className="ml-2 size-4" />
+        ) : column.getIsSorted() === 'asc' ? (
+          <ArrowUp className="ml-2 size-4" />
+        ) : (
+          <ChevronsUpDown className="text-muted-foreground/70 ml-2 size-4" />
+        )}
+      </Button>
     </div>
   )
 }

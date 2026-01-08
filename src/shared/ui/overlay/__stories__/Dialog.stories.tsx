@@ -10,8 +10,8 @@ import {
   DialogDescription,
   DialogClose,
 } from '../dialog'
-import { Button } from '@/shared/ui/primitives/button'
-import { Input } from '@/shared/ui/primitives/input'
+import { Button } from '../../button'
+import { Input } from '../../input'
 
 const meta: Meta<typeof Dialog> = {
   title: 'Overlay/Dialog',

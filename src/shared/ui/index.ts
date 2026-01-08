@@ -1,21 +1,16 @@
-// Primitives
+// Simple components (root level)
+export { Button, IconButton, buttonVariants } from './button'
+export { Input } from './input'
+export { Checkbox } from './checkbox'
+export { Label } from './label'
+export { RadioGroup, type RadioOption } from './radio-group'
+export { Switch } from './switch'
+export { Textarea } from './textarea'
+export { Separator } from './separator'
+export { Skeleton } from './skeleton'
+export { Spinner } from './spinner'
+export { Badge, badgeVariants } from './badge'
 export {
-  Button,
-  IconButton,
-  buttonVariants,
-  Input,
-  Checkbox,
-  Label,
-  RadioGroup,
-  Switch,
-  Textarea,
-  Select,
-  MultiSelect,
-  Separator,
-  Skeleton,
-  Spinner,
-  Badge,
-  badgeVariants,
   Table,
   TableBody,
   TableCaption,
@@ -24,15 +19,20 @@ export {
   TableHead,
   TableHeader,
   TableRow,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  ImageUpload,
-  type SelectOption,
-  type MultiSelectOption,
-  type RadioOption,
-} from './primitives'
+} from './table'
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
+
+// Select
+export { Select, MultiSelect, type SelectOption, type MultiSelectOption } from './select'
+
+// Date & Time
+export { Calendar, DatePicker, TimePicker } from './date-time'
+
+// Upload
+export { FileUpload, ImageUpload } from './upload'
+
+// Location
+export { LocationPicker } from './location'
 
 // Overlay
 export {

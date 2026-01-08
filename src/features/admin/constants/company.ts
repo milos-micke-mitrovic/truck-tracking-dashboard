@@ -1,8 +1,13 @@
-// Plan options (labels come from translations)
-export const PLAN_VALUES = ['basic', 'premium', 'enterprise'] as const
+// Plan options (backend format - labels come from translations)
+export const PLAN_VALUES = [
+  'BASIC',
+  'STANDARD',
+  'PREMIUM',
+  'ENTERPRISE',
+] as const
 export type PlanValue = (typeof PLAN_VALUES)[number]
 
-export const DEFAULT_PLAN: PlanValue = 'basic'
+export const DEFAULT_PLAN: PlanValue = 'BASIC'
 
 // Fleet options
 export const FLEET_OPTIONS = [

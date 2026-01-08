@@ -6,9 +6,9 @@ import {
   ChevronsRight,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { IconButton } from '@/shared/ui/primitives/button'
-import { Select } from '@/shared/ui/primitives/select'
-import { BodySmall } from '@/shared/ui/typography'
+import { IconButton } from '../button'
+import { Select } from '../select'
+import { BodySmall } from '../typography'
 
 type DataTablePaginationProps<TData> = {
   table: Table<TData>

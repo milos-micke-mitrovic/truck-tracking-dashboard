@@ -3,8 +3,8 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useCompanies } from '../api'
 import { useAdminTab } from '../hooks'
-import type { Company, CompanyFilters } from '../types'
-import { STATUS_VALUES } from '../constants'
+import type { CompanyListItem, CompanyFilters, CompanyStatus } from '../types'
+import { COMPANY_STATUS_VALUES } from '../constants'
 import { StatusBadge } from './status-badge'
 import { CompanySheet } from './dialogs'
 import { Button, Input, Select } from '@/shared/ui'
@@ -22,18 +22,18 @@ export function CompaniesTab() {
     handleAdd,
     handleRowClick,
     handlePaginationChange,
-  } = useAdminTab<CompanyFilters, Company>({
-    defaultFilters: { status: 'active' },
+  } = useAdminTab<CompanyFilters, CompanyListItem>({
+    defaultFilters: { status: 'ACTIVE' },
   })
 
-  const { data, isLoading, refetch } = useCompanies({
+  const { data, isLoading, isFetching } = useCompanies({
     ...filters,
     ...pagination,
   })
 
-  const columns: ColumnDef<Company>[] = [
+  const columns: ColumnDef<CompanyListItem>[] = [
     {
-      accessorKey: 'name',
+      accessorKey: 'fullName',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.name')} />
       ),
@@ -57,7 +57,7 @@ export function CompaniesTab() {
       ),
     },
     {
-      accessorKey: 'phone',
+      accessorKey: 'phoneNumber',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.phone')} />
       ),
@@ -72,18 +72,20 @@ export function CompaniesTab() {
       ),
     },
     {
-      accessorKey: 'plan',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.plan')} />
-      ),
-      cell: ({ row }) => t(`plan.${row.original.plan}`),
-    },
-    {
       accessorKey: 'status',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.status')} />
       ),
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      cell: ({ row }) => (
+        <StatusBadge
+          status={
+            (row.original.status?.toLowerCase() || 'inactive') as
+              | 'active'
+              | 'inactive'
+              | 'suspended'
+          }
+        />
+      ),
     },
   ]
 
@@ -96,6 +98,7 @@ export function CompaniesTab() {
             value={filters.name || ''}
             debounce={300}
             onDebounceChange={(value) => updateFilter('name', value)}
+            clearable
             className="w-[200px]"
           />
           <Input
@@ -103,19 +106,20 @@ export function CompaniesTab() {
             value={filters.dotNumber || ''}
             debounce={300}
             onDebounceChange={(value) => updateFilter('dotNumber', value)}
+            clearable
             className="w-[150px]"
           />
           <Select
             options={[
               { value: 'all', label: t('filters.all') },
-              ...STATUS_VALUES.map((value) => ({
+              ...COMPANY_STATUS_VALUES.map((value) => ({
                 value,
-                label: t(`status.${value}`),
+                label: t(`status.${value.toLowerCase()}`),
               })),
             ]}
-            value={filters.status || 'active'}
+            value={filters.status || 'ACTIVE'}
             onChange={(value) =>
-              updateFilter('status', value as CompanyFilters['status'])
+              updateFilter('status', value as CompanyStatus | 'all')
             }
             placeholder={t('filters.status')}
             className="w-[130px]"
@@ -129,13 +133,13 @@ export function CompaniesTab() {
       </div>
       <DataTable
         columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
+        data={data?.content || []}
+        isLoading={isLoading || isFetching}
         manualPagination
-        pageCount={data?.meta.totalPages}
-        totalCount={data?.meta.total}
-        pageIndex={pagination.page - 1}
-        pageSize={pagination.pageSize}
+        pageCount={data?.totalPages}
+        totalCount={data?.totalElements}
+        pageIndex={pagination.page}
+        pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
         onRowClick={handleRowClick}
       />
@@ -143,8 +147,7 @@ export function CompaniesTab() {
       <CompanySheet
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        company={selectedCompany}
-        onSuccess={refetch}
+        companyId={selectedCompany?.id}
       />
     </div>
   )

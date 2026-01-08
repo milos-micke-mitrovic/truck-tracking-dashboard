@@ -22,6 +22,8 @@
     "export": "Export",
     "import": "Import"
   },
+  "selectDate": "Select date",
+  "selectTime": "Select time",
   "status": {
     "active": "Active",
     "inactive": "Inactive",
@@ -69,5 +71,79 @@
     "title": "Something went wrong",
     "message": "An unexpected error occurred. Please try again or contact support if the problem persists.",
     "retry": "Try again"
+  },
+  "fileUpload": {
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "dropFiles_one": "Drop file here",
+    "dropFiles_other": "Drop files here",
+    "clickToUpload_one": "Click to upload or drag and drop",
+    "clickToUpload_other": "Click to upload or drag and drop files",
+    "clickToReplace": "Click to replace",
+    "clickToAddMore": "Click to add more",
+    "removeFile": "Remove file",
+    "fileTooLarge": "File too large. Max size: {{size}}MB",
+    "maxFilesAllowed": "Maximum {{count}} files allowed"
+  },
+  "imageUpload": {
+    "upload": "Upload",
+    "change": "Change",
+    "removeImage": "Remove image",
+    "imagePreview": "Image preview",
+    "invalidFormat": "Invalid format. Accepted: {{formats}}",
+    "fileTooLarge": "File too large. Max size: {{size}}MB"
+  },
+  "calendar": {
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "selectMonth": "Select month",
+    "selectYear": "Select year",
+    "previousMonth": "Go to previous month",
+    "nextMonth": "Go to next month"
+  },
+  "datePicker": {
+    "clearDate": "Clear date"
+  },
+  "timePicker": {
+    "clearTime": "Clear time",
+    "am": "AM",
+    "pm": "PM"
+  },
+  "locationPicker": {
+    "pickOnMap": "Pick location on map",
+    "selectLocation": "Select Location",
+    "searchPlaceholder": "Search for an address...",
+    "clearSearch": "Clear search",
+    "searching": "Searching...",
+    "noResults": "No results found",
+    "selectedLocation": "Selected Location",
+    "gettingAddress": "Getting address...",
+    "helpText": "Click on the map or search for an address to select a location",
+    "confirmLocation": "Confirm Location"
+  },
+  "select": {
+    "placeholder": "Select...",
+    "searchPlaceholder": "Search...",
+    "noResults": "No results found.",
+    "clearSelection": "Clear selection",
+    "clearAll": "Clear all selections",
+    "remove": "Remove {{label}}"
+  },
+  "sidebar": {
+    "title": "Sidebar",
+    "description": "Displays the mobile sidebar.",
+    "toggle": "Toggle Sidebar"
   }
 }

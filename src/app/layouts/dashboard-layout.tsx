@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/shared/ui'
-import { AppSidebar } from '@/shared/components'
-import { RouteGuard } from './route-guard'
+import { AppSidebar } from './app-sidebar'
+import { RouteGuard } from '@/app/routes/route-guard'
 
 export function DashboardLayout() {
   return (

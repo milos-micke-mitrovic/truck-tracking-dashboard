@@ -3,8 +3,8 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useDrivers } from '../api'
 import { useAdminTab } from '../hooks'
-import type { Driver, DriverFilters } from '../types'
-import { STATUS_VALUES } from '../constants'
+import type { DriverListItem, DriverFilters, DriverStatus } from '../types'
+import { DRIVER_STATUS_VALUES } from '../constants'
 import { StatusBadge } from './status-badge'
 import { DriverSheet } from './dialogs'
 import { Button, Input, Select, BodySmall } from '@/shared/ui'
@@ -22,16 +22,40 @@ export function DriversTab() {
     handleAdd,
     handleRowClick,
     handlePaginationChange,
-  } = useAdminTab<DriverFilters, Driver>({
-    defaultFilters: { status: 'active' },
+  } = useAdminTab<DriverFilters, DriverListItem>({
+    defaultFilters: { status: 'ACTIVE' },
   })
 
-  const { data, isLoading, refetch } = useDrivers({
+  const { data, isLoading, isFetching } = useDrivers({
     ...filters,
     ...pagination,
   })
 
-  const columns: ColumnDef<Driver>[] = [
+  const columns: ColumnDef<DriverListItem>[] = [
+    {
+      accessorKey: 'name',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('columns.name')} />
+      ),
+      cell: ({ row }) => (
+        <BodySmall as="span" truncate className="max-w-[180px]">
+          {row.original.name}
+        </BodySmall>
+      ),
+    },
+    {
+      accessorKey: 'username',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('columns.username')} />
+      ),
+    },
+    {
+      accessorKey: 'phoneNumber',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('columns.phone')} />
+      ),
+      cell: ({ row }) => row.original.phoneNumber || '-',
+    },
     {
       accessorKey: 'companyName',
       header: ({ column }) => (
@@ -44,53 +68,20 @@ export function DriversTab() {
       ),
     },
     {
-      accessorKey: 'name',
+      accessorKey: 'status',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.name')} />
+        <DataTableColumnHeader column={column} title={t('columns.status')} />
       ),
-    },
-    {
-      accessorKey: 'username',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.username')} />
-      ),
-    },
-    {
-      accessorKey: 'phone',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.phone')} />
-      ),
-    },
-    {
-      accessorKey: 'personalUse',
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title={t('columns.personalUse')}
+      cell: ({ row }) => (
+        <StatusBadge
+          status={
+            (row.original.status?.toLowerCase() || 'inactive') as
+              | 'active'
+              | 'inactive'
+              | 'suspended'
+          }
         />
       ),
-      cell: ({ row }) => <StatusBadge status={row.original.personalUse} />,
-    },
-    {
-      accessorKey: 'yardMoves',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.yardMoves')} />
-      ),
-      cell: ({ row }) => <StatusBadge status={row.original.yardMoves} />,
-    },
-    {
-      accessorKey: 'exempt',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.exempt')} />
-      ),
-      cell: ({ row }) => <StatusBadge status={row.original.exempt} />,
-    },
-    {
-      accessorKey: 'cycle',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('columns.cycle')} />
-      ),
-      cell: ({ row }) => <StatusBadge status={row.original.cycle} />,
     },
   ]
 
@@ -103,26 +94,28 @@ export function DriversTab() {
             value={filters.name || ''}
             debounce={300}
             onDebounceChange={(value) => updateFilter('name', value)}
+            clearable
             className="w-[200px]"
           />
           <Input
             placeholder={t('filters.phone')}
-            value={filters.phone || ''}
+            value={filters.phoneNumber || ''}
             debounce={300}
-            onDebounceChange={(value) => updateFilter('phone', value)}
+            onDebounceChange={(value) => updateFilter('phoneNumber', value)}
+            clearable
             className="w-[150px]"
           />
           <Select
             options={[
               { value: 'all', label: t('filters.all') },
-              ...STATUS_VALUES.map((value) => ({
+              ...DRIVER_STATUS_VALUES.map((value) => ({
                 value,
-                label: t(`status.${value}`),
+                label: t(`status.${value.toLowerCase()}`),
               })),
             ]}
-            value={filters.status || 'active'}
+            value={filters.status || 'ACTIVE'}
             onChange={(value) =>
-              updateFilter('status', value as DriverFilters['status'])
+              updateFilter('status', value as DriverStatus | 'all')
             }
             placeholder={t('filters.status')}
             className="w-[130px]"
@@ -136,13 +129,13 @@ export function DriversTab() {
       </div>
       <DataTable
         columns={columns}
-        data={data?.data || []}
-        isLoading={isLoading}
+        data={data?.content || []}
+        isLoading={isLoading || isFetching}
         manualPagination
-        pageCount={data?.meta.totalPages}
-        totalCount={data?.meta.total}
-        pageIndex={pagination.page - 1}
-        pageSize={pagination.pageSize}
+        pageCount={data?.totalPages}
+        totalCount={data?.totalElements}
+        pageIndex={pagination.page}
+        pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
         onRowClick={handleRowClick}
       />
@@ -150,8 +143,7 @@ export function DriversTab() {
       <DriverSheet
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        driver={selectedDriver}
-        onSuccess={refetch}
+        driverId={selectedDriver?.id}
       />
     </div>
   )
