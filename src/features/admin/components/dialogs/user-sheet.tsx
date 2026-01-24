@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -21,7 +21,7 @@ import {
   FormMessage,
 } from '@/shared/ui'
 import { FormSection, DocumentsSection } from '@/shared/components'
-import { getApiErrorMessage } from '@/shared/utils'
+import { getApiErrorMessage, emailValidationRules } from '@/shared/utils'
 import { useAuth } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
 import { useUser, useCreateUser, useUpdateUser, useCompanies } from '../../api'
@@ -84,9 +84,13 @@ export function UserSheet({
     name: 'documents',
   })
 
+  // Track deleted document IDs for existing documents
+  const [deletedDocumentIds, setDeletedDocumentIds] = useState<number[]>([])
+
   // Reset form when sheet opens or user data loads
   useEffect(() => {
     if (open) {
+      setDeletedDocumentIds([])
       if (isEdit && user) {
         form.reset(getFormDefaults(user))
       } else if (!isEdit) {
@@ -94,6 +98,27 @@ export function UserSheet({
       }
     }
   }, [open, isEdit, user, form])
+
+  // Track document ID for deletion (used by both remove and file clear)
+  const trackDocumentDeletion = (index: number) => {
+    const doc = form.getValues(`documents.${index}`)
+    if (doc?.id && !deletedDocumentIds.includes(doc.id)) {
+      setDeletedDocumentIds((prev) => [...prev, doc.id!])
+    }
+  }
+
+  // Handle document removal - track IDs of existing documents for deletion
+  const handleRemoveDocument = (index: number) => {
+    trackDocumentDeletion(index)
+    remove(index)
+  }
+
+  // Handle file clear - track ID and clear file fields
+  const handleFileClear = (index: number) => {
+    trackDocumentDeletion(index)
+    form.setValue(`documents.${index}.tempFileName`, undefined)
+    form.setValue(`documents.${index}.originalFileName`, undefined)
+  }
 
   // Company options
   const companyOptions = useMemo(
@@ -159,9 +184,13 @@ export function UserSheet({
         }))
 
       if (isEdit && userId) {
+        if (!authUser?.tenantId) {
+          throw new Error('Missing tenant ID')
+        }
         await updateMutation.mutateAsync({
           id: userId,
           data: {
+            tenantId: authUser.tenantId,
             companyId: values.companyId || undefined,
             email: values.email,
             firstName: values.firstName,
@@ -172,12 +201,16 @@ export function UserSheet({
             role: (values.role as UserRole) || undefined,
             status: values.status as UserStatus,
             documents: documentRequests.length > 0 ? documentRequests : undefined,
+            documentIdsToDelete: deletedDocumentIds.length > 0 ? deletedDocumentIds : undefined,
           },
         })
         toast.success(t('userSheet.updateSuccess'))
       } else {
+        if (!authUser?.tenantId) {
+          throw new Error('Missing tenant ID')
+        }
         await createMutation.mutateAsync({
-          tenantId: authUser?.tenantId || 1,
+          tenantId: authUser.tenantId,
           companyId: values.companyId || undefined,
           email: values.email,
           firstName: values.firstName,
@@ -289,7 +322,10 @@ export function UserSheet({
                   <FormField
                     control={form.control}
                     name="email"
-                    rules={{ required: t('validation.required') }}
+                    rules={emailValidationRules(
+                      t('validation.required'),
+                      t('validation.emailInvalid')
+                    )}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required>{t('columns.email')}</FormLabel>
@@ -400,13 +436,11 @@ export function UserSheet({
                 getDocument={(index) => form.watch(`documents.${index}`)}
                 documentTypeOptions={documentTypeOptions}
                 onFileUpload={handleFileUpload}
-                onRemove={remove}
+                onRemove={handleRemoveDocument}
                 onAdd={handleAddDocument}
-                onFileClear={(index) => {
-                  form.setValue(`documents.${index}.tempFileName`, undefined)
-                  form.setValue(`documents.${index}.originalFileName`, undefined)
-                }}
+                onFileClear={handleFileClear}
                 isUploading={uploadMutation.isPending}
+                entityType="user"
               />
             </div>
           </Form>

@@ -7,10 +7,37 @@ import type { Route, RouteFilters, RouteStatus } from '../types'
 import { ROUTE_STATUS_VALUES } from '../constants'
 import { RouteSheet } from '../components/route-sheet'
 import { getRoutesColumns } from '../components/routes-columns'
-import { Button, Input, Select, DataTable, H1 } from '@/shared/ui'
+import {
+  Button,
+  Input,
+  Select,
+  DataTable,
+  H1,
+  FilterToggle,
+  type FilterConfig,
+} from '@/shared/ui'
+import { useFilterVisibility } from '@/shared/hooks'
+
+// Define all available filters for routes
+const ROUTE_FILTERS: FilterConfig[] = [
+  { key: 'searchTerm', labelKey: 'filters.search' },
+  { key: 'routeNumber', labelKey: 'filters.routeNumber' },
+  { key: 'routeName', labelKey: 'filters.routeName' },
+  { key: 'origin', labelKey: 'filters.origin' },
+  { key: 'destination', labelKey: 'filters.destination' },
+  { key: 'status', labelKey: 'filters.status' },
+]
+
+// Default visible filters (currently shown in UI)
+const DEFAULT_VISIBLE = ['searchTerm', 'status']
 
 export function RoutesPage() {
   const { t } = useTranslation('routes')
+  const { visibleFilters, toggleFilter, isFilterVisible } = useFilterVisibility({
+    storageKey: 'routes',
+    defaultVisible: DEFAULT_VISIBLE,
+  })
+
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [routeSheetOpen, setRouteSheetOpen] = useState(false)
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
@@ -81,21 +108,70 @@ export function RoutesPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2 py-3">
-          <Input
-            placeholder={t('filters.search')}
-            value={filters.searchTerm || ''}
-            debounce={300}
-            onDebounceChange={(value) => updateFilter('searchTerm', value)}
-            clearable
-            className="w-[200px]"
-          />
-          <Select
-            options={statusOptions}
-            value={filters.status || 'all'}
-            onChange={(value) =>
-              updateFilter('status', value as RouteStatus | 'all')
-            }
-            className="w-[140px]"
+          {isFilterVisible('searchTerm') && (
+            <Input
+              placeholder={t('filters.search')}
+              value={filters.searchTerm || ''}
+              debounce={300}
+              onDebounceChange={(value) => updateFilter('searchTerm', value)}
+              clearable
+              className="w-[200px]"
+            />
+          )}
+          {isFilterVisible('routeNumber') && (
+            <Input
+              placeholder={t('filters.routeNumber')}
+              value={filters.routeNumber || ''}
+              debounce={300}
+              onDebounceChange={(value) => updateFilter('routeNumber', value)}
+              clearable
+              className="w-[130px]"
+            />
+          )}
+          {isFilterVisible('routeName') && (
+            <Input
+              placeholder={t('filters.routeName')}
+              value={filters.routeName || ''}
+              debounce={300}
+              onDebounceChange={(value) => updateFilter('routeName', value)}
+              clearable
+              className="w-[150px]"
+            />
+          )}
+          {isFilterVisible('origin') && (
+            <Input
+              placeholder={t('filters.origin')}
+              value={filters.origin || ''}
+              debounce={300}
+              onDebounceChange={(value) => updateFilter('origin', value)}
+              clearable
+              className="w-[150px]"
+            />
+          )}
+          {isFilterVisible('destination') && (
+            <Input
+              placeholder={t('filters.destination')}
+              value={filters.destination || ''}
+              debounce={300}
+              onDebounceChange={(value) => updateFilter('destination', value)}
+              clearable
+              className="w-[150px]"
+            />
+          )}
+          {isFilterVisible('status') && (
+            <Select
+              options={statusOptions}
+              value={filters.status || 'all'}
+              onChange={(value) =>
+                updateFilter('status', value as RouteStatus | 'all')
+              }
+              className="w-[140px]"
+            />
+          )}
+          <FilterToggle
+            filters={ROUTE_FILTERS}
+            visibleFilters={visibleFilters}
+            onToggleFilter={toggleFilter}
           />
 
           <div className="flex-1" />

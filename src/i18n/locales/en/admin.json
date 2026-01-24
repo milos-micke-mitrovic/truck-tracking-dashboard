@@ -1,16 +1,22 @@
 {
   "title": "Admin Panel",
   "validation": {
-    "required": "This field is required"
+    "required": "This field is required",
+    "emailInvalid": "Please enter a valid email address"
   },
   "documents": {
     "title": "Documents",
     "type": "Type",
     "selectType": "Select document type",
-    "uploadPdf": "Upload PDF",
+    "file": "File",
+    "uploadPdf": "Upload file",
     "expirationDate": "Expiration Date",
     "addDocument": "Add Document",
-    "selectDate": "Select date"
+    "selectDate": "Select date",
+    "download": "Download",
+    "downloadError": "Failed to download document",
+    "removeFile": "Remove file",
+    "removeRow": "Remove document"
   },
   "tabs": {
     "companies": "Companies",
@@ -38,11 +44,19 @@
     "refresh": "Refresh"
   },
   "filters": {
+    "toggle": "Filters",
+    "selectFilters": "Select filters",
     "name": "Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
     "phone": "Phone",
+    "email": "Email",
+    "username": "Username",
     "unitNumber": "Unit #",
+    "unitId": "Unit ID",
     "trailerId": "ID #",
     "dotNumber": "DOT #",
+    "mcNumber": "MC #",
     "serialNumber": "Serial Number",
     "macAddress": "MAC Address",
     "snNumber": "S/N",
@@ -51,6 +65,16 @@
     "ownership": "Ownership",
     "driver": "Driver",
     "vehicle": "Vehicle",
+    "company": "Company",
+    "role": "Role",
+    "type": "Type",
+    "model": "Model",
+    "make": "Make",
+    "vin": "VIN",
+    "licensePlate": "License Plate",
+    "address": "Address",
+    "emailDomain": "Email Domain",
+    "year": "Year",
     "all": "All"
   },
   "columns": {
@@ -379,7 +403,7 @@
     "license": "License",
     "country": "Country",
     "state": "State",
-    "licenseNumber": "Number",
+    "licenseNumber": "License Number",
     "countries": {
       "us": "United States",
       "ca": "Canada",

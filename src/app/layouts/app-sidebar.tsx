@@ -53,19 +53,21 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={t('sidebar.admin')}>
-                  <NavLink
-                    to="/admin"
-                    className={({ isActive }) =>
-                      cn(isActive && 'bg-sidebar-accent')
-                    }
-                  >
-                    <Settings className="size-4" />
-                    <BodySmall as="span">{t('sidebar.admin')}</BodySmall>
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {user?.role === 'ADMIN' && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip={t('sidebar.admin')}>
+                    <NavLink
+                      to="/admin"
+                      className={({ isActive }) =>
+                        cn(isActive && 'bg-sidebar-accent')
+                      }
+                    >
+                      <Settings className="size-4" />
+                      <BodySmall as="span">{t('sidebar.admin')}</BodySmall>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={t('sidebar.routes')}>
                   <NavLink

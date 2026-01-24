@@ -90,14 +90,17 @@ export type DriverRequest = {
   homeTerminal?: string
   status: DriverStatus
   documents?: DriverDocumentRequest[]
+  documentIdsToDelete?: number[]
 }
 
-// Filters
+// Filters (matches BE DriverFilterRequest)
 export type DriverFilters = {
   name?: string
+  username?: string
   phoneNumber?: string
-  status?: DriverStatus | 'all'
   companyId?: number
+  vehicleId?: number
+  status?: DriverStatus | 'all'
 }
 
 // Form values for driver dialog

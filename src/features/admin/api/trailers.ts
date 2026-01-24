@@ -9,17 +9,19 @@ async function fetchTrailers(
   params: TrailerFilters & PageParams
 ): Promise<PageResponse<TrailerListItem>> {
   const searchParams = new URLSearchParams()
-  if (params.page !== undefined) searchParams.set('page', String(params.page))
+  if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
   if (params.unitId) searchParams.set('unitId', params.unitId)
+  if (params.type && params.type !== 'all') searchParams.set('type', params.type)
   if (params.model) searchParams.set('model', params.model)
+  if (params.vin) searchParams.set('vin', params.vin)
+  if (params.licensePlate) searchParams.set('licensePlate', params.licensePlate)
   if (params.ownership && params.ownership !== 'all')
     searchParams.set('ownership', params.ownership)
   if (params.status && params.status !== 'all')
     searchParams.set('status', params.status)
-  if (params.type && params.type !== 'all') searchParams.set('type', params.type)
   if (params.companyId) searchParams.set('companyId', String(params.companyId))
   if (params.vehicleId) searchParams.set('vehicleId', String(params.vehicleId))
 

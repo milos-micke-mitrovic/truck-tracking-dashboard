@@ -90,6 +90,10 @@ export type RouteRequest = {
 
 // Filters for list
 export type RouteFilters = {
+  routeNumber?: string
+  routeName?: string
+  origin?: string
+  destination?: string
   status?: RouteStatus | 'all'
   searchTerm?: string
 }

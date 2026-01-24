@@ -82,16 +82,16 @@ export type UserCreateRequest = {
   isActive?: boolean
   companyId?: number
   documents?: UserDocumentRequest[]
+  documentIdsToDelete?: number[]
 }
 
 // Request type for updating a user
 export type UserUpdateRequest = Partial<UserCreateRequest>
 
-// Filters for user list
+// Filters for user list (matches BE UserFilterRequest)
 export type UserFilters = {
+  name?: string
   email?: string
-  firstName?: string
-  lastName?: string
   username?: string
   department?: string
   role?: UserRole | 'all'

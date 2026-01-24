@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -106,9 +106,13 @@ export function TrailerSheet({
     name: 'documents',
   })
 
+  // Track deleted document IDs for existing documents
+  const [deletedDocumentIds, setDeletedDocumentIds] = useState<number[]>([])
+
   // Reset form when sheet opens or trailer data loads
   useEffect(() => {
     if (open) {
+      setDeletedDocumentIds([])
       if (isEdit && trailer) {
         form.reset(getFormDefaults(trailer))
       } else if (!isEdit) {
@@ -116,6 +120,27 @@ export function TrailerSheet({
       }
     }
   }, [open, isEdit, trailer, form])
+
+  // Track document ID for deletion (used by both remove and file clear)
+  const trackDocumentDeletion = (index: number) => {
+    const doc = form.getValues(`documents.${index}`)
+    if (doc?.id && !deletedDocumentIds.includes(doc.id)) {
+      setDeletedDocumentIds((prev) => [...prev, doc.id!])
+    }
+  }
+
+  // Handle document removal - track IDs of existing documents for deletion
+  const handleRemoveDocument = (index: number) => {
+    trackDocumentDeletion(index)
+    remove(index)
+  }
+
+  // Handle file clear - track ID and clear file fields
+  const handleFileClear = (index: number) => {
+    trackDocumentDeletion(index)
+    form.setValue(`documents.${index}.tempFileName`, undefined)
+    form.setValue(`documents.${index}.originalFileName`, undefined)
+  }
 
   // Company options
   const companyOptions = useMemo(
@@ -182,9 +207,16 @@ export function TrailerSheet({
           expirationDate: doc.expirationDate,
         }))
 
+      if (!user?.tenantId) {
+        throw new Error('Missing tenant ID')
+      }
+      if (!values.companyId) {
+        throw new Error('Missing company ID')
+      }
+
       const requestData = {
-        tenantId: user?.tenantId || 1,
-        companyId: values.companyId || 1,
+        tenantId: user.tenantId,
+        companyId: values.companyId,
         currentVehicleId: values.currentVehicleId || undefined,
         unitId: values.unitId,
         vin: values.vin,
@@ -199,6 +231,7 @@ export function TrailerSheet({
         homeTerminal: values.homeTerminal || undefined,
         status: values.status,
         documents: documentRequests.length > 0 ? documentRequests : undefined,
+        documentIdsToDelete: deletedDocumentIds.length > 0 ? deletedDocumentIds : undefined,
       }
 
       if (isEdit && trailerId) {
@@ -501,13 +534,11 @@ export function TrailerSheet({
                 getDocument={(index) => form.watch(`documents.${index}`)}
                 documentTypeOptions={documentTypeOptions}
                 onFileUpload={handleFileUpload}
-                onRemove={remove}
+                onRemove={handleRemoveDocument}
                 onAdd={handleAddDocument}
-                onFileClear={(index) => {
-                  form.setValue(`documents.${index}.tempFileName`, undefined)
-                  form.setValue(`documents.${index}.originalFileName`, undefined)
-                }}
+                onFileClear={handleFileClear}
                 isUploading={uploadMutation.isPending}
+                entityType="trailer"
               />
             </div>
           </Form>

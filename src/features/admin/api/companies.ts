@@ -9,12 +9,16 @@ async function fetchCompanies(
   params: CompanyFilters & PageParams
 ): Promise<PageResponse<CompanyListItem>> {
   const searchParams = new URLSearchParams()
-  if (params.page !== undefined) searchParams.set('page', String(params.page))
+  if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
-  if (params.name) searchParams.set('name', params.name)
+  if (params.fullName) searchParams.set('fullName', params.fullName)
   if (params.dotNumber) searchParams.set('dotNumber', params.dotNumber)
+  if (params.mcNumber) searchParams.set('mcNumber', params.mcNumber)
+  if (params.address) searchParams.set('address', params.address)
+  if (params.phoneNumber) searchParams.set('phoneNumber', params.phoneNumber)
+  if (params.emailDomain) searchParams.set('emailDomain', params.emailDomain)
   if (params.status && params.status !== 'all')
     searchParams.set('status', params.status)
 

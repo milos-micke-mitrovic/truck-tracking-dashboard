@@ -88,15 +88,18 @@ export type TrailerRequest = {
   homeTerminal?: string
   currentLocation?: string
   documents?: TrailerDocumentRequest[]
+  documentIdsToDelete?: number[]
 }
 
 // Filters
 export type TrailerFilters = {
   unitId?: string
+  type?: TrailerType | 'all'
   model?: string
+  vin?: string
+  licensePlate?: string
   ownership?: TrailerOwnership | 'all'
   status?: TrailerStatus | 'all'
-  type?: TrailerType | 'all'
   companyId?: number
   tenantId?: number
   vehicleId?: number

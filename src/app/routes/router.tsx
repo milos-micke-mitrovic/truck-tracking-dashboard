@@ -66,14 +66,16 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Navigate to="/admin" replace />,
+        element: <Navigate to="/routes" replace />,
       },
       {
         path: '/admin',
         element: (
-          <LazyPage>
-            <AdminPage />
-          </LazyPage>
+          <RouteGuard allowedRoles={['ADMIN']}>
+            <LazyPage>
+              <AdminPage />
+            </LazyPage>
+          </RouteGuard>
         ),
       },
       {

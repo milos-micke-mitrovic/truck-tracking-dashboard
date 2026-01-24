@@ -9,15 +9,17 @@ async function fetchDrivers(
   params: DriverFilters & PageParams
 ): Promise<PageResponse<DriverListItem>> {
   const searchParams = new URLSearchParams()
-  if (params.page !== undefined) searchParams.set('page', String(params.page))
+  if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
   if (params.name) searchParams.set('name', params.name)
+  if (params.username) searchParams.set('username', params.username)
   if (params.phoneNumber) searchParams.set('phoneNumber', params.phoneNumber)
+  if (params.companyId) searchParams.set('companyId', String(params.companyId))
+  if (params.vehicleId) searchParams.set('vehicleId', String(params.vehicleId))
   if (params.status && params.status !== 'all')
     searchParams.set('status', params.status)
-  if (params.companyId) searchParams.set('companyId', String(params.companyId))
 
   return httpClient.get(`/drivers?${searchParams}`)
 }

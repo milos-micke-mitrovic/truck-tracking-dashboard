@@ -49,8 +49,6 @@ export const adminKeys = {
   usersList: (params: UserFilters & PageParams) =>
     [...adminKeys.users(), 'list', params] as const,
   user: (id: number) => [...adminKeys.users(), 'detail', id] as const,
-  usersByCompany: (companyId: number) =>
-    [...adminKeys.users(), 'company', companyId] as const,
   usersByRole: (role: string) => [...adminKeys.users(), 'role', role] as const,
   usersByStatus: (status: string) =>
     [...adminKeys.users(), 'status', status] as const,

@@ -1,4 +1,5 @@
 import { AUTH_STORAGE_KEY } from '@/shared/utils'
+import { refreshAccessToken } from '@/features/auth/api'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
@@ -22,13 +23,16 @@ class HttpError extends Error {
   }
 }
 
-// Get token from localStorage
-function getAuthToken(): string | null {
+// Track if a refresh is in progress to prevent multiple concurrent refresh attempts
+let isRefreshing = false
+let refreshPromise: Promise<boolean> | null = null
+
+// Get stored auth data from localStorage
+function getStoredAuth(): { token: string; refreshToken: string; user: unknown } | null {
   try {
     const stored = localStorage.getItem(AUTH_STORAGE_KEY)
     if (stored) {
-      const parsed = JSON.parse(stored)
-      return parsed.token || null
+      return JSON.parse(stored)
     }
   } catch {
     // Invalid JSON
@@ -36,15 +40,82 @@ function getAuthToken(): string | null {
   return null
 }
 
-// Clear auth and redirect on 401/403
+// Get token from localStorage
+function getAuthToken(): string | null {
+  const auth = getStoredAuth()
+  return auth?.token || null
+}
+
+// Get refresh token from localStorage
+function getRefreshToken(): string | null {
+  const auth = getStoredAuth()
+  return auth?.refreshToken || null
+}
+
+// Update tokens in localStorage
+function updateStoredTokens(token: string, refreshToken: string): void {
+  const auth = getStoredAuth()
+  if (auth) {
+    auth.token = token
+    auth.refreshToken = refreshToken
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(auth))
+  }
+}
+
+// Clear auth and redirect on auth failure
 function handleUnauthorized() {
   localStorage.removeItem(AUTH_STORAGE_KEY)
   window.location.href = '/login'
 }
 
-async function handleResponse<T>(response: Response): Promise<T> {
-  // Handle both 401 (Unauthorized) and 403 (Forbidden) as auth errors
-  if (response.status === 401 || response.status === 403) {
+// Attempt to refresh the access token
+async function attemptTokenRefresh(): Promise<boolean> {
+  // If already refreshing, wait for that to complete
+  if (isRefreshing && refreshPromise) {
+    return refreshPromise
+  }
+
+  const currentRefreshToken = getRefreshToken()
+  if (!currentRefreshToken) {
+    return false
+  }
+
+  isRefreshing = true
+  refreshPromise = (async () => {
+    try {
+      const response = await refreshAccessToken(currentRefreshToken)
+      updateStoredTokens(response.accessToken, response.refreshToken)
+      return true
+    } catch {
+      return false
+    } finally {
+      isRefreshing = false
+      refreshPromise = null
+    }
+  })()
+
+  return refreshPromise
+}
+
+async function handleResponse<T>(
+  response: Response,
+  retryFn?: () => Promise<Response>
+): Promise<T> {
+  // Handle 401 (Unauthorized) - try to refresh token
+  if (response.status === 401 && retryFn) {
+    const refreshed = await attemptTokenRefresh()
+    if (refreshed) {
+      // Retry the original request with new token
+      const retryResponse = await retryFn()
+      return handleResponse<T>(retryResponse)
+    }
+    // Refresh failed, logout
+    handleUnauthorized()
+    throw new HttpError(response.status, response.statusText)
+  }
+
+  // Handle 403 (Forbidden) - no retry, just logout
+  if (response.status === 403) {
     handleUnauthorized()
     throw new HttpError(response.status, response.statusText)
   }
@@ -82,13 +153,16 @@ function getHeaders(
 
 export const httpClient = {
   async get<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'GET',
-      headers: getHeaders(options.headers, options.skipAuth),
-      signal: options.signal,
-    })
+    const makeRequest = () =>
+      fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'GET',
+        headers: getHeaders(options.headers, options.skipAuth),
+        signal: options.signal,
+      })
 
-    return handleResponse<T>(response)
+    const response = await makeRequest()
+    const retryFn = options.skipAuth ? undefined : makeRequest
+    return handleResponse<T>(response, retryFn)
   },
 
   async post<T>(
@@ -96,14 +170,17 @@ export const httpClient = {
     data?: unknown,
     options: RequestOptions = {}
   ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: getHeaders(options.headers, options.skipAuth),
-      body: data ? JSON.stringify(data) : undefined,
-      signal: options.signal,
-    })
+    const makeRequest = () =>
+      fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'POST',
+        headers: getHeaders(options.headers, options.skipAuth),
+        body: data ? JSON.stringify(data) : undefined,
+        signal: options.signal,
+      })
 
-    return handleResponse<T>(response)
+    const response = await makeRequest()
+    const retryFn = options.skipAuth ? undefined : makeRequest
+    return handleResponse<T>(response, retryFn)
   },
 
   async put<T>(
@@ -111,14 +188,17 @@ export const httpClient = {
     data?: unknown,
     options: RequestOptions = {}
   ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'PUT',
-      headers: getHeaders(options.headers, options.skipAuth),
-      body: data ? JSON.stringify(data) : undefined,
-      signal: options.signal,
-    })
+    const makeRequest = () =>
+      fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'PUT',
+        headers: getHeaders(options.headers, options.skipAuth),
+        body: data ? JSON.stringify(data) : undefined,
+        signal: options.signal,
+      })
 
-    return handleResponse<T>(response)
+    const response = await makeRequest()
+    const retryFn = options.skipAuth ? undefined : makeRequest
+    return handleResponse<T>(response, retryFn)
   },
 
   async patch<T>(
@@ -126,24 +206,30 @@ export const httpClient = {
     data?: unknown,
     options: RequestOptions = {}
   ): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'PATCH',
-      headers: getHeaders(options.headers, options.skipAuth),
-      body: data ? JSON.stringify(data) : undefined,
-      signal: options.signal,
-    })
+    const makeRequest = () =>
+      fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'PATCH',
+        headers: getHeaders(options.headers, options.skipAuth),
+        body: data ? JSON.stringify(data) : undefined,
+        signal: options.signal,
+      })
 
-    return handleResponse<T>(response)
+    const response = await makeRequest()
+    const retryFn = options.skipAuth ? undefined : makeRequest
+    return handleResponse<T>(response, retryFn)
   },
 
   async delete<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'DELETE',
-      headers: getHeaders(options.headers, options.skipAuth),
-      signal: options.signal,
-    })
+    const makeRequest = () =>
+      fetch(`${API_BASE_URL}${endpoint}`, {
+        method: 'DELETE',
+        headers: getHeaders(options.headers, options.skipAuth),
+        signal: options.signal,
+      })
 
-    return handleResponse<T>(response)
+    const response = await makeRequest()
+    const retryFn = options.skipAuth ? undefined : makeRequest
+    return handleResponse<T>(response, retryFn)
   },
 }
 

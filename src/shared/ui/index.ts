@@ -140,4 +140,6 @@ export {
   DataTable,
   DataTablePagination,
   DataTableColumnHeader,
+  FilterToggle,
+  type FilterConfig,
 } from './data-table'

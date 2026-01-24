@@ -13,6 +13,12 @@
   "filters": {
     "all": "All",
     "search": "Search routes...",
+    "toggle": "Filters",
+    "selectFilters": "Select filters",
+    "routeNumber": "Route #",
+    "routeName": "Route Name",
+    "origin": "Origin",
+    "destination": "Destination",
     "status": "Status"
   },
   "status": {

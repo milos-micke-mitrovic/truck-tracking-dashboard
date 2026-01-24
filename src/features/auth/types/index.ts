@@ -17,7 +17,21 @@ export type LoginCredentials = {
 }
 
 export type LoginResponse = {
-  token: string
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  expiresIn: number
+}
+
+export type RefreshTokenRequest = {
+  refreshToken: string
+}
+
+export type RefreshTokenResponse = {
+  accessToken: string
+  refreshToken: string
+  tokenType: string
+  expiresIn: number
 }
 
 export type JwtPayload = {
@@ -34,5 +48,6 @@ export type JwtPayload = {
 export type AuthState = {
   user: User | null
   token: string | null
+  refreshToken: string | null
   isAuthenticated: boolean
 }

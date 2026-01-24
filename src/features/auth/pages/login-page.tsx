@@ -7,6 +7,7 @@ import { z } from 'zod'
 import type { TFunction } from 'i18next'
 import { toast } from 'sonner'
 import { Logo } from '@/shared/components'
+import { EMAIL_REGEX } from '@/shared/utils'
 import {
   useLogin,
   useAuth,
@@ -38,7 +39,7 @@ const DRIVER_APP_URL = 'https://truck-drive.vercel.app'
 const createLoginSchema = (t: TFunction) =>
   z.object({
     tenantId: z.string().min(1, t('login.validation.tenantIdRequired')),
-    email: z.string().email(t('login.validation.emailInvalid')),
+    email: z.string().regex(EMAIL_REGEX, t('login.validation.emailInvalid')),
     password: z.string().min(1, t('login.validation.passwordRequired')),
   })
 
@@ -71,16 +72,16 @@ export function LoginPage() {
       })
 
       // Decode JWT to get user info directly (no extra API call needed)
-      const payload = decodeJwt(response.token)
+      const payload = decodeJwt(response.accessToken)
       if (!payload) {
         toast.error(t('login.error.generic'))
         return
       }
 
       const user = jwtPayloadToUser(payload)
-      login(user, response.token)
+      login(user, response.accessToken, response.refreshToken)
       toast.success(`Welcome back, ${getUserDisplayName(user)}!`)
-      navigate('/admin')
+      navigate('/routes')
     } catch (error) {
       // Check if it's a network error (server down)
       if (error instanceof TypeError && error.message === 'Failed to fetch') {

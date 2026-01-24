@@ -15,14 +15,16 @@ async function fetchVehicles(
   params: VehicleFilters & PageParams
 ): Promise<PageResponse<VehicleListItem>> {
   const searchParams = new URLSearchParams()
-  if (params.page !== undefined) searchParams.set('page', String(params.page))
+  if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
   if (params.unitId) searchParams.set('unitId', params.unitId)
+  if (params.licensePlate) searchParams.set('licensePlate', params.licensePlate)
   if (params.vin) searchParams.set('vin', params.vin)
   if (params.make) searchParams.set('make', params.make)
   if (params.model) searchParams.set('model', params.model)
+  if (params.year) searchParams.set('year', String(params.year))
   if (params.status && params.status !== 'all')
     searchParams.set('status', params.status)
   if (params.companyId) searchParams.set('companyId', String(params.companyId))

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -91,9 +91,13 @@ export function CompanySheet({
     name: 'documents',
   })
 
+  // Track deleted document IDs for existing documents
+  const [deletedDocumentIds, setDeletedDocumentIds] = useState<number[]>([])
+
   // Reset form when sheet opens or company data loads
   useEffect(() => {
     if (open) {
+      setDeletedDocumentIds([])
       if (isEdit && company) {
         form.reset(getFormDefaults(company))
       } else if (!isEdit) {
@@ -101,6 +105,27 @@ export function CompanySheet({
       }
     }
   }, [open, isEdit, company, form])
+
+  // Track document ID for deletion (used by both remove and file clear)
+  const trackDocumentDeletion = (index: number) => {
+    const doc = form.getValues(`documents.${index}`)
+    if (doc?.id && !deletedDocumentIds.includes(doc.id)) {
+      setDeletedDocumentIds((prev) => [...prev, doc.id!])
+    }
+  }
+
+  // Handle document removal - track IDs of existing documents for deletion
+  const handleRemoveDocument = (index: number) => {
+    trackDocumentDeletion(index)
+    remove(index)
+  }
+
+  // Handle file clear - track ID and clear file fields
+  const handleFileClear = (index: number) => {
+    trackDocumentDeletion(index)
+    form.setValue(`documents.${index}.tempFileName`, undefined)
+    form.setValue(`documents.${index}.originalFileName`, undefined)
+  }
 
   // Document type options
   const documentTypeOptions = COMPANY_DOCUMENT_TYPES.map((type) => ({
@@ -143,8 +168,12 @@ export function CompanySheet({
           expirationDate: doc.expirationDate,
         }))
 
+      if (!user?.tenantId) {
+        throw new Error('Missing tenant ID')
+      }
+
       const requestData = {
-        tenantId: user?.tenantId || 1,
+        tenantId: user.tenantId,
         fullName: values.fullName,
         displayName: values.displayName,
         dotNumber: values.dotNumber,
@@ -155,6 +184,7 @@ export function CompanySheet({
         status: values.status,
         subscriptionPlan: values.subscriptionPlan,
         documents: documentRequests.length > 0 ? documentRequests : undefined,
+        documentIdsToDelete: deletedDocumentIds.length > 0 ? deletedDocumentIds : undefined,
       }
 
       if (isEdit && companyId) {
@@ -378,13 +408,11 @@ export function CompanySheet({
                 getDocument={(index) => form.watch(`documents.${index}`)}
                 documentTypeOptions={documentTypeOptions}
                 onFileUpload={handleFileUpload}
-                onRemove={remove}
+                onRemove={handleRemoveDocument}
                 onAdd={handleAddDocument}
-                onFileClear={(index) => {
-                  form.setValue(`documents.${index}.tempFileName`, undefined)
-                  form.setValue(`documents.${index}.originalFileName`, undefined)
-                }}
+                onFileClear={handleFileClear}
                 isUploading={uploadMutation.isPending}
+                entityType="company"
               />
             </div>
           </Form>

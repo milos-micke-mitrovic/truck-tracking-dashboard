@@ -25,10 +25,17 @@ async function fetchRoutes(
   params: RouteFilters & PageParams
 ): Promise<PageResponse<Route>> {
   const searchParams = new URLSearchParams()
-  if (params.page !== undefined) searchParams.set('page', String(params.page))
+  if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
+  if (params.routeNumber) searchParams.set('routeNumber', params.routeNumber)
+  if (params.routeName) searchParams.set('routeName', params.routeName)
+  if (params.origin) searchParams.set('origin', params.origin)
+  if (params.destination) searchParams.set('destination', params.destination)
+  if (params.status && params.status !== 'all')
+    searchParams.set('status', params.status)
+  if (params.searchTerm) searchParams.set('searchTerm', params.searchTerm)
 
   return httpClient.get(`/routes?${searchParams}`)
 }

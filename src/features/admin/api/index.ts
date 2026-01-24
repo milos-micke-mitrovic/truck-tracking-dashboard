@@ -39,8 +39,6 @@ export {
   useUsers,
   useUser,
   useUserByEmail,
-  useUserByUsername,
-  useUsersByCompany,
   useUsersByRole,
   useUsersByStatus,
   useActiveUsers,

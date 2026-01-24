@@ -15,16 +15,14 @@ async function fetchUsers(
   params: UserFilters & PageParams
 ): Promise<PageResponse<User>> {
   const searchParams = new URLSearchParams()
-  if (params.page !== undefined) searchParams.set('page', String(params.page))
+  if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
+  if (params.name) searchParams.set('name', params.name)
   if (params.email) searchParams.set('email', params.email)
-  if (params.firstName) searchParams.set('firstName', params.firstName)
-  if (params.lastName) searchParams.set('lastName', params.lastName)
   if (params.username) searchParams.set('username', params.username)
-  if (params.department && params.department !== 'all')
-    searchParams.set('department', params.department)
+  if (params.department) searchParams.set('department', params.department)
   if (params.role && params.role !== 'all') searchParams.set('role', params.role)
   if (params.status && params.status !== 'all')
     searchParams.set('status', params.status)
@@ -39,14 +37,6 @@ async function fetchUser(id: number): Promise<User> {
 
 async function fetchUserByEmail(email: string): Promise<User> {
   return httpClient.get(`/users/email/${encodeURIComponent(email)}`)
-}
-
-async function fetchUserByUsername(username: string): Promise<User> {
-  return httpClient.get(`/users/username/${encodeURIComponent(username)}`)
-}
-
-async function fetchUsersByCompany(companyId: number): Promise<UserListItem[]> {
-  return httpClient.get(`/users/company/${companyId}`)
 }
 
 async function fetchUsersByRole(role: string): Promise<UserListItem[]> {
@@ -108,22 +98,6 @@ export function useUserByEmail(email: string) {
     queryKey: [...adminKeys.users(), 'email', email],
     queryFn: () => fetchUserByEmail(email),
     enabled: !!email,
-  })
-}
-
-export function useUserByUsername(username: string) {
-  return useQuery({
-    queryKey: [...adminKeys.users(), 'username', username],
-    queryFn: () => fetchUserByUsername(username),
-    enabled: !!username,
-  })
-}
-
-export function useUsersByCompany(companyId: number) {
-  return useQuery({
-    queryKey: adminKeys.usersByCompany(companyId),
-    queryFn: () => fetchUsersByCompany(companyId),
-    enabled: companyId > 0,
   })
 }
 

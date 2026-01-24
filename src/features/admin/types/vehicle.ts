@@ -117,17 +117,20 @@ export type VehicleCreateRequest = {
   hasRefrigeration?: boolean
   isHazmatCertified?: boolean
   documents?: VehicleDocumentRequest[]
+  documentIdsToDelete?: number[]
 }
 
 // Request type for updating a vehicle
 export type VehicleUpdateRequest = Partial<VehicleCreateRequest>
 
-// Filters for vehicle list
+// Filters for vehicle list (matches BE VehicleFilterRequest)
 export type VehicleFilters = {
   unitId?: string
+  licensePlate?: string
   vin?: string
   make?: string
   model?: string
+  year?: number
   status?: VehicleStatus | 'all'
   companyId?: number
 }

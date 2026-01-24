@@ -66,12 +66,17 @@ export type CompanyRequest = {
     originalFileName: string
     expirationDate?: string
   }[]
+  documentIdsToDelete?: number[]
 }
 
-// Filters for list
+// Filters for list (matches BE CompanyFilterRequest)
 export type CompanyFilters = {
-  name?: string
+  fullName?: string
   dotNumber?: string
+  mcNumber?: string
+  address?: string
+  phoneNumber?: string
+  emailDomain?: string
   status?: CompanyStatus | 'all'
 }
 
