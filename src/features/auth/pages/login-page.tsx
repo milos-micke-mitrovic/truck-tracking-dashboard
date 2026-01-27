@@ -15,7 +15,7 @@ import {
   decodeJwt,
   jwtPayloadToUser,
 } from '@/features/auth'
-import { Smartphone, ChevronDown, ChevronUp, ExternalLink, Building2, Mail, Lock } from 'lucide-react'
+import { Smartphone, ChevronDown, ChevronUp, ExternalLink, Mail, Lock } from 'lucide-react'
 import {
   Button,
   H1,
@@ -38,7 +38,6 @@ const DRIVER_APP_URL = 'https://truck-drive.vercel.app'
 
 const createLoginSchema = (t: TFunction) =>
   z.object({
-    tenantId: z.string().min(1, t('login.validation.tenantIdRequired')),
     email: z.string().regex(EMAIL_REGEX, t('login.validation.emailInvalid')),
     password: z.string().min(1, t('login.validation.passwordRequired')),
   })
@@ -57,7 +56,6 @@ export function LoginPage() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      tenantId: '',
       email: '',
       password: '',
     },
@@ -66,7 +64,6 @@ export function LoginPage() {
   const onSubmit = async (values: LoginFormValues) => {
     try {
       const response = await loginMutation.mutateAsync({
-        tenantId: parseInt(values.tenantId.trim(), 10),
         email: values.email.trim(),
         password: values.password,
       })
@@ -139,25 +136,6 @@ export function LoginPage() {
           <Form form={form} onSubmit={onSubmit} className="space-y-5">
             <FormField
               control={form.control}
-              name="tenantId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('login.tenantId')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('login.tenantIdPlaceholder')}
-                      prefixIcon={<Building2 />}
-                      autoFocus
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -168,6 +146,7 @@ export function LoginPage() {
                       placeholder={t('login.emailPlaceholder')}
                       prefixIcon={<Mail />}
                       autoComplete="email"
+                      autoFocus
                       {...field}
                     />
                   </FormControl>

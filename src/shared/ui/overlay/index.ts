@@ -56,3 +56,5 @@ export {
   CommandSeparator,
   CommandShortcut,
 } from './command'
+
+export { ConfirmDialog } from './confirm-dialog'

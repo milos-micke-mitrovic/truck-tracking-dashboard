@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -20,6 +21,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  ConfirmDialog,
 } from '@/shared/ui'
 import { FormSection, DocumentsSection } from '@/shared/components'
 import { getApiErrorMessage } from '@/shared/utils'
@@ -29,6 +31,7 @@ import {
   useVehicle,
   useCreateVehicle,
   useUpdateVehicle,
+  useDeleteVehicle,
   useCompanies,
   useDrivers,
 } from '../../api'
@@ -103,7 +106,10 @@ export function VehicleSheet({
 
   const createMutation = useCreateVehicle()
   const updateMutation = useUpdateVehicle()
+  const deleteMutation = useDeleteVehicle()
   const uploadMutation = useUploadTempFile()
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const form = useForm<VehicleFormValues>({
     defaultValues: getFormDefaults(),
@@ -289,6 +295,18 @@ export function VehicleSheet({
     }
   }
 
+  const handleDelete = async () => {
+    if (!vehicleId) return
+    try {
+      await deleteMutation.mutateAsync(vehicleId)
+      toast.success(t('deleteConfirm.success', { entity: t('tabs.vehicles') }))
+      setDeleteDialogOpen(false)
+      onOpenChange(false)
+    } catch {
+      // Error toast is handled by QueryClient
+    }
+  }
+
   const isLoading = createMutation.isPending || updateMutation.isPending
 
   return (
@@ -313,6 +331,18 @@ export function VehicleSheet({
               className="border-b px-6 py-3"
               actions={
                 <>
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      {t('actions.delete')}
+                    </Button>
+                  )}
                   <SheetClose asChild>
                     <Button type="button" variant="outline" size="sm">
                       {t('dialogs.cancel')}
@@ -706,6 +736,15 @@ export function VehicleSheet({
             </div>
           </Form>
         )}
+
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title={t('deleteConfirm.vehicle.title')}
+          description={t('deleteConfirm.vehicle.description')}
+          onConfirm={handleDelete}
+          loading={deleteMutation.isPending}
+        />
       </SheetContent>
     </Sheet>
   )

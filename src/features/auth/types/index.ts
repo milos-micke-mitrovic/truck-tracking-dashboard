@@ -11,7 +11,6 @@ export type User = {
 }
 
 export type LoginCredentials = {
-  tenantId: number
   email: string
   password: string
 }

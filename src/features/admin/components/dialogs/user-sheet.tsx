@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -19,12 +20,13 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  ConfirmDialog,
 } from '@/shared/ui'
 import { FormSection, DocumentsSection } from '@/shared/components'
 import { getApiErrorMessage, emailValidationRules } from '@/shared/utils'
 import { useAuth } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
-import { useUser, useCreateUser, useUpdateUser, useCompanies } from '../../api'
+import { useUser, useCreateUser, useUpdateUser, useDeleteUser, useCompanies } from '../../api'
 import type {
   User,
   UserRole,
@@ -73,7 +75,10 @@ export function UserSheet({
 
   const createMutation = useCreateUser()
   const updateMutation = useUpdateUser()
+  const deleteMutation = useDeleteUser()
   const uploadMutation = useUploadTempFile()
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const form = useForm<UserFormValues>({
     defaultValues: getFormDefaults(),
@@ -232,6 +237,18 @@ export function UserSheet({
     }
   }
 
+  const handleDelete = async () => {
+    if (!userId) return
+    try {
+      await deleteMutation.mutateAsync(userId)
+      toast.success(t('deleteConfirm.success', { entity: t('tabs.users') }))
+      setDeleteDialogOpen(false)
+      onOpenChange(false)
+    } catch {
+      // Error toast is handled by QueryClient
+    }
+  }
+
   const isLoading = createMutation.isPending || updateMutation.isPending
 
   return (
@@ -256,6 +273,18 @@ export function UserSheet({
               className="border-b px-6 py-3"
               actions={
                 <>
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      {t('actions.delete')}
+                    </Button>
+                  )}
                   <SheetClose asChild>
                     <Button type="button" variant="outline" size="sm">
                       {t('dialogs.cancel')}
@@ -445,6 +474,15 @@ export function UserSheet({
             </div>
           </Form>
         )}
+
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title={t('deleteConfirm.user.title')}
+          description={t('deleteConfirm.user.description')}
+          onConfirm={handleDelete}
+          loading={deleteMutation.isPending}
+        />
       </SheetContent>
     </Sheet>
   )

@@ -80,6 +80,7 @@ export {
   CommandList,
   CommandSeparator,
   CommandShortcut,
+  ConfirmDialog,
 } from './overlay'
 
 // Sidebar

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -13,6 +14,7 @@ import {
   Select,
   Spinner,
   DatePicker,
+  ConfirmDialog,
 } from '@/shared/ui'
 import {
   Form,
@@ -30,6 +32,7 @@ import {
   useDriver,
   useCreateDriver,
   useUpdateDriver,
+  useDeleteDriver,
   useCompanies,
   useVehicles,
 } from '../../api'
@@ -91,7 +94,10 @@ export function DriverSheet({
 
   const createMutation = useCreateDriver()
   const updateMutation = useUpdateDriver()
+  const deleteMutation = useDeleteDriver()
   const uploadMutation = useUploadTempFile()
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const form = useForm<DriverFormValues>({
     defaultValues: getFormDefaults(),
@@ -246,6 +252,18 @@ export function DriverSheet({
     }
   }
 
+  const handleDelete = async () => {
+    if (!driverId) return
+    try {
+      await deleteMutation.mutateAsync(driverId)
+      toast.success(t('deleteConfirm.success', { entity: t('tabs.drivers') }))
+      setDeleteDialogOpen(false)
+      onOpenChange(false)
+    } catch {
+      // Error toast is handled by QueryClient
+    }
+  }
+
   const isLoading = createMutation.isPending || updateMutation.isPending
 
   const countryOptions = COUNTRY_VALUES.map((value) => ({
@@ -277,6 +295,18 @@ export function DriverSheet({
               className="border-b px-6 py-3"
               actions={
                 <>
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      {t('actions.delete')}
+                    </Button>
+                  )}
                   <SheetClose asChild>
                     <Button type="button" variant="outline" size="sm">
                       {t('dialogs.cancel')}
@@ -574,6 +604,15 @@ export function DriverSheet({
             </div>
           </Form>
         )}
+
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title={t('deleteConfirm.driver.title')}
+          description={t('deleteConfirm.driver.description')}
+          onConfirm={handleDelete}
+          loading={deleteMutation.isPending}
+        />
       </SheetContent>
     </Sheet>
   )

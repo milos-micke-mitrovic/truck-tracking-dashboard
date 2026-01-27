@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -13,6 +14,7 @@ import {
   Select,
   Spinner,
   DatePicker,
+  ConfirmDialog,
 } from '@/shared/ui'
 import {
   Form,
@@ -30,6 +32,7 @@ import {
   useTrailer,
   useCreateTrailer,
   useUpdateTrailer,
+  useDeleteTrailer,
   useCompanies,
   useVehicles,
 } from '../../api'
@@ -95,7 +98,10 @@ export function TrailerSheet({
 
   const createMutation = useCreateTrailer()
   const updateMutation = useUpdateTrailer()
+  const deleteMutation = useDeleteTrailer()
   const uploadMutation = useUploadTempFile()
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const form = useForm<TrailerFormValues>({
     defaultValues: getFormDefaults(),
@@ -250,6 +256,18 @@ export function TrailerSheet({
     }
   }
 
+  const handleDelete = async () => {
+    if (!trailerId) return
+    try {
+      await deleteMutation.mutateAsync(trailerId)
+      toast.success(t('deleteConfirm.success', { entity: t('tabs.trailers') }))
+      setDeleteDialogOpen(false)
+      onOpenChange(false)
+    } catch {
+      // Error toast is handled by QueryClient
+    }
+  }
+
   const isLoading = createMutation.isPending || updateMutation.isPending
 
   return (
@@ -274,6 +292,18 @@ export function TrailerSheet({
               className="border-b px-6 py-3"
               actions={
                 <>
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      {t('actions.delete')}
+                    </Button>
+                  )}
                   <SheetClose asChild>
                     <Button type="button" variant="outline" size="sm">
                       {t('dialogs.cancel')}
@@ -543,6 +573,15 @@ export function TrailerSheet({
             </div>
           </Form>
         )}
+
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title={t('deleteConfirm.trailer.title')}
+          description={t('deleteConfirm.trailer.description')}
+          onConfirm={handleDelete}
+          loading={deleteMutation.isPending}
+        />
       </SheetContent>
     </Sheet>
   )

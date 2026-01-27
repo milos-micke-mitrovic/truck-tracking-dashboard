@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Plus, Trash2, Download, Loader2, FileText, Upload, X } from 'lucide-react'
 import type { FieldArrayWithId, FieldValues, Control } from 'react-hook-form'
@@ -71,6 +71,15 @@ export function DocumentsSection({
 }: DocumentsSectionProps) {
   const { t } = useTranslation(namespace)
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
+  const bottomRef = useRef<HTMLButtonElement>(null)
+
+  const handleAdd = () => {
+    onAdd()
+    // Scroll to the add button after a short delay to allow DOM update
+    setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 100)
+  }
 
   const handleDownload = async (documentId: number) => {
     if (!entityType) return
@@ -198,7 +207,13 @@ export function DocumentsSection({
             </div>
           )
         })}
-        <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+        <Button
+          ref={bottomRef}
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleAdd}
+        >
           <Plus className="mr-1 h-4 w-4" />
           {t('documents.addDocument')}
         </Button>

@@ -41,7 +41,32 @@
     "addEldDevice": "Add ELD Device",
     "order": "Order",
     "export": "Export",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "delete": "Delete",
+    "actions": "Actions"
+  },
+  "deleteConfirm": {
+    "company": {
+      "title": "Delete Company",
+      "description": "Are you sure you want to delete this company? This action cannot be undone."
+    },
+    "driver": {
+      "title": "Delete Driver",
+      "description": "Are you sure you want to delete this driver? This action cannot be undone."
+    },
+    "vehicle": {
+      "title": "Delete Vehicle",
+      "description": "Are you sure you want to delete this vehicle? This action cannot be undone."
+    },
+    "trailer": {
+      "title": "Delete Trailer",
+      "description": "Are you sure you want to delete this trailer? This action cannot be undone."
+    },
+    "user": {
+      "title": "Delete User",
+      "description": "Are you sure you want to delete this user? This action cannot be undone."
+    },
+    "success": "{{entity}} deleted successfully"
   },
   "filters": {
     "toggle": "Filters",
