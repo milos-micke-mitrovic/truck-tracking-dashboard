@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LogOut, Settings, Route } from 'lucide-react'
+import { LogOut, Settings, Route, Building2 } from 'lucide-react'
 import { Logo } from '@/shared/components'
 import {
   Sidebar,
@@ -21,6 +21,7 @@ import {
   useLogout,
   getUserDisplayName,
   getUserInitials,
+  isSuperAdmin,
 } from '@/features/auth'
 
 export function AppSidebar() {
@@ -53,7 +54,22 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {user?.role === 'ADMIN' && (
+              {isSuperAdmin(user) && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip={t('sidebar.tenants')}>
+                    <NavLink
+                      to="/tenants"
+                      className={({ isActive }) =>
+                        cn(isActive && 'bg-sidebar-accent')
+                      }
+                    >
+                      <Building2 className="size-4" />
+                      <BodySmall as="span">{t('sidebar.tenants')}</BodySmall>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {!isSuperAdmin(user) && user?.role === 'ADMIN' && (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip={t('sidebar.admin')}>
                     <NavLink
@@ -68,19 +84,21 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={t('sidebar.routes')}>
-                  <NavLink
-                    to="/routes"
-                    className={({ isActive }) =>
-                      cn(isActive && 'bg-sidebar-accent')
-                    }
-                  >
-                    <Route className="size-4" />
-                    <BodySmall as="span">{t('sidebar.routes')}</BodySmall>
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {!isSuperAdmin(user) && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip={t('sidebar.routes')}>
+                    <NavLink
+                      to="/routes"
+                      className={({ isActive }) =>
+                        cn(isActive && 'bg-sidebar-accent')
+                      }
+                    >
+                      <Route className="size-4" />
+                      <BodySmall as="span">{t('sidebar.routes')}</BodySmall>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { httpClient } from '@/shared/api/http-client'
-import type { Tenant, TenantRequest } from '../types'
+import type { Tenant, TenantRequest, TenantAdmin } from '../types'
 
 // Query keys
 export const tenantKeys = {
@@ -10,6 +10,7 @@ export const tenantKeys = {
   detail: (id: number) => [...tenantKeys.all, 'detail', id] as const,
   byCode: (code: string) => [...tenantKeys.all, 'code', code] as const,
   search: (name: string) => [...tenantKeys.all, 'search', name] as const,
+  admins: (id: number) => [...tenantKeys.all, 'admins', id] as const,
 }
 
 // API functions
@@ -31,6 +32,10 @@ async function fetchTenantByCode(code: string): Promise<Tenant> {
 
 async function searchTenants(name: string): Promise<Tenant[]> {
   return httpClient.get(`/tenants/search?name=${encodeURIComponent(name)}`)
+}
+
+async function fetchTenantAdmins(id: number): Promise<TenantAdmin[]> {
+  return httpClient.get(`/tenants/${id}/admins`)
 }
 
 async function createTenant(data: TenantRequest): Promise<Tenant> {
@@ -77,6 +82,14 @@ export function useTenantByCode(code: string) {
     queryKey: tenantKeys.byCode(code),
     queryFn: () => fetchTenantByCode(code),
     enabled: !!code,
+  })
+}
+
+export function useTenantAdmins(id: number) {
+  return useQuery({
+    queryKey: tenantKeys.admins(id),
+    queryFn: () => fetchTenantAdmins(id),
+    enabled: id > 0,
   })
 }
 

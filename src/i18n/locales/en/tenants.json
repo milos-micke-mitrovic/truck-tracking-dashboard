@@ -1,0 +1,67 @@
+{
+  "title": "Tenants",
+  "columns": {
+    "name": "Name",
+    "code": "Code",
+    "status": "Status",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "actions": {
+    "addTenant": "Add Tenant"
+  },
+  "filters": {
+    "search": "Search tenants..."
+  },
+  "sheet": {
+    "addTitle": "Add Tenant",
+    "editTitle": "Edit Tenant",
+    "tenantInfo": "Tenant Info",
+    "name": "Name",
+    "code": "Code",
+    "isActive": "Active",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "createSuccess": "Tenant created successfully",
+    "updateSuccess": "Tenant updated successfully",
+    "error": "An error occurred. Please try again."
+  },
+  "admins": {
+    "title": "Admins",
+    "addAdmin": "Add Admin",
+    "name": "Name",
+    "email": "Email",
+    "status": "Status",
+    "empty": "No admin users for this tenant"
+  },
+  "adminSheet": {
+    "addTitle": "Add Admin",
+    "editTitle": "Edit Admin",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "department": "Department",
+    "leaveBlank": "Leave blank to keep current",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "createSuccess": "Admin created successfully",
+    "updateSuccess": "Admin updated successfully",
+    "error": "An error occurred. Please try again."
+  },
+  "deleteConfirm": {
+    "title": "Delete Tenant",
+    "description": "Are you sure you want to delete this tenant? This action cannot be undone.",
+    "success": "Tenant deleted successfully",
+    "adminTitle": "Delete Admin",
+    "adminDescription": "Are you sure you want to delete this admin user? This action cannot be undone.",
+    "adminSuccess": "Admin deleted successfully"
+  }
+}

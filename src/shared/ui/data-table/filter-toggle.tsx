@@ -19,14 +19,16 @@ type FilterToggleProps = {
   filters: FilterConfig[]
   visibleFilters: string[]
   onToggleFilter: (key: string) => void
+  namespace?: string
 }
 
 export function FilterToggle({
   filters,
   visibleFilters,
   onToggleFilter,
+  namespace = 'admin',
 }: FilterToggleProps) {
-  const { t } = useTranslation('admin')
+  const { t } = useTranslation(namespace)
 
   const visibleCount = visibleFilters.length
 

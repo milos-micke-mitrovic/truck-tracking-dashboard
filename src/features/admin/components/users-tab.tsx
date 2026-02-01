@@ -16,6 +16,7 @@ import {
   type FilterConfig,
 } from '@/shared/ui'
 import { useFilterVisibility } from '@/shared/hooks'
+import { useAuth, getVisibleRoles } from '@/features/auth'
 
 // Define all available filters for users (matches BE UserFilterRequest)
 const USER_FILTERS: FilterConfig[] = [
@@ -32,6 +33,8 @@ const DEFAULT_VISIBLE = ['name', 'role', 'status']
 
 export function UsersTab() {
   const { t } = useTranslation('admin')
+  const { user: authUser } = useAuth()
+  const visibleRoles = useMemo(() => getVisibleRoles(ROLE_VALUES, authUser), [authUser])
   const { visibleFilters, toggleFilter, isFilterVisible } = useFilterVisibility({
     storageKey: 'admin-users',
     defaultVisible: DEFAULT_VISIBLE,
@@ -55,6 +58,15 @@ export function UsersTab() {
     ...filters,
     ...pagination,
   })
+
+  // Filter out SUPER_ADMIN always, and ADMIN if current user is not SUPER_ADMIN
+  const filteredContent = useMemo(
+    () =>
+      (data?.content || []).filter((u) =>
+        visibleRoles.includes(u.role as (typeof visibleRoles)[number])
+      ),
+    [data?.content, visibleRoles]
+  )
 
   const columns: ColumnDef<UserListItem>[] = useMemo(() => [
     {
@@ -174,7 +186,7 @@ export function UsersTab() {
             <Select
               options={[
                 { value: 'all', label: t('filters.all') },
-                ...ROLE_VALUES.map((value) => ({
+                ...visibleRoles.map((value) => ({
                   value,
                   label: t(`roles.${value.toLowerCase()}`),
                 })),
@@ -216,7 +228,7 @@ export function UsersTab() {
       </div>
       <DataTable
         columns={columns}
-        data={data?.content || []}
+        data={filteredContent}
         isLoading={isLoading || isFetching}
         manualPagination
         pageCount={data?.totalPages}

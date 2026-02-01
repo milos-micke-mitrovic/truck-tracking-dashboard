@@ -6,6 +6,7 @@ import navigationEn from './locales/en/navigation.json'
 import adminEn from './locales/en/admin.json'
 import authEn from './locales/en/auth.json'
 import routesEn from './locales/en/routes.json'
+import tenantsEn from './locales/en/tenants.json'
 
 export const defaultNS = 'common'
 
@@ -16,6 +17,7 @@ export const resources = {
     admin: adminEn,
     auth: authEn,
     routes: routesEn,
+    tenants: tenantsEn,
   },
 } as const
 

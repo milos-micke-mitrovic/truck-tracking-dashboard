@@ -3,7 +3,7 @@ export type User = {
   firstName: string
   lastName: string
   email: string
-  role: 'ADMIN' | 'MANAGER' | 'DISPATCHER' | 'DRIVER' | 'ACCOUNTING' | 'USER'
+  role: 'SUPER_ADMIN' | 'ADMIN' | 'MANAGER' | 'DISPATCHER' | 'DRIVER' | 'ACCOUNTING' | 'USER'
   tenantId: number
   companyId?: number
   department?: string

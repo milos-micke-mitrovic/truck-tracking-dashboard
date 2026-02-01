@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Trash2 } from 'lucide-react'
@@ -27,6 +28,7 @@ import { FormSection, DocumentsSection } from '@/shared/components'
 import { getApiErrorMessage } from '@/shared/utils'
 import { useAuth } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
+import { adminKeys } from '../../api/keys'
 import {
   useVehicle,
   useCreateVehicle,
@@ -92,6 +94,7 @@ export function VehicleSheet({
   onSuccess,
 }: VehicleSheetProps) {
   const { t } = useTranslation('admin')
+  const queryClient = useQueryClient()
   const { user } = useAuth()
   const isEdit = !!vehicleId
 
@@ -298,6 +301,7 @@ export function VehicleSheet({
   const handleDelete = async () => {
     if (!vehicleId) return
     try {
+      queryClient.removeQueries({ queryKey: adminKeys.vehicle(vehicleId) })
       await deleteMutation.mutateAsync(vehicleId)
       toast.success(t('deleteConfirm.success', { entity: t('tabs.vehicles') }))
       setDeleteDialogOpen(false)

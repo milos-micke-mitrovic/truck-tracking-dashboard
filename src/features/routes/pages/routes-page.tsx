@@ -172,6 +172,7 @@ export function RoutesPage() {
             filters={ROUTE_FILTERS}
             visibleFilters={visibleFilters}
             onToggleFilter={toggleFilter}
+            namespace="routes"
           />
 
           <div className="flex-1" />

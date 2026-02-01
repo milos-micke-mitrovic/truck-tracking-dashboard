@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '@/features/auth'
+import { useAuth, getDefaultRoute } from '@/features/auth'
 import type { User } from '@/features/auth/types'
 
 type RouteGuardProps = {
@@ -24,14 +24,13 @@ export function RouteGuard({
 
   // Redirect authenticated users away from public routes
   if (!requireAuth && isAuthenticated) {
-    return <Navigate to="/routes" replace />
+    return <Navigate to={getDefaultRoute(user)} replace />
   }
 
   // Check role-based access
   if (allowedRoles && allowedRoles.length > 0 && user) {
     if (!allowedRoles.includes(user.role)) {
-      // Redirect to routes page if user doesn't have required role
-      return <Navigate to="/routes" replace />
+      return <Navigate to={getDefaultRoute(user)} replace />
     }
   }
 

@@ -31,3 +31,26 @@ export function jwtPayloadToUser(payload: JwtPayload): User {
     status: 'ACTIVE',
   }
 }
+
+export function isSuperAdmin(user: User | null): boolean {
+  return user?.role === 'SUPER_ADMIN'
+}
+
+export function getDefaultRoute(user: User | null): string {
+  return isSuperAdmin(user) ? '/tenants' : '/routes'
+}
+
+/**
+ * Filters a list of role values to only include roles visible to the current user.
+ * SUPER_ADMIN is always hidden. ADMIN is hidden unless the viewer is SUPER_ADMIN.
+ */
+export function getVisibleRoles<T extends string>(
+  roles: readonly T[],
+  viewer: User | null
+): T[] {
+  return roles.filter((role) => {
+    if (role === 'SUPER_ADMIN') return false
+    if (role === 'ADMIN' && !isSuperAdmin(viewer)) return false
+    return true
+  })
+}

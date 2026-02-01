@@ -1,3 +1,6 @@
+// Pages
+export { TenantsPage } from './pages/tenants-page'
+
 // API
 export {
   tenantKeys,
@@ -6,6 +9,7 @@ export {
   useTenant,
   useTenantByCode,
   useSearchTenants,
+  useTenantAdmins,
   useCreateTenant,
   useUpdateTenant,
   useDeleteTenant,
@@ -13,4 +17,4 @@ export {
 } from './api'
 
 // Types
-export type { Tenant, TenantRequest } from './types'
+export type { Tenant, TenantRequest, TenantAdmin } from './types'

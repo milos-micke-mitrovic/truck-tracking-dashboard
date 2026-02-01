@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Trash2 } from 'lucide-react'
@@ -24,8 +25,9 @@ import {
 } from '@/shared/ui'
 import { FormSection, DocumentsSection } from '@/shared/components'
 import { getApiErrorMessage, emailValidationRules } from '@/shared/utils'
-import { useAuth } from '@/features/auth'
+import { useAuth, getVisibleRoles } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
+import { adminKeys } from '../../api/keys'
 import { useUser, useCreateUser, useUpdateUser, useDeleteUser, useCompanies } from '../../api'
 import type {
   User,
@@ -64,6 +66,7 @@ export function UserSheet({
   onSuccess,
 }: UserSheetProps) {
   const { t } = useTranslation('admin')
+  const queryClient = useQueryClient()
   const { user: authUser } = useAuth()
   const isEdit = !!userId
 
@@ -137,7 +140,7 @@ export function UserSheet({
     [companiesData, t]
   )
 
-  const roleOptions = ROLE_VALUES.map((value) => ({
+  const roleOptions = getVisibleRoles(ROLE_VALUES, authUser).map((value) => ({
     value,
     label: t(`roles.${value.toLowerCase()}`),
   }))
@@ -240,6 +243,7 @@ export function UserSheet({
   const handleDelete = async () => {
     if (!userId) return
     try {
+      queryClient.removeQueries({ queryKey: adminKeys.user(userId) })
       await deleteMutation.mutateAsync(userId)
       toast.success(t('deleteConfirm.success', { entity: t('tabs.users') }))
       setDeleteDialogOpen(false)

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Trash2 } from 'lucide-react'
@@ -28,6 +29,7 @@ import { FormSection, DocumentsSection } from '@/shared/components'
 import { getApiErrorMessage } from '@/shared/utils'
 import { useAuth } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
+import { adminKeys } from '../../api/keys'
 import {
   useTrailer,
   useCreateTrailer,
@@ -84,6 +86,7 @@ export function TrailerSheet({
   onSuccess,
 }: TrailerSheetProps) {
   const { t } = useTranslation('admin')
+  const queryClient = useQueryClient()
   const { user } = useAuth()
   const isEdit = !!trailerId
 
@@ -259,6 +262,7 @@ export function TrailerSheet({
   const handleDelete = async () => {
     if (!trailerId) return
     try {
+      queryClient.removeQueries({ queryKey: adminKeys.trailer(trailerId) })
       await deleteMutation.mutateAsync(trailerId)
       toast.success(t('deleteConfirm.success', { entity: t('tabs.trailers') }))
       setDeleteDialogOpen(false)

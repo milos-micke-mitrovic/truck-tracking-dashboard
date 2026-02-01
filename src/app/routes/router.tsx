@@ -5,6 +5,7 @@ import { DashboardLayout } from '@/app/layouts/dashboard-layout'
 import { NotFoundPage } from './not-found-page'
 import { ErrorBoundary } from './error-boundary'
 import { Spinner } from '@/shared/ui'
+import { useAuth, getDefaultRoute } from '@/features/auth'
 
 // Lazy load feature pages
 const AdminPage = lazy(() =>
@@ -22,6 +23,17 @@ const RoutesPage = lazy(() =>
     default: m.RoutesPage,
   }))
 )
+const TenantsPage = lazy(() =>
+  import('@/features/tenants/pages/tenants-page').then((m) => ({
+    default: m.TenantsPage,
+  }))
+)
+
+// Redirects to the user's default route based on role
+function DefaultRedirect() {
+  const { user } = useAuth()
+  return <Navigate to={getDefaultRoute(user)} replace />
+}
 
 // Loading fallback for lazy-loaded pages
 function PageLoadingFallback() {
@@ -66,7 +78,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Navigate to="/routes" replace />,
+        element: <DefaultRedirect />,
       },
       {
         path: '/admin',
@@ -84,6 +96,16 @@ export const router = createBrowserRouter([
           <LazyPage>
             <RoutesPage />
           </LazyPage>
+        ),
+      },
+      {
+        path: '/tenants',
+        element: (
+          <RouteGuard allowedRoles={['SUPER_ADMIN']}>
+            <LazyPage>
+              <TenantsPage />
+            </LazyPage>
+          </RouteGuard>
         ),
       },
     ],

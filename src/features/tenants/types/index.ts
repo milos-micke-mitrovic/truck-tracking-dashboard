@@ -12,3 +12,15 @@ export type TenantRequest = {
   name: string
   isActive: boolean
 }
+
+export type TenantAdmin = {
+  id: number
+  companyId: number | null
+  companyName: string | null
+  name: string
+  username: string | null
+  email: string
+  department: string | null
+  role: string
+  status: string
+}
