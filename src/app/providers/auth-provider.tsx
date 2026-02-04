@@ -1,5 +1,8 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react'
 import { AUTH_STORAGE_KEY } from '@/shared/utils'
+import { decodeJwt } from '@/features/auth/utils'
+import { refreshAccessToken } from '@/features/auth/api'
+import { router } from '@/app/routes/router'
 import type { User, AuthState } from '@/features/auth/types'
 
 type StoredAuth = {
@@ -15,6 +18,9 @@ type AuthContextType = AuthState & {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
+
+// Refresh 60 seconds before expiry
+const REFRESH_BUFFER_MS = 60 * 1000
 
 function getStoredAuth(): StoredAuth | null {
   try {
@@ -49,6 +55,14 @@ function getInitialState(): AuthState {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(getInitialState)
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const clearRefreshTimer = useCallback(() => {
+    if (refreshTimerRef.current) {
+      clearTimeout(refreshTimerRef.current)
+      refreshTimerRef.current = null
+    }
+  }, [])
 
   const login = useCallback((user: User, token: string, refreshToken: string) => {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ user, token, refreshToken }))
@@ -61,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const logout = useCallback(() => {
+    clearRefreshTimer()
     localStorage.removeItem(AUTH_STORAGE_KEY)
     setState({
       user: null,
@@ -68,9 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshToken: null,
       isAuthenticated: false,
     })
-  }, [])
+  }, [clearRefreshTimer])
 
-  // Update tokens after a successful refresh (called from http-client)
   const updateTokens = useCallback((token: string, refreshToken: string) => {
     setState((prev) => {
       if (!prev.user) return prev
@@ -83,6 +97,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return newState
     })
   }, [])
+
+  // Schedule a proactive refresh based on the token's exp claim
+  const scheduleRefresh = useCallback((token: string, currentRefreshToken: string) => {
+    clearRefreshTimer()
+
+    const payload = decodeJwt(token)
+    if (!payload?.exp) return
+
+    const expiresAt = payload.exp * 1000
+    const delay = expiresAt - Date.now() - REFRESH_BUFFER_MS
+
+    if (delay <= 0) {
+      // Token already expired or about to — refresh immediately
+      refreshAccessToken(currentRefreshToken).catch(() => {
+        // Refresh failed; the next API call will trigger 401 → auth:logout
+      })
+      return
+    }
+
+    refreshTimerRef.current = setTimeout(() => {
+      refreshAccessToken(currentRefreshToken).catch(() => {
+        // Refresh failed; the next API call will trigger 401 → auth:logout
+      })
+    }, delay)
+  }, [clearRefreshTimer])
+
+  // Listen for custom events from http-client
+  useEffect(() => {
+    function handleTokensUpdated(e: Event) {
+      const { accessToken, refreshToken } = (e as CustomEvent).detail
+      updateTokens(accessToken, refreshToken)
+    }
+
+    function handleLogout() {
+      logout()
+      router.navigate('/login')
+    }
+
+    window.addEventListener('auth:tokens-updated', handleTokensUpdated)
+    window.addEventListener('auth:logout', handleLogout)
+
+    return () => {
+      window.removeEventListener('auth:tokens-updated', handleTokensUpdated)
+      window.removeEventListener('auth:logout', handleLogout)
+    }
+  }, [updateTokens, logout])
+
+  // Schedule proactive refresh whenever token changes
+  useEffect(() => {
+    if (state.token && state.refreshToken) {
+      scheduleRefresh(state.token, state.refreshToken)
+    }
+    return clearRefreshTimer
+  }, [state.token, state.refreshToken, scheduleRefresh, clearRefreshTimer])
 
   return (
     <AuthContext.Provider value={{ ...state, login, logout, updateTokens }}>

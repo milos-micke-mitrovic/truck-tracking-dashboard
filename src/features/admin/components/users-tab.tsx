@@ -70,15 +70,11 @@ export function UsersTab() {
 
   const columns: ColumnDef<UserListItem>[] = useMemo(() => [
     {
-      accessorKey: 'firstName',
+      accessorKey: 'name',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.name')} />
       ),
-      cell: ({ row }) => {
-        const firstName = row.original.firstName || ''
-        const lastName = row.original.lastName || ''
-        return `${firstName} ${lastName}`.trim() || '-'
-      },
+      cell: ({ row }) => row.original.name || '-',
     },
     {
       accessorKey: 'username',

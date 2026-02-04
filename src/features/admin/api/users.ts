@@ -13,7 +13,7 @@ import { adminKeys } from './keys'
 // API functions
 async function fetchUsers(
   params: UserFilters & PageParams
-): Promise<PageResponse<User>> {
+): Promise<PageResponse<UserListItem>> {
   const searchParams = new URLSearchParams()
   if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
   if (params.size !== undefined) searchParams.set('size', String(params.size))

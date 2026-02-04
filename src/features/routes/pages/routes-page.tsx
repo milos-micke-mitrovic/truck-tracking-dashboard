@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import type { PaginationState } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useRoutes } from '../api'
-import type { Route, RouteFilters, RouteStatus } from '../types'
+import type { RouteFilters, RouteStatus } from '../types'
 import { ROUTE_STATUS_VALUES } from '../constants'
 import { RouteSheet } from '../components/route-sheet'
 import { getRoutesColumns } from '../components/routes-columns'
@@ -11,36 +11,42 @@ import {
   Button,
   Input,
   Select,
+  DatePicker,
   DataTable,
   H1,
   FilterToggle,
   type FilterConfig,
 } from '@/shared/ui'
 import { useFilterVisibility } from '@/shared/hooks'
+import { useCompanies, useDrivers, useVehicles, useUsers } from '@/features/admin/api'
+import { useBrokers } from '@/features/brokers'
 
-// Define all available filters for routes
+// All available filters
 const ROUTE_FILTERS: FilterConfig[] = [
-  { key: 'searchTerm', labelKey: 'filters.search' },
-  { key: 'routeNumber', labelKey: 'filters.routeNumber' },
-  { key: 'routeName', labelKey: 'filters.routeName' },
-  { key: 'origin', labelKey: 'filters.origin' },
-  { key: 'destination', labelKey: 'filters.destination' },
+  { key: 'identifier', labelKey: 'filters.identifier' },
   { key: 'status', labelKey: 'filters.status' },
+  { key: 'companyId', labelKey: 'filters.companyId' },
+  { key: 'dispatcherId', labelKey: 'filters.dispatcherId' },
+  { key: 'driverId', labelKey: 'filters.driverId' },
+  { key: 'vehicleId', labelKey: 'filters.vehicleId' },
+  { key: 'brokerId', labelKey: 'filters.brokerId' },
+  { key: 'bookedAtFrom', labelKey: 'filters.bookedAtFrom' },
+  { key: 'bookedAtTo', labelKey: 'filters.bookedAtTo' },
 ]
 
-// Default visible filters (currently shown in UI)
-const DEFAULT_VISIBLE = ['searchTerm', 'status']
+const DEFAULT_VISIBLE = ['identifier', 'status']
 
 export function RoutesPage() {
   const { t } = useTranslation('routes')
-  const { visibleFilters, toggleFilter, isFilterVisible } = useFilterVisibility({
-    storageKey: 'routes',
-    defaultVisible: DEFAULT_VISIBLE,
-  })
+  const { visibleFilters, toggleFilter, isFilterVisible } =
+    useFilterVisibility({
+      storageKey: 'routes',
+      defaultVisible: DEFAULT_VISIBLE,
+    })
 
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [routeSheetOpen, setRouteSheetOpen] = useState(false)
-  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<RouteFilters>({
     status: 'all',
@@ -55,6 +61,13 @@ export function RoutesPage() {
     ...filters,
     ...pagination,
   })
+
+  // Fetch data for searchable selects
+  const { data: companiesData } = useCompanies({ size: 100 })
+  const { data: usersData } = useUsers({ size: 100 })
+  const { data: driversData } = useDrivers({ size: 100 })
+  const { data: vehiclesData } = useVehicles({ size: 100 })
+  const { data: brokersData } = useBrokers()
 
   const updateFilter = <K extends keyof RouteFilters>(
     key: K,
@@ -77,15 +90,15 @@ export function RoutesPage() {
     setTimeout(() => setCopiedId(null), 2000)
   }
 
-  const handleRowClick = (route: Route) => {
-    setSelectedRoute(route)
+  const handleRowClick = (route: { id: string }) => {
+    setSelectedRouteId(route.id)
     setRouteSheetOpen(true)
   }
 
   const handleSheetOpenChange = (open: boolean) => {
     setRouteSheetOpen(open)
     if (!open) {
-      setSelectedRoute(null)
+      setSelectedRouteId(null)
     }
   }
 
@@ -93,9 +106,54 @@ export function RoutesPage() {
     { value: 'all', label: t('filters.all') },
     ...ROUTE_STATUS_VALUES.map((value) => ({
       value,
-      label: t(`status.${value.toLowerCase()}`),
+      label: t(`status.${value}`),
     })),
   ]
+
+  const companyOptions = useMemo(
+    () =>
+      (companiesData?.content || []).map((c) => ({
+        value: String(c.id),
+        label: c.displayName || c.fullName,
+      })),
+    [companiesData]
+  )
+
+  const dispatcherOptions = useMemo(
+    () =>
+      (usersData?.content || []).map((u) => ({
+        value: String(u.id),
+        label: u.name,
+      })),
+    [usersData]
+  )
+
+  const driverOptions = useMemo(
+    () =>
+      (driversData?.content || []).map((d) => ({
+        value: String(d.id),
+        label: d.name,
+      })),
+    [driversData]
+  )
+
+  const vehicleOptions = useMemo(
+    () =>
+      (vehiclesData?.content || []).map((v) => ({
+        value: String(v.id),
+        label: v.unitId,
+      })),
+    [vehiclesData]
+  )
+
+  const brokerOptions = useMemo(
+    () =>
+      (brokersData || []).map((b) => ({
+        value: String(b.id),
+        label: b.legalName || b.dbaName || b.mcNumber,
+      })),
+    [brokersData]
+  )
 
   const columns = useMemo(
     () => getRoutesColumns({ t, copiedId, onCopy: handleCopy }),
@@ -108,54 +166,14 @@ export function RoutesPage() {
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-2 py-3">
-          {isFilterVisible('searchTerm') && (
+          {isFilterVisible('identifier') && (
             <Input
-              placeholder={t('filters.search')}
-              value={filters.searchTerm || ''}
+              placeholder={t('filters.identifier')}
+              value={filters.identifier || ''}
               debounce={300}
-              onDebounceChange={(value) => updateFilter('searchTerm', value)}
+              onDebounceChange={(value) => updateFilter('identifier', value)}
               clearable
               className="w-[200px]"
-            />
-          )}
-          {isFilterVisible('routeNumber') && (
-            <Input
-              placeholder={t('filters.routeNumber')}
-              value={filters.routeNumber || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('routeNumber', value)}
-              clearable
-              className="w-[130px]"
-            />
-          )}
-          {isFilterVisible('routeName') && (
-            <Input
-              placeholder={t('filters.routeName')}
-              value={filters.routeName || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('routeName', value)}
-              clearable
-              className="w-[150px]"
-            />
-          )}
-          {isFilterVisible('origin') && (
-            <Input
-              placeholder={t('filters.origin')}
-              value={filters.origin || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('origin', value)}
-              clearable
-              className="w-[150px]"
-            />
-          )}
-          {isFilterVisible('destination') && (
-            <Input
-              placeholder={t('filters.destination')}
-              value={filters.destination || ''}
-              debounce={300}
-              onDebounceChange={(value) => updateFilter('destination', value)}
-              clearable
-              className="w-[150px]"
             />
           )}
           {isFilterVisible('status') && (
@@ -166,6 +184,74 @@ export function RoutesPage() {
                 updateFilter('status', value as RouteStatus | 'all')
               }
               className="w-[140px]"
+            />
+          )}
+          {isFilterVisible('companyId') && (
+            <Select
+              searchable
+              options={companyOptions}
+              value={filters.companyId || ''}
+              onChange={(value) => updateFilter('companyId', value)}
+              placeholder={t('filters.companyId')}
+              className="w-[160px]"
+            />
+          )}
+          {isFilterVisible('dispatcherId') && (
+            <Select
+              searchable
+              options={dispatcherOptions}
+              value={filters.dispatcherId || ''}
+              onChange={(value) => updateFilter('dispatcherId', value)}
+              placeholder={t('filters.dispatcherId')}
+              className="w-[160px]"
+            />
+          )}
+          {isFilterVisible('driverId') && (
+            <Select
+              searchable
+              options={driverOptions}
+              value={filters.driverId || ''}
+              onChange={(value) => updateFilter('driverId', value)}
+              placeholder={t('filters.driverId')}
+              className="w-[160px]"
+            />
+          )}
+          {isFilterVisible('vehicleId') && (
+            <Select
+              searchable
+              options={vehicleOptions}
+              value={filters.vehicleId || ''}
+              onChange={(value) => updateFilter('vehicleId', value)}
+              placeholder={t('filters.vehicleId')}
+              className="w-[140px]"
+            />
+          )}
+          {isFilterVisible('brokerId') && (
+            <Select
+              searchable
+              options={brokerOptions}
+              value={filters.brokerId || ''}
+              onChange={(value) => updateFilter('brokerId', value)}
+              placeholder={t('filters.brokerId')}
+              className="w-[160px]"
+            />
+          )}
+          {isFilterVisible('bookedAtFrom') && (
+            <DatePicker
+              value={filters.bookedAtFrom || ''}
+              onChange={(value) =>
+                updateFilter('bookedAtFrom', value ? String(value) : undefined)
+              }
+              placeholder={t('filters.bookedAtFrom')}
+            />
+          )}
+          {isFilterVisible('bookedAtTo') && (
+            <DatePicker
+              value={filters.bookedAtTo || ''}
+              onChange={(value) =>
+                updateFilter('bookedAtTo', value ? String(value) : undefined)
+              }
+              placeholder={t('filters.bookedAtTo')}
             />
           )}
           <FilterToggle
@@ -181,7 +267,7 @@ export function RoutesPage() {
             size="sm"
             prefixIcon={<Plus />}
             onClick={() => {
-              setSelectedRoute(null)
+              setSelectedRouteId(null)
               setRouteSheetOpen(true)
             }}
           >
@@ -206,7 +292,7 @@ export function RoutesPage() {
       <RouteSheet
         open={routeSheetOpen}
         onOpenChange={handleSheetOpenChange}
-        route={selectedRoute}
+        routeId={selectedRouteId}
       />
     </div>
   )

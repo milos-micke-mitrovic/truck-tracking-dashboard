@@ -49,12 +49,3 @@ export const USER_DOCUMENT_TYPES = [
   'background_check',
 ] as const
 
-// Route document types
-export const ROUTE_DOCUMENT_TYPES = [
-  'bill_of_lading',
-  'proof_of_delivery',
-  'customs_document',
-  'weight_ticket',
-  'fuel_receipt',
-  'toll_receipt',
-] as const

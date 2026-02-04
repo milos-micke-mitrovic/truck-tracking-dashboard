@@ -1,136 +1,354 @@
-// Route status from backend
-export type RouteStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED'
+import type { FacilityShort } from '@/features/facilities'
+import type { BrokerShort } from '@/features/brokers'
 
-// Nested vehicle info in route response
-export type RouteVehicle = {
-  id: number
-  company: string
-  unitId: string
-  licensePlate: string
-  vin: string
-  model: string
-  make: string
-  year: number
-  driver: string
-  status: string
+// --- Enum types ---
+
+export type RouteStatus =
+  | 'BOOKED'
+  | 'DISPATCHED'
+  | 'IN_TRANSIT'
+  | 'AT_PICKUP'
+  | 'LOADED'
+  | 'AT_DELIVERY'
+  | 'DELIVERED'
+  | 'COMPLETED'
+  | 'INVOICED'
+  | 'PAID'
+  | 'CANCELLED'
+
+export type RouteType = 'SHORTEST_FASTEST' | 'CHEAPEST' | 'ALTERNATE'
+
+export type StopType = 'PICKUP' | 'DELIVERY'
+
+export type StopStatus =
+  | 'PENDING'
+  | 'EN_ROUTE'
+  | 'ARRIVED'
+  | 'LOADING'
+  | 'UNLOADING'
+  | 'DEPARTED'
+  | 'COMPLETED'
+  | 'SKIPPED'
+
+export type ArrivalSlotType =
+  | 'WINDOW'
+  | 'FCFS'
+  | 'BY_APPOINTMENT'
+  | 'EXACT_TIME'
+
+export type Capacity = 'FULL' | 'PARTIAL'
+
+export type WeightUnit = 'LBS' | 'KG'
+
+export type UnitType =
+  | 'PALLETS'
+  | 'BAGS'
+  | 'BALES'
+  | 'BINS'
+  | 'BOXES'
+  | 'BUNCHES'
+  | 'BUNDLES'
+
+export type AccessoryType =
+  | 'SAFETY_VEST'
+  | 'HARD_HAT'
+  | 'SAFETY_GLASSES'
+  | 'STEEL_TOED_BOOTS'
+  | 'WORK_GLOVES'
+  | 'FACE_MASK_RESPIRATOR'
+  | 'FLAME_RESISTANT_CLOTHING'
+  | 'HAIR_NET_BEARD_NET'
+  | 'LOAD_LOCKS_LOAD_BARS'
+  | 'TIE_DOWN_STRAPS'
+  | 'PALLET_JACK'
+  | 'HAND_TRUCK_DOLLY'
+  | 'LIFTGATE'
+  | 'TARPS'
+  | 'HOSES_AND_FITTINGS'
+  | 'BULKHEADS'
+  | 'TRAILER_SEAL'
+  | 'OVERSIZE_LOAD_BANNER_FLAGS'
+
+export type RequiredDocumentType =
+  | 'BOL_PHOTO'
+  | 'POD_PHOTO'
+  | 'TIRES_PHOTO'
+  | 'TRAILER_PHOTO'
+  | 'SECURED_FREIGHT_PHOTO'
+  | 'SEAL_PHOTO'
+  | 'EMPTY_SCALE_PHOTO'
+  | 'LOADED_SCALE_PHOTO'
+  | 'ESCORT_PHOTO'
+  | 'LUMPER_RECEIPT_PHOTO'
+
+export type ReferenceNumberType =
+  | 'APPT_CONF'
+  | 'BOL'
+  | 'CUSTOMER'
+  | 'DEL_CONSIGNEE'
+  | 'DELIVERY'
+  | 'GATE_CHECK_IN'
+  | 'ITEM'
+
+// --- Short response types (nested in RouteResponse) ---
+
+export type CompanyShort = {
+  id: string
+  name: string
 }
 
-// Nested driver info in route response
-export type RouteDriver = {
-  id: number
-  companyId: number
+export type UserShort = {
+  id: string
+  name: string
+}
+
+export type VehicleShort = {
+  id: string
+  unitNumber: string
+}
+
+export type DriverShort = {
+  id: string
+  name: string
+}
+
+// --- Response types ---
+
+export type ReferenceNumberResponse = {
+  id: string
+  type: ReferenceNumberType
+  value: string
+}
+
+export type RouteStopResponse = {
+  id: string
+  type: StopType
+  facility: FacilityShort | null
+  stopOrder: number
+  arrivalSlotType: ArrivalSlotType | null
+  arrivalStartDate: string | null
+  arrivalEndDate: string | null
+  actualArrivalDate: string | null
+  actualDepartureDate: string | null
+  status: StopStatus
+  referenceNumbers: ReferenceNumberResponse[]
+  accessories: AccessoryType[]
+  requiredDocuments: RequiredDocumentType[]
+}
+
+export type LoadDetailsResponse = {
+  id: string
+  weight: string | null
+  weightUnit: WeightUnit | null
+  lengthFeet: string | null
+  commodity: string | null
+  capacity: Capacity | null
+  temperature: string | null
+  unitCount: number | null
+  unitType: UnitType | null
+}
+
+export type RouteResponse = {
+  id: string
+  tenantId: number
+  company: CompanyShort
+  dispatcher: UserShort | null
+  vehicle: VehicleShort | null
+  driver: DriverShort | null
+  coDriver: DriverShort | null
+  broker: BrokerShort | null
+  brokerRepresentative: string | null
+  brokerIdentifier: string | null
+  internalIdentifier: string | null
+  brokerRate: number
+  driverRate: number
+  ratePerMile: number | null
+  totalMiles: number | null
+  totalStops: number
+  estimatedDuration: string | null
+  routeHighway: string | null
+  tolls: number | null
+  fuelCost: number | null
+  routeType: RouteType | null
+  status: RouteStatus
+  autoDispatched: boolean
+  dispatchedAt: string | null
+  bookedAt: string | null
+  completedAt: string | null
+  stops: RouteStopResponse[]
+  loadDetails: LoadDetailsResponse | null
+  createdAt: string
+  updatedAt: string
+}
+
+export type RouteShortResponse = {
+  id: string
   companyName: string
-  name: string
-  username: string
-  phoneNumber: string
-  vehicleId: number
-  status: string
-}
-
-// Document attached to route
-export type RouteDocument = {
-  id: number
-  type: string
-  name: string
-  path: string
-  expirationDate: string | null
-  createdAt: string
-  updatedAt: string
-}
-
-// Route entity from backend
-export type Route = {
-  id: number
-  tenantId: number
-  routeNumber: string
-  routeName: string
+  brokerIdentifier: string | null
+  internalIdentifier: string | null
+  brokerRate: number
+  ratePerMile: number | null
+  totalMiles: number | null
+  totalStops: number
+  originCity: string | null
+  originDate: string | null
+  destinationCity: string | null
+  destinationDate: string | null
+  unitNumber: string | null
+  driverName: string | null
+  dispatcherName: string | null
   status: RouteStatus
-  origin: string
-  destination: string
-  distanceMiles: number
-  estimatedDurationHours: number
-  vehicle?: RouteVehicle | null
-  driver?: RouteDriver | null
-  vehicleId?: number
-  driverId?: number
-  scheduledStartDate: string
-  scheduledEndDate: string
-  actualStartDate?: string | null
-  actualEndDate?: string | null
-  notes?: string | null
-  createdAt: string
-  updatedAt: string
-  documents?: RouteDocument[]
+  statusChangedAt: string | null
+  bookedAt: string | null
 }
 
-// Request body for create/update
-export type RouteRequest = {
-  tenantId: number
-  routeNumber: string
-  routeName: string
+// --- Request types ---
+
+export type StopReferenceNumberRequest = {
+  type: ReferenceNumberType
+  value: string
+}
+
+export type StopRequest = {
+  type: StopType
+  facilityId?: string
+  stopOrder: number
+  arrivalSlotType?: ArrivalSlotType
+  arrivalStartDate?: string
+  arrivalEndDate?: string
+  referenceNumbers?: StopReferenceNumberRequest[]
+  accessories?: AccessoryType[]
+  requiredDocuments?: RequiredDocumentType[]
+}
+
+export type LoadDetailsRequest = {
+  weight?: string
+  weightUnit?: WeightUnit
+  lengthFeet?: string
+  commodity?: string
+  capacity?: Capacity
+  temperature?: string
+  unitCount?: number
+  unitType?: UnitType
+}
+
+export type RouteCreateRequest = {
+  companyId: string
+  dispatcherId?: string
+  vehicleId?: string
+  driverId?: string
+  coDriverId?: string
+  autoDispatch?: boolean
+  brokerId?: string
+  brokerRepresentative?: string
+  brokerIdentifier?: string
+  internalIdentifier?: string
+  brokerRate?: number
+  driverRate?: number
+  stops: StopRequest[]
+  totalMiles?: number
+  estimatedDuration?: string
+  routeHighway?: string
+  tolls?: number
+  fuelCost?: number
+  routeType?: RouteType
+  loadDetails?: LoadDetailsRequest
+}
+
+export type RouteUpdateRequest = {
+  companyId?: string
+  dispatcherId?: string
+  vehicleId?: string
+  driverId?: string
+  coDriverId?: string
+  autoDispatch?: boolean
+  brokerId?: string
+  brokerRepresentative?: string
+  brokerIdentifier?: string
+  internalIdentifier?: string
+  brokerRate?: number
+  driverRate?: number
+  stops?: StopRequest[]
+  totalMiles?: number
+  estimatedDuration?: string
+  routeHighway?: string
+  tolls?: number
+  fuelCost?: number
+  routeType?: RouteType
+  loadDetails?: LoadDetailsRequest
+}
+
+export type RouteStatusUpdateRequest = {
   status: RouteStatus
-  origin: string
-  destination: string
-  distanceMiles: number
-  estimatedDurationHours: number
-  vehicleId?: number
-  driverId?: number
-  scheduledStartDate: string
-  scheduledEndDate: string
-  actualStartDate?: string
-  actualEndDate?: string
-  notes?: string
-  documents?: {
-    type: string
-    tempFileName: string
-    originalFileName: string
-    expirationDate?: string
-  }[]
 }
 
-// Filters for list
+// --- Filter types ---
+
 export type RouteFilters = {
-  routeNumber?: string
-  routeName?: string
-  origin?: string
-  destination?: string
+  identifier?: string
+  vehicleId?: string
+  dispatcherId?: string
   status?: RouteStatus | 'all'
-  searchTerm?: string
+  bookedAtFrom?: string
+  bookedAtTo?: string
+  companyId?: string
+  brokerId?: string
+  driverId?: string
 }
 
-// Route sheet props
-export type RouteSheetProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  route?: Route | null
-  onSuccess?: () => void
+// --- Form types ---
+
+export type ReferenceNumberFormValue = {
+  type: ReferenceNumberType | ''
+  value: string
 }
 
-// Document form value for creating/editing
-export type RouteDocumentFormValue = {
-  id?: number
-  type: string
-  tempFileName?: string
-  originalFileName?: string
-  expirationDate?: string
-  isNew?: boolean
+export type StopFormValues = {
+  type: StopType
+  facilityId: string
+  arrivalSlotType: ArrivalSlotType | ''
+  arrivalStartDate: string
+  arrivalEndDate: string
+  referenceNumbers: ReferenceNumberFormValue[]
+  accessories: AccessoryType[]
+  requiredDocuments: RequiredDocumentType[]
 }
 
-// Form values for route sheet
+export type LoadDetailsFormValues = {
+  weight: string
+  weightUnit: WeightUnit | ''
+  lengthFeet: string
+  commodity: string
+  capacity: Capacity | ''
+  temperature: string
+  unitCount: string
+  unitType: UnitType | ''
+}
+
 export type RouteFormValues = {
-  routeNumber: string
-  routeName: string
-  status: RouteStatus
-  origin: string
-  destination: string
-  distanceMiles: number
-  estimatedDurationHours: number
-  vehicleId?: number
-  driverId?: number
-  scheduledStartDate: string
-  scheduledEndDate: string
-  actualStartDate?: string
-  actualEndDate?: string
-  notes?: string
-  documents: RouteDocumentFormValue[]
+  // Carrier tab
+  companyId: string
+  dispatcherId: string
+  vehicleId: string
+  driverId: string
+  coDriverId: string
+  autoDispatch: boolean
+  // Booking tab
+  brokerId: string
+  brokerRepresentative: string
+  brokerIdentifier: string
+  internalIdentifier: string
+  brokerRate: string
+  driverRate: string
+  // Stops tab
+  stops: StopFormValues[]
+  // Route details tab
+  totalMiles: string
+  estimatedDuration: string
+  routeHighway: string
+  tolls: string
+  fuelCost: string
+  routeType: RouteType | ''
+  // Load tab
+  loadDetails: LoadDetailsFormValues
 }

@@ -41,21 +41,17 @@ export type User = {
   documents: UserDocument[]
 }
 
-// Simplified user for list views
+// Simplified user for list views (matches BE UserListResponseDto)
 export type UserListItem = {
   id: number
-  tenantId: number
   companyId: number | null
-  email: string
-  firstName: string
-  lastName: string
+  companyName: string | null
+  name: string
   username: string | null
+  email: string
   department: string | null
   role: UserRole
   status: UserStatus
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
 }
 
 // Document request for create/update

@@ -1,49 +1,48 @@
 {
-  "title": "Routes",
+  "title": "Dispatch",
   "columns": {
-    "routeNumber": "Route #",
-    "routeName": "Route Name",
+    "identifier": "Identifier",
     "origin": "Origin",
     "destination": "Destination",
-    "distance": "Distance",
-    "vehicle": "Vehicle",
-    "driver": "Driver",
+    "rate": "Rate / Miles",
+    "unit": "Unit / Driver",
+    "dispatcher": "Dispatcher",
     "status": "Status"
   },
   "filters": {
     "all": "All",
-    "search": "Search routes...",
+    "identifier": "Search identifier...",
+    "status": "Status",
+    "companyId": "Company",
+    "dispatcherId": "Dispatcher",
+    "driverId": "Driver",
+    "vehicleId": "Unit",
+    "brokerId": "Broker",
+    "bookedAtFrom": "Booked from",
+    "bookedAtTo": "Booked to",
     "toggle": "Filters",
-    "selectFilters": "Select filters",
-    "routeNumber": "Route #",
-    "routeName": "Route Name",
-    "origin": "Origin",
-    "destination": "Destination",
-    "status": "Status"
+    "selectFilters": "Select filters"
   },
   "status": {
-    "active": "Active",
-    "inactive": "Inactive",
-    "pending": "Pending",
-    "suspended": "Suspended"
+    "BOOKED": "Booked",
+    "DISPATCHED": "Dispatched",
+    "IN_TRANSIT": "In Transit",
+    "AT_PICKUP": "At Pickup",
+    "LOADED": "Loaded",
+    "AT_DELIVERY": "At Delivery",
+    "DELIVERED": "Delivered",
+    "COMPLETED": "Completed",
+    "INVOICED": "Invoiced",
+    "PAID": "Paid",
+    "CANCELLED": "Cancelled"
   },
   "actions": {
     "addRoute": "Add Route",
-    "export": "Export",
-    "refresh": "Refresh",
-    "copyRouteNumber": "Copy route number",
+    "copyIdentifier": "Copy identifier",
     "copied": "Copied!"
   },
   "validation": {
     "required": "This field is required"
-  },
-  "documents": {
-    "title": "Documents",
-    "type": "Type",
-    "selectType": "Select document type",
-    "uploadPdf": "Upload PDF",
-    "expirationDate": "Expiration Date",
-    "addDocument": "Add Document"
   },
   "sheet": {
     "addTitle": "Add Route",
@@ -51,36 +50,157 @@
     "error": "An error occurred. Please try again.",
     "cancel": "Cancel",
     "save": "Save",
-    "selectDate": "Select date",
-    "routeNumber": "Route Number",
-    "routeName": "Route Name",
-    "origin": "Origin",
-    "destination": "Destination",
-    "distanceMiles": "Distance (miles)",
-    "estimatedDurationHours": "Est. Duration (hours)",
-    "vehicle": "Vehicle",
-    "selectVehicle": "Select vehicle",
-    "driver": "Driver",
-    "selectDriver": "Select driver",
-    "scheduledStartDate": "Scheduled Start",
-    "scheduledEndDate": "Scheduled End",
-    "actualStartDate": "Actual Start",
-    "actualEndDate": "Actual End",
-    "notes": "Notes",
-    "status": "Status",
-    "documents": "Documents",
-    "documentType": "Type",
-    "expirationDate": "Expiration Date",
-    "addDocument": "Add Document",
-    "selectDocumentType": "Select document type",
-    "uploadPdf": "Upload PDF",
-    "documentTypes": {
-      "bill_of_lading": "Bill of Lading",
-      "proof_of_delivery": "Proof of Delivery",
-      "customs_document": "Customs Document",
-      "weight_ticket": "Weight Ticket",
-      "fuel_receipt": "Fuel Receipt",
-      "toll_receipt": "Toll Receipt"
+    "tabs": {
+      "carrier": "Carrier",
+      "booking": "Booking",
+      "stops": "Stops",
+      "routeDetails": "Route Details",
+      "load": "Load"
+    },
+    "carrier": {
+      "company": "Company",
+      "selectCompany": "Select company",
+      "dispatcher": "Dispatcher",
+      "selectDispatcher": "Select dispatcher",
+      "vehicle": "Unit",
+      "selectVehicle": "Select unit",
+      "driver": "Driver",
+      "selectDriver": "Select driver",
+      "coDriver": "Co-Driver",
+      "selectCoDriver": "Select co-driver",
+      "autoDispatch": "Auto Dispatch",
+      "autoDispatchDescription": "Automatically dispatch after creation"
+    },
+    "booking": {
+      "broker": "Broker",
+      "selectBroker": "Select broker",
+      "brokerRepresentative": "Broker Representative",
+      "brokerIdentifier": "Broker Identifier",
+      "internalIdentifier": "Internal Identifier",
+      "brokerRate": "Broker Rate ($)",
+      "driverRate": "Driver Rate ($)"
+    },
+    "stops": {
+      "title": "Stops",
+      "addStop": "Add Stop",
+      "stop": "Stop",
+      "type": "Type",
+      "selectType": "Select type",
+      "facility": "Facility",
+      "selectFacility": "Select facility",
+      "arrivalSlotType": "Arrival Slot",
+      "selectArrivalSlot": "Select arrival slot",
+      "arrivalStartDate": "Arrival Start",
+      "arrivalEndDate": "Arrival End",
+      "referenceNumbers": "Reference Numbers",
+      "addReference": "Add Reference",
+      "referenceType": "Type",
+      "selectReferenceType": "Select type",
+      "referenceValue": "Value",
+      "accessories": "Accessories",
+      "requiredDocuments": "Required Documents",
+      "removeStop": "Remove Stop"
+    },
+    "routeDetails": {
+      "totalMiles": "Total Miles",
+      "estimatedDuration": "Estimated Duration",
+      "routeHighway": "Route / Highway",
+      "tolls": "Tolls ($)",
+      "fuelCost": "Fuel Cost ($)",
+      "routeType": "Route Type",
+      "selectRouteType": "Select route type"
+    },
+    "load": {
+      "weight": "Weight",
+      "weightUnit": "Weight Unit",
+      "selectWeightUnit": "Select unit",
+      "lengthFeet": "Length (ft)",
+      "commodity": "Commodity",
+      "capacity": "Capacity",
+      "selectCapacity": "Select capacity",
+      "temperature": "Temperature",
+      "unitCount": "Unit Count",
+      "unitType": "Unit Type",
+      "selectUnitType": "Select unit type"
+    }
+  },
+  "deleteConfirm": {
+    "title": "Delete Route",
+    "description": "Are you sure you want to delete this route? This action cannot be undone."
+  },
+  "enums": {
+    "stopTypes": {
+      "PICKUP": "Pickup",
+      "DELIVERY": "Delivery"
+    },
+    "arrivalSlots": {
+      "WINDOW": "Window",
+      "FCFS": "FCFS",
+      "BY_APPOINTMENT": "By Appointment",
+      "EXACT_TIME": "Exact Time"
+    },
+    "routeTypes": {
+      "SHORTEST_FASTEST": "Shortest / Fastest",
+      "CHEAPEST": "Cheapest",
+      "ALTERNATE": "Alternate"
+    },
+    "capacity": {
+      "FULL": "Full",
+      "PARTIAL": "Partial"
+    },
+    "weightUnits": {
+      "LBS": "lbs",
+      "KG": "kg"
+    },
+    "unitTypes": {
+      "PALLETS": "Pallets",
+      "BAGS": "Bags",
+      "BALES": "Bales",
+      "BINS": "Bins",
+      "BOXES": "Boxes",
+      "BUNCHES": "Bunches",
+      "BUNDLES": "Bundles"
+    },
+    "accessories": {
+      "SAFETY_VEST": "Safety Vest",
+      "HARD_HAT": "Hard Hat",
+      "SAFETY_GLASSES": "Safety Glasses",
+      "STEEL_TOED_BOOTS": "Steel Toed Boots",
+      "WORK_GLOVES": "Work Gloves",
+      "FACE_MASK_RESPIRATOR": "Face Mask / Respirator",
+      "FLAME_RESISTANT_CLOTHING": "Flame Resistant Clothing",
+      "HAIR_NET_BEARD_NET": "Hair Net / Beard Net",
+      "LOAD_LOCKS_LOAD_BARS": "Load Locks / Load Bars",
+      "TIE_DOWN_STRAPS": "Tie Down Straps",
+      "PALLET_JACK": "Pallet Jack",
+      "HAND_TRUCK_DOLLY": "Hand Truck / Dolly",
+      "LIFTGATE": "Liftgate",
+      "TARPS": "Tarps",
+      "HOSES_AND_FITTINGS": "Hoses & Fittings",
+      "BULKHEADS": "Bulkheads",
+      "TRAILER_SEAL": "Trailer Seal",
+      "OVERSIZE_LOAD_BANNER_FLAGS": "Oversize Load Banner / Flags"
+    },
+    "requiredDocuments": {
+      "BOL_PHOTO": "BOL Photo",
+      "POD_PHOTO": "POD Photo",
+      "TIRES_PHOTO": "Tires Photo",
+      "TRAILER_PHOTO": "Trailer Photo",
+      "SECURED_FREIGHT_PHOTO": "Secured Freight Photo",
+      "SEAL_PHOTO": "Seal Photo",
+      "EMPTY_SCALE_PHOTO": "Empty Scale Photo",
+      "LOADED_SCALE_PHOTO": "Loaded Scale Photo",
+      "ESCORT_PHOTO": "Escort Photo",
+      "LUMPER_RECEIPT_PHOTO": "Lumper Receipt Photo"
+    },
+    "referenceNumbers": {
+      "APPT_CONF": "Appt Conf #",
+      "BOL": "BOL #",
+      "CUSTOMER": "Customer #",
+      "DEL_CONSIGNEE": "Del / Consignee #",
+      "DELIVERY": "Delivery #",
+      "GATE_CHECK_IN": "Gate Check-In #",
+      "ITEM": "Item #"
     }
   }
 }

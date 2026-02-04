@@ -1,7 +1,9 @@
-import { useEffect, useMemo } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { Trash2 } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -9,222 +11,260 @@ import {
   SheetTitle,
   SheetClose,
   Button,
-  Input,
-  Select,
-  Textarea,
-  LocationPicker,
-  DatePicker,
-} from '@/shared/ui'
-import {
+  Spinner,
   Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from '@/shared/ui/form'
-import { DocumentsSection } from '@/shared/components'
+  ConfirmDialog,
+} from '@/shared/ui'
 import { getApiErrorMessage } from '@/shared/utils'
-import { useAuth } from '@/features/auth'
-import { useUploadTempFile } from '@/shared/api/documents'
-import { useVehicles, useDrivers } from '@/features/admin/api'
-import { ROUTE_DOCUMENT_TYPES } from '@/features/admin/constants'
-import { useCreateRoute, useUpdateRoute } from '../api'
-import { ROUTE_STATUS_VALUES } from '../constants'
-import type { RouteFormValues, RouteSheetProps, RouteStatus, RouteDocumentFormValue } from '../types'
+import {
+  useRoute,
+  useCreateRoute,
+  useUpdateRoute,
+  useDeleteRoute,
+  routeKeys,
+} from '../api'
+import type {
+  RouteFormValues,
+  RouteResponse,
+  RouteCreateRequest,
+  RouteUpdateRequest,
+  StopRequest,
+  LoadDetailsRequest,
+  RouteType,
+  ArrivalSlotType,
+  Capacity,
+  WeightUnit,
+  UnitType,
+  ReferenceNumberType,
+} from '../types'
+import { CarrierTab, BookingTab, StopsTab, RouteDetailsTab, LoadTab } from './tabs'
 
-// Convert date string (YYYY-MM-DD) to ISO 8601 with timezone for backend
-const toZonedDateTime = (dateStr: string | undefined): string | undefined => {
-  if (!dateStr) return undefined
-  return `${dateStr}T00:00:00Z`
+type RouteSheetProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  routeId?: string | null
 }
 
 const getDefaultValues = (): RouteFormValues => ({
-  routeNumber: '',
-  routeName: '',
-  status: 'PENDING',
-  origin: '',
-  destination: '',
-  distanceMiles: 0,
-  estimatedDurationHours: 0,
-  vehicleId: undefined,
-  driverId: undefined,
-  scheduledStartDate: '',
-  scheduledEndDate: '',
-  actualStartDate: '',
-  actualEndDate: '',
-  notes: '',
-  documents: [],
+  companyId: '',
+  dispatcherId: '',
+  vehicleId: '',
+  driverId: '',
+  coDriverId: '',
+  autoDispatch: false,
+  brokerId: '',
+  brokerRepresentative: '',
+  brokerIdentifier: '',
+  internalIdentifier: '',
+  brokerRate: '',
+  driverRate: '',
+  stops: [
+    {
+      type: 'PICKUP',
+      facilityId: '',
+      arrivalSlotType: '',
+      arrivalStartDate: '',
+      arrivalEndDate: '',
+      referenceNumbers: [],
+      accessories: [],
+      requiredDocuments: [],
+    },
+    {
+      type: 'DELIVERY',
+      facilityId: '',
+      arrivalSlotType: '',
+      arrivalStartDate: '',
+      arrivalEndDate: '',
+      referenceNumbers: [],
+      accessories: [],
+      requiredDocuments: [],
+    },
+  ],
+  totalMiles: '',
+  estimatedDuration: '',
+  routeHighway: '',
+  tolls: '',
+  fuelCost: '',
+  routeType: '',
+  loadDetails: {
+    weight: '',
+    weightUnit: '',
+    lengthFeet: '',
+    commodity: '',
+    capacity: '',
+    temperature: '',
+    unitCount: '',
+    unitType: '',
+  },
 })
 
-export function RouteSheet({
-  open,
-  onOpenChange,
-  route,
-  onSuccess,
-}: RouteSheetProps) {
+function mapRouteToFormValues(route: RouteResponse): RouteFormValues {
+  return {
+    companyId: route.company?.id ? String(route.company.id) : '',
+    dispatcherId: route.dispatcher?.id ? String(route.dispatcher.id) : '',
+    vehicleId: route.vehicle?.id ? String(route.vehicle.id) : '',
+    driverId: route.driver?.id ? String(route.driver.id) : '',
+    coDriverId: route.coDriver?.id ? String(route.coDriver.id) : '',
+    autoDispatch: route.autoDispatched,
+    brokerId: route.broker?.id ? String(route.broker.id) : '',
+    brokerRepresentative: route.brokerRepresentative || '',
+    brokerIdentifier: route.brokerIdentifier || '',
+    internalIdentifier: route.internalIdentifier || '',
+    brokerRate: route.brokerRate != null ? String(route.brokerRate) : '',
+    driverRate: route.driverRate != null ? String(route.driverRate) : '',
+    stops:
+      route.stops?.map((stop) => ({
+        type: stop.type,
+        facilityId: stop.facility?.id ? String(stop.facility.id) : '',
+        arrivalSlotType: stop.arrivalSlotType || '',
+        arrivalStartDate: stop.arrivalStartDate?.split('T')[0] || '',
+        arrivalEndDate: stop.arrivalEndDate?.split('T')[0] || '',
+        referenceNumbers:
+          stop.referenceNumbers?.map((ref) => ({
+            type: ref.type,
+            value: ref.value,
+          })) || [],
+        accessories: stop.accessories || [],
+        requiredDocuments: stop.requiredDocuments || [],
+      })) || [],
+    totalMiles: route.totalMiles != null ? String(route.totalMiles) : '',
+    estimatedDuration: route.estimatedDuration || '',
+    routeHighway: route.routeHighway || '',
+    tolls: route.tolls != null ? String(route.tolls) : '',
+    fuelCost: route.fuelCost != null ? String(route.fuelCost) : '',
+    routeType: route.routeType || '',
+    loadDetails: {
+      weight: route.loadDetails?.weight || '',
+      weightUnit: route.loadDetails?.weightUnit || '',
+      lengthFeet: route.loadDetails?.lengthFeet || '',
+      commodity: route.loadDetails?.commodity || '',
+      capacity: route.loadDetails?.capacity || '',
+      temperature: route.loadDetails?.temperature || '',
+      unitCount:
+        route.loadDetails?.unitCount != null
+          ? String(route.loadDetails.unitCount)
+          : '',
+      unitType: route.loadDetails?.unitType || '',
+    },
+  }
+}
+
+function mapFormToCreateRequest(values: RouteFormValues): RouteCreateRequest {
+  const stops: StopRequest[] = values.stops.map((stop, index) => ({
+    type: stop.type,
+    facilityId: stop.facilityId || undefined,
+    stopOrder: index,
+    arrivalSlotType: (stop.arrivalSlotType as ArrivalSlotType) || undefined,
+    arrivalStartDate: stop.arrivalStartDate || undefined,
+    arrivalEndDate: stop.arrivalEndDate || undefined,
+    referenceNumbers: stop.referenceNumbers
+      .filter((ref) => ref.type && ref.value)
+      .map((ref) => ({
+        type: ref.type as ReferenceNumberType,
+        value: ref.value,
+      })),
+    accessories: stop.accessories.length > 0 ? stop.accessories : undefined,
+    requiredDocuments:
+      stop.requiredDocuments.length > 0 ? stop.requiredDocuments : undefined,
+  }))
+
+  const loadDetails: LoadDetailsRequest = {
+    weight: values.loadDetails.weight || undefined,
+    weightUnit: (values.loadDetails.weightUnit as WeightUnit) || undefined,
+    lengthFeet: values.loadDetails.lengthFeet || undefined,
+    commodity: values.loadDetails.commodity || undefined,
+    capacity: (values.loadDetails.capacity as Capacity) || undefined,
+    temperature: values.loadDetails.temperature || undefined,
+    unitCount: values.loadDetails.unitCount
+      ? parseInt(values.loadDetails.unitCount)
+      : undefined,
+    unitType: (values.loadDetails.unitType as UnitType) || undefined,
+  }
+
+  return {
+    companyId: values.companyId,
+    dispatcherId: values.dispatcherId || undefined,
+    vehicleId: values.vehicleId || undefined,
+    driverId: values.driverId || undefined,
+    coDriverId: values.coDriverId || undefined,
+    autoDispatch: values.autoDispatch,
+    brokerId: values.brokerId || undefined,
+    brokerRepresentative: values.brokerRepresentative || undefined,
+    brokerIdentifier: values.brokerIdentifier || undefined,
+    internalIdentifier: values.internalIdentifier || undefined,
+    brokerRate: values.brokerRate ? parseFloat(values.brokerRate) : undefined,
+    driverRate: values.driverRate ? parseFloat(values.driverRate) : undefined,
+    stops,
+    totalMiles: values.totalMiles ? parseInt(values.totalMiles) : undefined,
+    estimatedDuration: values.estimatedDuration || undefined,
+    routeHighway: values.routeHighway || undefined,
+    tolls: values.tolls ? parseFloat(values.tolls) : undefined,
+    fuelCost: values.fuelCost ? parseFloat(values.fuelCost) : undefined,
+    routeType: (values.routeType as RouteType) || undefined,
+    loadDetails,
+  }
+}
+
+function mapFormToUpdateRequest(values: RouteFormValues): RouteUpdateRequest {
+  return mapFormToCreateRequest(values)
+}
+
+export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
   const { t } = useTranslation('routes')
-  const { user } = useAuth()
-  const isEdit = !!route
+  const queryClient = useQueryClient()
+  const isEdit = !!routeId
+
+  const { data: route, isLoading: isLoadingRoute } = useRoute(
+    routeId || undefined
+  )
 
   const createMutation = useCreateRoute()
   const updateMutation = useUpdateRoute()
-  const uploadMutation = useUploadTempFile()
+  const deleteMutation = useDeleteRoute()
 
-  // Fetch vehicles and drivers for select dropdowns
-  const { data: vehiclesData } = useVehicles({ size: 100 })
-  const { data: driversData } = useDrivers({ size: 100 })
-
-  const vehicleOptions = useMemo(
-    () => [
-      { value: '', label: t('sheet.selectVehicle') },
-      ...(vehiclesData?.content || []).map((v) => ({
-        value: String(v.id),
-        label: `${v.unitId} - ${v.make} ${v.model}`,
-      })),
-    ],
-    [vehiclesData, t]
-  )
-
-  const driverOptions = useMemo(
-    () => [
-      { value: '', label: t('sheet.selectDriver') },
-      ...(driversData?.content || []).map((d) => ({
-        value: String(d.id),
-        label: d.name,
-      })),
-    ],
-    [driversData, t]
-  )
-
-  const statusOptions = useMemo(
-    () =>
-      ROUTE_STATUS_VALUES.map((value) => ({
-        value,
-        label: t(`status.${value.toLowerCase()}`),
-      })),
-    [t]
-  )
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const form = useForm<RouteFormValues>({
     defaultValues: getDefaultValues(),
   })
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: 'documents',
-  })
-
-  // Reset form when sheet opens or route changes
+  // Reset form when sheet opens or route data loads
   useEffect(() => {
     if (open) {
-      if (route) {
-        form.reset({
-          routeNumber: route.routeNumber,
-          routeName: route.routeName,
-          status: route.status,
-          origin: route.origin,
-          destination: route.destination,
-          distanceMiles: route.distanceMiles,
-          estimatedDurationHours: route.estimatedDurationHours,
-          vehicleId: route.vehicle?.id || route.vehicleId,
-          driverId: route.driver?.id || route.driverId,
-          scheduledStartDate: route.scheduledStartDate?.split('T')[0] || '',
-          scheduledEndDate: route.scheduledEndDate?.split('T')[0] || '',
-          actualStartDate: route.actualStartDate?.split('T')[0] || '',
-          actualEndDate: route.actualEndDate?.split('T')[0] || '',
-          notes: route.notes || '',
-          documents:
-            route.documents?.map((doc) => ({
-              id: doc.id,
-              type: doc.type,
-              originalFileName: doc.name,
-              expirationDate: doc.expirationDate || undefined,
-              isNew: false,
-            })) || [],
-        })
-      } else {
+      if (isEdit && route) {
+        form.reset(mapRouteToFormValues(route))
+      } else if (!isEdit) {
         form.reset(getDefaultValues())
       }
     }
-  }, [open, route, form])
-
-  // Document type options
-  const documentTypeOptions = ROUTE_DOCUMENT_TYPES.map((type) => ({
-    value: type,
-    label: t(`sheet.documentTypes.${type}`),
-  }))
-
-  // Handle file upload for a document
-  const handleFileUpload = async (index: number, file: File) => {
-    try {
-      const result = await uploadMutation.mutateAsync(file)
-      form.setValue(`documents.${index}.tempFileName`, result.tempFileName)
-      form.setValue(
-        `documents.${index}.originalFileName`,
-        result.originalFileName
-      )
-      form.setValue(`documents.${index}.isNew`, true)
-    } catch {
-      toast.error('Upload failed')
-    }
-  }
-
-  // Add new document row
-  const handleAddDocument = () => {
-    append({
-      type: '',
-      isNew: true,
-    } as RouteDocumentFormValue)
-  }
+  }, [open, isEdit, route, form])
 
   const handleSubmit = async (values: RouteFormValues) => {
-    if (!user?.tenantId) {
-      toast.error('User tenant not found')
-      return
-    }
-
-    // Prepare documents for submission (only new ones with uploads)
-    const documentRequests = values.documents
-      .filter((doc) => doc.isNew && doc.tempFileName && doc.type)
-      .map((doc) => ({
-        type: doc.type,
-        tempFileName: doc.tempFileName!,
-        originalFileName: doc.originalFileName!,
-        expirationDate: doc.expirationDate,
-      }))
-
-    const requestData = {
-      tenantId: user.tenantId,
-      routeNumber: values.routeNumber,
-      routeName: values.routeName,
-      status: values.status,
-      origin: values.origin,
-      destination: values.destination,
-      distanceMiles: values.distanceMiles,
-      estimatedDurationHours: values.estimatedDurationHours,
-      vehicleId: values.vehicleId || undefined,
-      driverId: values.driverId || undefined,
-      scheduledStartDate: toZonedDateTime(values.scheduledStartDate)!,
-      scheduledEndDate: toZonedDateTime(values.scheduledEndDate)!,
-      actualStartDate: toZonedDateTime(values.actualStartDate),
-      actualEndDate: toZonedDateTime(values.actualEndDate),
-      notes: values.notes || undefined,
-      documents: documentRequests.length > 0 ? documentRequests : undefined,
-    }
-
     try {
-      if (isEdit && route) {
-        await updateMutation.mutateAsync({ id: route.id, data: requestData })
-        toast.success('Route updated successfully')
+      if (isEdit && routeId) {
+        const data = mapFormToUpdateRequest(values)
+        await updateMutation.mutateAsync({ id: routeId, data })
+        toast.success(t('sheet.editTitle'))
       } else {
-        await createMutation.mutateAsync(requestData)
-        toast.success('Route created successfully')
+        const data = mapFormToCreateRequest(values)
+        await createMutation.mutateAsync(data)
+        toast.success(t('sheet.addTitle'))
       }
       onOpenChange(false)
-      onSuccess?.()
     } catch (error) {
       toast.error(getApiErrorMessage(error, t('sheet.error')))
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!routeId) return
+    try {
+      queryClient.removeQueries({ queryKey: routeKeys.detail(routeId) })
+      await deleteMutation.mutateAsync(routeId)
+      setDeleteDialogOpen(false)
+      onOpenChange(false)
+    } catch {
+      // Error toast handled by QueryClient
     }
   }
 
@@ -232,304 +272,72 @@ export function RouteSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent size="lg" className="flex flex-col overflow-hidden p-0">
-        <Form
-          form={form}
-          onSubmit={handleSubmit}
-          className="flex flex-1 flex-col overflow-hidden"
-        >
-          <SheetHeader
-            className="border-b px-6 py-3"
-            actions={
-              <>
-                <SheetClose asChild>
-                  <Button type="button" variant="outline" size="sm">
-                    {t('sheet.cancel')}
-                  </Button>
-                </SheetClose>
-                <Button type="submit" size="sm" loading={isLoading}>
-                  {t('sheet.save')}
-                </Button>
-              </>
-            }
+      <SheetContent size="2xl" className="flex flex-col overflow-hidden p-0">
+        {isEdit && isLoadingRoute ? (
+          <>
+            <SheetHeader className="border-b px-6 py-3">
+              <SheetTitle>{t('sheet.editTitle')}</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-1 items-center justify-center">
+              <Spinner size="lg" />
+            </div>
+          </>
+        ) : (
+          <Form
+            form={form}
+            onSubmit={handleSubmit}
+            className="flex flex-1 flex-col overflow-hidden"
           >
-            <SheetTitle>
-              {isEdit ? t('sheet.editTitle') : t('sheet.addTitle')}
-            </SheetTitle>
-          </SheetHeader>
+            <SheetHeader
+              className="border-b px-6 py-3"
+              actions={
+                <>
+                  {isEdit && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      {t('common:actions.delete')}
+                    </Button>
+                  )}
+                  <SheetClose asChild>
+                    <Button type="button" variant="outline" size="sm">
+                      {t('sheet.cancel')}
+                    </Button>
+                  </SheetClose>
+                  <Button type="submit" size="sm" loading={isLoading}>
+                    {t('sheet.save')}
+                  </Button>
+                </>
+              }
+            >
+              <SheetTitle>
+                {isEdit ? t('sheet.editTitle') : t('sheet.addTitle')}
+              </SheetTitle>
+            </SheetHeader>
 
-          <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
-            {/* Route Number and Name */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="routeNumber"
-                rules={{ required: t('validation.required') }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>{t('sheet.routeNumber')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="routeName"
-                rules={{ required: t('validation.required') }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>{t('sheet.routeName')}</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
+              <CarrierTab form={form} />
+              <BookingTab form={form} />
+              <StopsTab form={form} />
+              <RouteDetailsTab form={form} />
+              <LoadTab form={form} />
             </div>
+          </Form>
+        )}
 
-            {/* Origin and Destination */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="origin"
-                rules={{ required: t('validation.required') }}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <LocationPicker
-                      label={t('sheet.origin')}
-                      required
-                      value={field.value}
-                      onChange={(address) => field.onChange(address)}
-                      placeholder={t('sheet.origin')}
-                      error={fieldState.error?.message}
-                    />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="destination"
-                rules={{ required: t('validation.required') }}
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <LocationPicker
-                      label={t('sheet.destination')}
-                      required
-                      value={field.value}
-                      onChange={(address) => field.onChange(address)}
-                      placeholder={t('sheet.destination')}
-                      error={fieldState.error?.message}
-                    />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Distance and Duration */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="distanceMiles"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('sheet.distanceMiles')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="estimatedDurationHours"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('sheet.estimatedDurationHours')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.5"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Vehicle and Driver */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="vehicleId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('sheet.vehicle')}</FormLabel>
-                    <Select
-                      options={vehicleOptions}
-                      value={field.value ? String(field.value) : ''}
-                      onChange={(v) =>
-                        field.onChange(v ? parseInt(v, 10) : undefined)
-                      }
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="driverId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('sheet.driver')}</FormLabel>
-                    <Select
-                      options={driverOptions}
-                      value={field.value ? String(field.value) : ''}
-                      onChange={(v) =>
-                        field.onChange(v ? parseInt(v, 10) : undefined)
-                      }
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Scheduled Dates */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="scheduledStartDate"
-                rules={{ required: t('validation.required') }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>{t('sheet.scheduledStartDate')}</FormLabel>
-                    <DatePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder={t('sheet.selectDate')}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="scheduledEndDate"
-                rules={{ required: t('validation.required') }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>{t('sheet.scheduledEndDate')}</FormLabel>
-                    <DatePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder={t('sheet.selectDate')}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Actual Dates */}
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="actualStartDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('sheet.actualStartDate')}</FormLabel>
-                    <DatePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder={t('sheet.selectDate')}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="actualEndDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('sheet.actualEndDate')}</FormLabel>
-                    <DatePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder={t('sheet.selectDate')}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Status */}
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('sheet.status')}</FormLabel>
-                  <Select
-                    options={statusOptions}
-                    value={field.value}
-                    onChange={(v) => field.onChange(v as RouteStatus)}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Notes */}
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('sheet.notes')}</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} rows={3} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Documents */}
-            <DocumentsSection
-              control={form.control}
-              fields={fields}
-              getDocument={(index) => form.watch(`documents.${index}`)}
-              documentTypeOptions={documentTypeOptions}
-              onFileUpload={handleFileUpload}
-              onRemove={remove}
-              onAdd={handleAddDocument}
-              onFileClear={(index) => {
-                form.setValue(`documents.${index}.tempFileName`, undefined)
-                form.setValue(`documents.${index}.originalFileName`, undefined)
-              }}
-              isUploading={uploadMutation.isPending}
-              namespace="routes"
-            />
-          </div>
-        </Form>
+        <ConfirmDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          title={t('deleteConfirm.title')}
+          description={t('deleteConfirm.description')}
+          onConfirm={handleDelete}
+          loading={deleteMutation.isPending}
+        />
       </SheetContent>
     </Sheet>
   )

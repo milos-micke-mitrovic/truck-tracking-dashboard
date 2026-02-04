@@ -96,7 +96,6 @@ export {
   VEHICLE_DOCUMENT_TYPES,
   TRAILER_DOCUMENT_TYPES,
   USER_DOCUMENT_TYPES,
-  ROUTE_DOCUMENT_TYPES,
 } from './documents'
 
 // Location (countries, states)

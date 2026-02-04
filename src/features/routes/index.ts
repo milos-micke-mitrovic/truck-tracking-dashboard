@@ -1,2 +1,2 @@
 export { RoutesPage } from './pages/routes-page'
-export type { Route, RouteStatus, RouteFilters } from './types'
+export type { RouteShortResponse, RouteResponse, RouteStatus } from './types'

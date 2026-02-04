@@ -62,10 +62,9 @@ function updateStoredTokens(token: string, refreshToken: string): void {
   }
 }
 
-// Clear auth and redirect on auth failure
+// Signal auth failure — AuthProvider handles cleanup and navigation
 function handleUnauthorized() {
-  localStorage.removeItem(AUTH_STORAGE_KEY)
-  window.location.href = '/login'
+  window.dispatchEvent(new CustomEvent('auth:logout'))
 }
 
 // Attempt to refresh the access token
@@ -85,6 +84,11 @@ async function attemptTokenRefresh(): Promise<boolean> {
     try {
       const response = await refreshAccessToken(currentRefreshToken)
       updateStoredTokens(response.accessToken, response.refreshToken)
+      window.dispatchEvent(
+        new CustomEvent('auth:tokens-updated', {
+          detail: { accessToken: response.accessToken, refreshToken: response.refreshToken },
+        })
+      )
       return true
     } catch {
       return false
@@ -101,8 +105,8 @@ async function handleResponse<T>(
   response: Response,
   retryFn?: () => Promise<Response>
 ): Promise<T> {
-  // Handle 401 (Unauthorized) - try to refresh token
-  if (response.status === 401 && retryFn) {
+  // Handle 401/403 (Unauthorized/Forbidden) - try to refresh token
+  if ((response.status === 401 || response.status === 403) && retryFn) {
     const refreshed = await attemptTokenRefresh()
     if (refreshed) {
       // Retry the original request with new token
@@ -110,12 +114,6 @@ async function handleResponse<T>(
       return handleResponse<T>(retryResponse)
     }
     // Refresh failed, logout
-    handleUnauthorized()
-    throw new HttpError(response.status, response.statusText)
-  }
-
-  // Handle 403 (Forbidden) - no retry, just logout
-  if (response.status === 403) {
     handleUnauthorized()
     throw new HttpError(response.status, response.statusText)
   }
