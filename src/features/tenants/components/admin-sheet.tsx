@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -13,6 +13,7 @@ import {
   Button,
   Spinner,
   Input,
+  Select,
   Caption,
   ConfirmDialog,
 } from '@/shared/ui'
@@ -32,6 +33,7 @@ import {
   useCreateUser,
   useUpdateUser,
   useDeleteUser,
+  useCompanies,
 } from '@/features/admin/api'
 import { adminKeys } from '@/features/admin/api/keys'
 import type { TenantAdmin } from '../types'
@@ -50,6 +52,7 @@ type AdminFormValues = {
   username: string
   password: string
   department: string
+  companyId: number | null
 }
 
 const getFormDefaults = (): AdminFormValues => ({
@@ -59,6 +62,7 @@ const getFormDefaults = (): AdminFormValues => ({
   username: '',
   password: '',
   department: '',
+  companyId: null,
 })
 
 export function AdminSheet({
@@ -74,6 +78,9 @@ export function AdminSheet({
   // Fetch full user data when editing (admin list only has short DTO)
   const { data: fullUser, isLoading: isLoadingUser } = useUser(admin?.id || 0)
 
+  // Fetch companies for selector (filtered by tenant)
+  const { data: companiesData } = useCompanies({ tenantId, size: 100 })
+
   const createMutation = useCreateUser()
   const updateMutation = useUpdateUser()
   const deleteMutation = useDeleteUser()
@@ -83,6 +90,18 @@ export function AdminSheet({
   const form = useForm<AdminFormValues>({
     defaultValues: getFormDefaults(),
   })
+
+  // Company options
+  const companyOptions = useMemo(
+    () => [
+      { value: '', label: t('adminSheet.selectCompany') },
+      ...(companiesData?.content || []).map((c) => ({
+        value: String(c.id),
+        label: c.fullName,
+      })),
+    ],
+    [companiesData, t]
+  )
 
   useEffect(() => {
     if (open) {
@@ -94,6 +113,7 @@ export function AdminSheet({
           username: fullUser.username || '',
           password: '',
           department: fullUser.department || '',
+          companyId: fullUser.companyId || null,
         })
       } else if (!isEdit) {
         form.reset(getFormDefaults())
@@ -107,11 +127,16 @@ export function AdminSheet({
 
   const handleSubmit = async (values: AdminFormValues) => {
     try {
+      if (!values.companyId) {
+        throw new Error('Missing company ID')
+      }
+
       if (isEdit && admin) {
         await updateMutation.mutateAsync({
           id: admin.id,
           data: {
             tenantId,
+            companyId: values.companyId,
             email: values.email,
             firstName: values.firstName,
             lastName: values.lastName,
@@ -125,6 +150,7 @@ export function AdminSheet({
       } else {
         await createMutation.mutateAsync({
           tenantId,
+          companyId: values.companyId,
           email: values.email,
           firstName: values.firstName,
           lastName: values.lastName,
@@ -213,6 +239,26 @@ export function AdminSheet({
             <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
               <FormSection title={t('adminSheet.editTitle')}>
                 <div className="grid gap-4 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="companyId"
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel required>
+                          {t('adminSheet.company')}
+                        </FormLabel>
+                        <Select
+                          options={companyOptions}
+                          value={field.value ? String(field.value) : ''}
+                          onChange={(v) =>
+                            field.onChange(v ? parseInt(v, 10) : null)
+                          }
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="firstName"

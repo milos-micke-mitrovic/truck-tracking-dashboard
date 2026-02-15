@@ -31,6 +31,11 @@
     "updateSuccess": "Tenant updated successfully",
     "error": "An error occurred. Please try again."
   },
+  "companies": {
+    "title": "Companies",
+    "addCompany": "Add Company",
+    "empty": "No companies for this tenant"
+  },
   "admins": {
     "title": "Admins",
     "addAdmin": "Add Admin",
@@ -48,6 +53,9 @@
     "username": "Username",
     "password": "Password",
     "department": "Department",
+    "company": "Company",
+    "selectCompany": "Select company",
+    "noCompanies": "Create a company first before adding an admin",
     "leaveBlank": "Leave blank to keep current",
     "cancel": "Cancel",
     "save": "Save",

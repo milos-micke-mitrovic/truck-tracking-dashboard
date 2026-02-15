@@ -28,6 +28,9 @@ import {
 } from '@/shared/ui/form'
 import { FormSection } from '@/shared/components'
 import { getApiErrorMessage } from '@/shared/utils'
+import { useCompanies } from '@/features/admin/api'
+import { CompanySheet } from '@/features/admin/components/dialogs/company-sheet'
+import type { CompanyListItem } from '@/features/admin/types'
 import {
   tenantKeys,
   useTenant,
@@ -75,10 +78,18 @@ export function TenantSheet({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [adminSheetOpen, setAdminSheetOpen] = useState(false)
   const [selectedAdmin, setSelectedAdmin] = useState<TenantAdmin | null>(null)
+  const [companySheetOpen, setCompanySheetOpen] = useState(false)
+  const [selectedCompanyId, setSelectedCompanyId] = useState<number | undefined>(undefined)
 
   const { data: admins, isLoading: isLoadingAdmins } = useTenantAdmins(
     tenantId || 0
   )
+
+  const { data: companiesData, isLoading: isLoadingCompanies } = useCompanies(
+    tenantId ? { tenantId, size: 100 } : { size: 100 }
+  )
+  const companies = companiesData?.content ?? []
+  const hasCompanies = companies.length > 0
 
   const form = useForm<TenantFormValues>({
     defaultValues: getFormDefaults(),
@@ -120,11 +131,13 @@ export function TenantSheet({
   const handleDelete = async () => {
     if (!tenantId) return
     try {
-      queryClient.removeQueries({ queryKey: tenantKeys.detail(tenantId) })
-      await deleteMutation.mutateAsync(tenantId)
-      toast.success(t('deleteConfirm.success'))
+      const id = tenantId
       setDeleteDialogOpen(false)
       onOpenChange(false)
+      await deleteMutation.mutateAsync(id)
+      toast.success(t('deleteConfirm.success'))
+      queryClient.removeQueries({ queryKey: tenantKeys.detail(id) })
+      queryClient.removeQueries({ queryKey: tenantKeys.admins(id) })
     } catch {
       // Error toast is handled by QueryClient
     }
@@ -232,6 +245,63 @@ export function TenantSheet({
                 </div>
               </FormSection>
 
+              {isEdit && tenantId && (
+                <FormSection
+                  title={t('companies.title')}
+                  actions={
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedCompanyId(undefined)
+                        setCompanySheetOpen(true)
+                      }}
+                    >
+                      <Plus className="mr-1 h-4 w-4" />
+                      {t('companies.addCompany')}
+                    </Button>
+                  }
+                >
+                  {isLoadingCompanies ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Spinner />
+                    </div>
+                  ) : !companies.length ? (
+                    <Muted className="py-4 text-center">
+                      {t('companies.empty')}
+                    </Muted>
+                  ) : (
+                    <div className="divide-y rounded-md border">
+                      {companies.map((company: CompanyListItem) => (
+                        <button
+                          key={company.id}
+                          type="button"
+                          className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-muted/50"
+                          onClick={() => {
+                            setSelectedCompanyId(company.id)
+                            setCompanySheetOpen(true)
+                          }}
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium">{company.fullName}</div>
+                          </div>
+                          <Badge
+                            color={
+                              company.status === 'ACTIVE' ? 'success' : 'muted'
+                            }
+                          >
+                            {company.status === 'ACTIVE'
+                              ? t('status.active')
+                              : t('status.inactive')}
+                          </Badge>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </FormSection>
+              )}
+
               {isEdit && (
                 <FormSection
                   title={t('admins.title')}
@@ -240,6 +310,8 @@ export function TenantSheet({
                       type="button"
                       variant="outline"
                       size="sm"
+                      disabled={!hasCompanies}
+                      title={!hasCompanies ? t('adminSheet.noCompanies') : undefined}
                       onClick={() => {
                         setSelectedAdmin(null)
                         setAdminSheetOpen(true)
@@ -296,12 +368,20 @@ export function TenantSheet({
         )}
 
         {isEdit && tenantId && (
-          <AdminSheet
-            open={adminSheetOpen}
-            onOpenChange={setAdminSheetOpen}
-            tenantId={tenantId}
-            admin={selectedAdmin}
-          />
+          <>
+            <CompanySheet
+              open={companySheetOpen}
+              onOpenChange={setCompanySheetOpen}
+              companyId={selectedCompanyId}
+              tenantId={tenantId}
+            />
+            <AdminSheet
+              open={adminSheetOpen}
+              onOpenChange={setAdminSheetOpen}
+              tenantId={tenantId}
+              admin={selectedAdmin}
+            />
+          </>
         )}
 
         <ConfirmDialog

@@ -19,7 +19,6 @@ export type CompanyDocument = {
 export type CompanyListItem = {
   id: number
   fullName: string
-  displayName: string
   dotNumber: string
   mcNumber: string
   address: string
@@ -71,6 +70,7 @@ export type CompanyRequest = {
 
 // Filters for list (matches BE CompanyFilterRequest)
 export type CompanyFilters = {
+  tenantId?: number
   fullName?: string
   dotNumber?: string
   mcNumber?: string
@@ -109,5 +109,6 @@ export type CompanySheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   companyId?: number // Pass ID, sheet will fetch full data
+  tenantId?: number // Override tenant ID (used by SUPER_ADMIN from tenant sheet)
   onSuccess?: () => void
 }

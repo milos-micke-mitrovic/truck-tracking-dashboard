@@ -71,8 +71,8 @@ const getFormDefaults = (driver?: Driver | null): DriverFormValues => ({
   documents:
     driver?.documents?.map((doc) => ({
       id: doc.id,
-      type: doc.documentType,
-      originalFileName: doc.fileName,
+      type: doc.type,
+      originalFileName: doc.name,
       isNew: false,
     })) || [],
 })
@@ -155,7 +155,7 @@ export function DriverSheet({
       { value: '', label: t('driverDialog.selectCompany') || 'Select company' },
       ...(companiesData?.content || []).map((c) => ({
         value: String(c.id),
-        label: c.displayName || c.fullName,
+        label: c.fullName,
       })),
     ],
     [companiesData, t]
@@ -226,7 +226,7 @@ export function DriverSheet({
         lastName: values.lastName,
         birthDate: values.birthDate || undefined,
         phoneNumber: values.phoneNumber || undefined,
-        email: values.email || undefined,
+        email: values.email,
         address: values.address || undefined,
         username: values.username,
         password: values.password || undefined,
@@ -420,12 +420,11 @@ export function DriverSheet({
                     name="email"
                     rules={emailValidationRules(
                       t('validation.required'),
-                      t('validation.emailInvalid'),
-                      false // email is optional for drivers
+                      t('validation.emailInvalid')
                     )}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('columns.email')}</FormLabel>
+                        <FormLabel required>{t('columns.email')}</FormLabel>
                         <FormControl>
                           <Input type="email" {...field} />
                         </FormControl>

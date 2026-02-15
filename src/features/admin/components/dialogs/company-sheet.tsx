@@ -71,6 +71,7 @@ export function CompanySheet({
   open,
   onOpenChange,
   companyId,
+  tenantId: tenantIdProp,
   onSuccess,
 }: CompanySheetProps) {
   const { t } = useTranslation('admin')
@@ -176,12 +177,13 @@ export function CompanySheet({
           expirationDate: doc.expirationDate,
         }))
 
-      if (!user?.tenantId) {
+      const resolvedTenantId = tenantIdProp ?? user?.tenantId
+      if (!resolvedTenantId) {
         throw new Error('Missing tenant ID')
       }
 
       const requestData = {
-        tenantId: user.tenantId,
+        tenantId: resolvedTenantId,
         fullName: values.fullName,
         displayName: values.displayName,
         dotNumber: values.dotNumber,
