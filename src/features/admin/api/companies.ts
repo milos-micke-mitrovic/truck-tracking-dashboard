@@ -13,7 +13,6 @@ async function fetchCompanies(
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
-  if (params.tenantId) searchParams.set('tenantId', String(params.tenantId))
   if (params.fullName) searchParams.set('fullName', params.fullName)
   if (params.dotNumber) searchParams.set('dotNumber', params.dotNumber)
   if (params.mcNumber) searchParams.set('mcNumber', params.mcNumber)
@@ -23,7 +22,9 @@ async function fetchCompanies(
   if (params.status && params.status !== 'all')
     searchParams.set('status', params.status)
 
-  return httpClient.get(`/companies?${searchParams}`)
+  return httpClient.get(`/companies?${searchParams}`, {
+    tenantId: params.tenantId,
+  })
 }
 
 async function fetchCompany(id: number): Promise<Company> {

@@ -7,6 +7,7 @@ type RequestOptions = {
   headers?: Record<string, string>
   signal?: AbortSignal
   skipAuth?: boolean
+  tenantId?: number
 }
 
 class HttpError extends Error {
@@ -130,20 +131,21 @@ async function handleResponse<T>(
   return response.json()
 }
 
-function getHeaders(
-  customHeaders?: Record<string, string>,
-  skipAuth?: boolean
-): Headers {
+function getHeaders(options: RequestOptions = {}): Headers {
   const headers = new Headers({
     'Content-Type': 'application/json',
-    ...customHeaders,
+    ...options.headers,
   })
 
-  if (!skipAuth) {
+  if (!options.skipAuth) {
     const token = getAuthToken()
     if (token) {
       headers.set('Authorization', `Bearer ${token}`)
     }
+  }
+
+  if (options.tenantId !== undefined) {
+    headers.set('X-Tenant-Id', String(options.tenantId))
   }
 
   return headers
@@ -154,7 +156,7 @@ export const httpClient = {
     const makeRequest = () =>
       fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'GET',
-        headers: getHeaders(options.headers, options.skipAuth),
+        headers: getHeaders(options),
         signal: options.signal,
       })
 
@@ -171,7 +173,7 @@ export const httpClient = {
     const makeRequest = () =>
       fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers: getHeaders(options.headers, options.skipAuth),
+        headers: getHeaders(options),
         body: data ? JSON.stringify(data) : undefined,
         signal: options.signal,
       })
@@ -189,7 +191,7 @@ export const httpClient = {
     const makeRequest = () =>
       fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'PUT',
-        headers: getHeaders(options.headers, options.skipAuth),
+        headers: getHeaders(options),
         body: data ? JSON.stringify(data) : undefined,
         signal: options.signal,
       })
@@ -207,7 +209,7 @@ export const httpClient = {
     const makeRequest = () =>
       fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'PATCH',
-        headers: getHeaders(options.headers, options.skipAuth),
+        headers: getHeaders(options),
         body: data ? JSON.stringify(data) : undefined,
         signal: options.signal,
       })
@@ -221,7 +223,7 @@ export const httpClient = {
     const makeRequest = () =>
       fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'DELETE',
-        headers: getHeaders(options.headers, options.skipAuth),
+        headers: getHeaders(options),
         signal: options.signal,
       })
 
