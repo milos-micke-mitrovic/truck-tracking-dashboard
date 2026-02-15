@@ -2,7 +2,7 @@
   "sidebar": {
     "dashboard": "Dashboard",
     "admin": "Admin",
-    "routes": "Routes",
+    "dispatch": "Dispatch",
     "tenants": "Tenants"
   },
   "breadcrumbs": {

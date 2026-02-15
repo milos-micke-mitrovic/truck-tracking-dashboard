@@ -134,7 +134,7 @@ export function UserSheet({
       { value: '', label: t('userSheet.selectCompany') },
       ...(companiesData?.content || []).map((c) => ({
         value: String(c.id),
-        label: c.displayName || c.fullName,
+        label: c.fullName,
       })),
     ],
     [companiesData, t]
@@ -195,11 +195,14 @@ export function UserSheet({
         if (!authUser?.tenantId) {
           throw new Error('Missing tenant ID')
         }
+        if (!values.companyId) {
+          throw new Error('Missing company ID')
+        }
         await updateMutation.mutateAsync({
           id: userId,
           data: {
             tenantId: authUser.tenantId,
-            companyId: values.companyId || undefined,
+            companyId: values.companyId,
             email: values.email,
             firstName: values.firstName,
             lastName: values.lastName,
@@ -217,9 +220,12 @@ export function UserSheet({
         if (!authUser?.tenantId) {
           throw new Error('Missing tenant ID')
         }
+        if (!values.companyId) {
+          throw new Error('Missing company ID')
+        }
         await createMutation.mutateAsync({
           tenantId: authUser.tenantId,
-          companyId: values.companyId || undefined,
+          companyId: values.companyId,
           email: values.email,
           firstName: values.firstName,
           lastName: values.lastName,
@@ -396,9 +402,10 @@ export function UserSheet({
                   <FormField
                     control={form.control}
                     name="companyId"
+                    rules={{ required: t('validation.required') }}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('columns.company')}</FormLabel>
+                        <FormLabel required>{t('columns.company')}</FormLabel>
                         <Select
                           options={companyOptions}
                           value={field.value ? String(field.value) : ''}

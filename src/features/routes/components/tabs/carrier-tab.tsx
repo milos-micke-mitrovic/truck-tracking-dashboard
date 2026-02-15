@@ -22,7 +22,7 @@ export function CarrierTab({ form }: CarrierTabProps) {
   const { t } = useTranslation('routes')
 
   const { data: companiesData } = useCompanies({ size: 100 })
-  const { data: usersData } = useUsers({ size: 100 })
+  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER' })
   const { data: vehiclesData } = useVehicles({ size: 100 })
   const { data: driversData } = useDrivers({ size: 100 })
 
@@ -30,7 +30,7 @@ export function CarrierTab({ form }: CarrierTabProps) {
     () =>
       (companiesData?.content || []).map((c) => ({
         value: String(c.id),
-        label: c.displayName || c.fullName,
+        label: c.fullName,
       })),
     [companiesData]
   )

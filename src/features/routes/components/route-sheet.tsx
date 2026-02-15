@@ -69,16 +69,6 @@ const getDefaultValues = (): RouteFormValues => ({
       accessories: [],
       requiredDocuments: [],
     },
-    {
-      type: 'DELIVERY',
-      facilityId: '',
-      arrivalSlotType: '',
-      arrivalStartDate: '',
-      arrivalEndDate: '',
-      referenceNumbers: [],
-      accessories: [],
-      requiredDocuments: [],
-    },
   ],
   totalMiles: '',
   estimatedDuration: '',
@@ -152,7 +142,7 @@ function mapRouteToFormValues(route: RouteResponse): RouteFormValues {
 function mapFormToCreateRequest(values: RouteFormValues): RouteCreateRequest {
   const stops: StopRequest[] = values.stops.map((stop, index) => ({
     type: stop.type,
-    facilityId: stop.facilityId || undefined,
+    facilityId: stop.facilityId ? parseInt(stop.facilityId) : undefined,
     stopOrder: index,
     arrivalSlotType: (stop.arrivalSlotType as ArrivalSlotType) || undefined,
     arrivalStartDate: stop.arrivalStartDate || undefined,
@@ -182,13 +172,13 @@ function mapFormToCreateRequest(values: RouteFormValues): RouteCreateRequest {
   }
 
   return {
-    companyId: values.companyId,
-    dispatcherId: values.dispatcherId || undefined,
-    vehicleId: values.vehicleId || undefined,
-    driverId: values.driverId || undefined,
-    coDriverId: values.coDriverId || undefined,
+    companyId: parseInt(values.companyId),
+    dispatcherId: values.dispatcherId ? parseInt(values.dispatcherId) : undefined,
+    vehicleId: values.vehicleId ? parseInt(values.vehicleId) : undefined,
+    driverId: values.driverId ? parseInt(values.driverId) : undefined,
+    coDriverId: values.coDriverId ? parseInt(values.coDriverId) : undefined,
     autoDispatch: values.autoDispatch,
-    brokerId: values.brokerId || undefined,
+    brokerId: values.brokerId ? parseInt(values.brokerId) : undefined,
     brokerRepresentative: values.brokerRepresentative || undefined,
     brokerIdentifier: values.brokerIdentifier || undefined,
     internalIdentifier: values.internalIdentifier || undefined,

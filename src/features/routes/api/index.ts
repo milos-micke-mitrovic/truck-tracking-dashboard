@@ -10,6 +10,7 @@ import type {
   RouteFilters,
   RouteStopResponse,
   StopRequest,
+  StopUpdateRequest,
 } from '../types'
 
 // Query keys
@@ -29,7 +30,7 @@ async function fetchRoutes(
   params: RouteFilters & PageParams
 ): Promise<PageResponse<RouteShortResponse>> {
   const searchParams = new URLSearchParams()
-  if (params.page !== undefined) searchParams.set('page', String(params.page + 1))
+  if (params.page !== undefined) searchParams.set('page', String(params.page))
   if (params.size !== undefined) searchParams.set('size', String(params.size))
   if (params.sortBy) searchParams.set('sortBy', params.sortBy)
   if (params.sortDir) searchParams.set('sortDir', params.sortDir)
@@ -91,7 +92,7 @@ async function createRouteStop(
 async function updateRouteStop(
   routeId: string,
   stopId: string,
-  data: StopRequest
+  data: StopUpdateRequest
 ): Promise<RouteStopResponse> {
   return httpClient.put(`/routes/${routeId}/stops/${stopId}`, data)
 }
@@ -203,7 +204,7 @@ export function useUpdateRouteStop() {
     }: {
       routeId: string
       stopId: string
-      data: StopRequest
+      data: StopUpdateRequest
     }) => updateRouteStop(routeId, stopId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: routeKeys.all })

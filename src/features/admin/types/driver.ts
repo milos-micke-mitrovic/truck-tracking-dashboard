@@ -4,10 +4,12 @@ export type DriverStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED'
 // Document type for drivers (from API response)
 export type DriverDocument = {
   id: number
-  documentType: string
-  fileName: string
-  fileSize: number
-  uploadedAt: string
+  type: string
+  name: string
+  path: string
+  expirationDate: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 // Document request for create/update

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Check, ChevronDown, X } from 'lucide-react'
+import { Check, ChevronDown, X, Plus } from 'lucide-react'
 
 import { cn } from '@/shared/utils'
 import { IconButton } from '../button'
@@ -42,6 +42,8 @@ type SelectProps = {
   disabled?: boolean
   searchable?: boolean
   clearable?: boolean
+  /** Allow users to type and create custom values */
+  creatable?: boolean
   name?: string
   id?: string
   className?: string
@@ -60,23 +62,44 @@ function Select({
   disabled,
   searchable = false,
   clearable = false,
+  creatable = false,
   name,
   id,
   className,
 }: SelectProps) {
   const { t } = useTranslation('common')
   const [open, setOpen] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
 
   const resolvedPlaceholder = placeholder ?? t('select.placeholder')
   const resolvedSearchPlaceholder = searchPlaceholder ?? t('select.searchPlaceholder')
   const resolvedEmptyText = emptyText ?? t('select.noResults')
   const selectId = id || name
 
+  // For creatable, also check if value matches a custom typed value
   const selectedOption = options.find((opt) => opt.value === value)
+  const displayLabel = selectedOption?.label || (value && creatable ? value : undefined)
   const showClearButton = clearable && value && !disabled
 
+  // Check if search value matches any existing option (case-insensitive)
+  const searchMatchesOption = options.some(
+    (opt) => opt.label.toLowerCase() === searchValue.toLowerCase() ||
+             opt.value.toLowerCase() === searchValue.toLowerCase()
+  )
+  const showCreateValueOption = isCreating && searchValue.trim() && !searchMatchesOption
+
+  // Reset creating mode when popover closes
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen)
+    if (!isOpen) {
+      setIsCreating(false)
+      setSearchValue('')
+    }
+  }
+
   const selectElement = (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -93,14 +116,14 @@ function Select({
             !selectedOption && 'text-muted-foreground'
           )}
         >
-          {selectedOption ? (
+          {displayLabel ? (
             <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
                 <BodySmall as="span" truncate className="min-w-0">
-                  {selectedOption.label}
+                  {displayLabel}
                 </BodySmall>
               </TooltipTrigger>
-              <TooltipContent>{selectedOption.label}</TooltipContent>
+              <TooltipContent>{displayLabel}</TooltipContent>
             </Tooltip>
           ) : (
             <BodySmall as="span" truncate className="min-w-0">{resolvedPlaceholder}</BodySmall>
@@ -128,30 +151,72 @@ function Select({
         align="start"
         className="!w-[var(--radix-popover-trigger-width)] p-0"
       >
-        <Command>
-          {searchable && (
-            <CommandInput placeholder={resolvedSearchPlaceholder} className="h-9" />
+        <Command shouldFilter={!isCreating}>
+          {(searchable || isCreating) && (
+            <CommandInput
+              placeholder={isCreating ? t('select.typeCustomValue') : resolvedSearchPlaceholder}
+              className="h-9"
+              value={searchValue}
+              onValueChange={setSearchValue}
+              autoFocus={isCreating}
+            />
           )}
           <CommandList>
-            <CommandEmpty>{resolvedEmptyText}</CommandEmpty>
+            {!showCreateValueOption && !isCreating && <CommandEmpty>{resolvedEmptyText}</CommandEmpty>}
+            {isCreating && !showCreateValueOption && (
+              <CommandEmpty>{t('select.typeToCreate')}</CommandEmpty>
+            )}
             <CommandGroup>
-              {options.map((option) => (
+              {showCreateValueOption && (
                 <CommandItem
-                  key={option.value}
-                  value={option.label}
-                  disabled={option.disabled}
+                  value={searchValue}
                   onSelect={() => {
-                    onChange?.(option.value)
+                    onChange?.(searchValue.trim())
+                    setSearchValue('')
+                    setIsCreating(false)
                     setOpen(false)
                   }}
-                  title={option.label}
+                  className="text-primary"
                 >
-                  <BodySmall as="span" truncate>{option.label}</BodySmall>
-                  {value === option.value && (
-                    <Check className="ml-auto size-4" />
-                  )}
+                  <Plus className="mr-2 size-4" />
+                  <BodySmall as="span">
+                    {t('select.create', { value: searchValue.trim() })}
+                  </BodySmall>
                 </CommandItem>
-              ))}
+              )}
+              {!isCreating && options
+                .filter((option) =>
+                  !searchable || !searchValue ||
+                  option.label.toLowerCase().includes(searchValue.toLowerCase())
+                )
+                .map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.label}
+                    disabled={option.disabled}
+                    onSelect={() => {
+                      onChange?.(option.value)
+                      setSearchValue('')
+                      setOpen(false)
+                    }}
+                    title={option.label}
+                  >
+                    <BodySmall as="span" truncate>{option.label}</BodySmall>
+                    {value === option.value && (
+                      <Check className="ml-auto size-4" />
+                    )}
+                  </CommandItem>
+                ))}
+              {creatable && !isCreating && (
+                <CommandItem
+                  value="__create_new__"
+                  onSelect={() => setIsCreating(true)}
+                  className="text-primary"
+                >
+                  <Plus className="mr-2 size-4" />
+                  <BodySmall as="span">{t('select.createNew')}</BodySmall>
+                </CommandItem>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>

@@ -165,7 +165,7 @@ export function VehicleSheet({
       { value: '', label: t('vehicleSheet.selectCompany') },
       ...(companiesData?.content || []).map((c) => ({
         value: String(c.id),
-        label: c.displayName || c.fullName,
+        label: c.fullName,
       })),
     ],
     [companiesData, t]

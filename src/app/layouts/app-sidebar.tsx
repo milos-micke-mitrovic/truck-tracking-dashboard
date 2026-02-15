@@ -86,7 +86,7 @@ export function AppSidebar() {
               )}
               {!isSuperAdmin(user) && (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={t('sidebar.routes')}>
+                  <SidebarMenuButton asChild tooltip={t('sidebar.dispatch')}>
                     <NavLink
                       to="/routes"
                       className={({ isActive }) =>
@@ -94,7 +94,7 @@ export function AppSidebar() {
                       }
                     >
                       <Route className="size-4" />
-                      <BodySmall as="span">{t('sidebar.routes')}</BodySmall>
+                      <BodySmall as="span">{t('sidebar.dispatch')}</BodySmall>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

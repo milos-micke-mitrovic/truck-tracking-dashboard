@@ -139,7 +139,11 @@
     "noResults": "No results found.",
     "clearSelection": "Clear selection",
     "clearAll": "Clear all selections",
-    "remove": "Remove {{label}}"
+    "remove": "Remove {{label}}",
+    "create": "Create \"{{value}}\"",
+    "createNew": "Create new",
+    "typeCustomValue": "Type custom value...",
+    "typeToCreate": "Type a name and press Enter"
   },
   "sidebar": {
     "title": "Sidebar",

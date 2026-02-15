@@ -115,6 +115,7 @@ export function DocumentsSection({
                       value={typeField.value as string}
                       onChange={typeField.onChange}
                       placeholder={t('documents.selectType')}
+                      creatable
                     />
                     <FormMessage />
                   </FormItem>

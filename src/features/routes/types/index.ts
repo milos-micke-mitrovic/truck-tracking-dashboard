@@ -94,22 +94,31 @@ export type ReferenceNumberType =
 
 export type CompanyShort = {
   id: string
-  name: string
+  displayName: string
+  dotNumber: string | null
+  mcNumber: string | null
 }
 
 export type UserShort = {
   id: string
   name: string
+  email: string
+  role: string
 }
 
 export type VehicleShort = {
   id: string
-  unitNumber: string
+  unitId: string
+  make: string
+  model: string
+  status: string
 }
 
 export type DriverShort = {
   id: string
   name: string
+  phoneNumber: string | null
+  status: string
 }
 
 // --- Response types ---
@@ -198,8 +207,8 @@ export type RouteShortResponse = {
   driverName: string | null
   dispatcherName: string | null
   status: RouteStatus
-  statusChangedAt: string | null
   bookedAt: string | null
+  createdAt: string
 }
 
 // --- Request types ---
@@ -211,11 +220,26 @@ export type StopReferenceNumberRequest = {
 
 export type StopRequest = {
   type: StopType
-  facilityId?: string
+  facilityId?: number
   stopOrder: number
   arrivalSlotType?: ArrivalSlotType
   arrivalStartDate?: string
   arrivalEndDate?: string
+  referenceNumbers?: StopReferenceNumberRequest[]
+  accessories?: AccessoryType[]
+  requiredDocuments?: RequiredDocumentType[]
+}
+
+export type StopUpdateRequest = {
+  type?: StopType
+  facilityId?: number
+  stopOrder?: number
+  arrivalSlotType?: ArrivalSlotType
+  arrivalStartDate?: string
+  arrivalEndDate?: string
+  actualArrivalDate?: string
+  actualDepartureDate?: string
+  status?: StopStatus
   referenceNumbers?: StopReferenceNumberRequest[]
   accessories?: AccessoryType[]
   requiredDocuments?: RequiredDocumentType[]
@@ -233,13 +257,13 @@ export type LoadDetailsRequest = {
 }
 
 export type RouteCreateRequest = {
-  companyId: string
-  dispatcherId?: string
-  vehicleId?: string
-  driverId?: string
-  coDriverId?: string
+  companyId: number
+  dispatcherId?: number
+  vehicleId?: number
+  driverId?: number
+  coDriverId?: number
   autoDispatch?: boolean
-  brokerId?: string
+  brokerId?: number
   brokerRepresentative?: string
   brokerIdentifier?: string
   internalIdentifier?: string
@@ -256,13 +280,12 @@ export type RouteCreateRequest = {
 }
 
 export type RouteUpdateRequest = {
-  companyId?: string
-  dispatcherId?: string
-  vehicleId?: string
-  driverId?: string
-  coDriverId?: string
-  autoDispatch?: boolean
-  brokerId?: string
+  companyId?: number
+  dispatcherId?: number
+  vehicleId?: number
+  driverId?: number
+  coDriverId?: number
+  brokerId?: number
   brokerRepresentative?: string
   brokerIdentifier?: string
   internalIdentifier?: string

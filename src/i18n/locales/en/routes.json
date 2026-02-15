@@ -37,7 +37,7 @@
     "CANCELLED": "Cancelled"
   },
   "actions": {
-    "addRoute": "Add Route",
+    "addDispatch": "Add Dispatch",
     "copyIdentifier": "Copy identifier",
     "copied": "Copied!"
   },
@@ -45,8 +45,8 @@
     "required": "This field is required"
   },
   "sheet": {
-    "addTitle": "Add Route",
-    "editTitle": "Edit Route",
+    "addTitle": "Add Dispatch",
+    "editTitle": "Edit Dispatch",
     "error": "An error occurred. Please try again.",
     "cancel": "Cancel",
     "save": "Save",
@@ -75,7 +75,7 @@
       "broker": "Broker",
       "selectBroker": "Select broker",
       "brokerRepresentative": "Broker Representative",
-      "brokerIdentifier": "Broker Identifier",
+      "brokerIdentifier": "Load Number",
       "internalIdentifier": "Internal Identifier",
       "brokerRate": "Broker Rate ($)",
       "driverRate": "Driver Rate ($)"
@@ -125,8 +125,8 @@
     }
   },
   "deleteConfirm": {
-    "title": "Delete Route",
-    "description": "Are you sure you want to delete this route? This action cannot be undone."
+    "title": "Delete Dispatch",
+    "description": "Are you sure you want to delete this dispatch? This action cannot be undone."
   },
   "enums": {
     "stopTypes": {

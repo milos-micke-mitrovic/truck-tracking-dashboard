@@ -65,6 +65,7 @@ export type UserDocumentRequest = {
 // Request type for creating a user (UserRequestDto)
 export type UserCreateRequest = {
   tenantId: number
+  companyId: number
   email: string
   firstName: string
   lastName: string
@@ -76,7 +77,6 @@ export type UserCreateRequest = {
   createdBy?: number
   updatedBy?: number
   isActive?: boolean
-  companyId?: number
   documents?: UserDocumentRequest[]
   documentIdsToDelete?: number[]
 }

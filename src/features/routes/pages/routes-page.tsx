@@ -64,7 +64,7 @@ export function RoutesPage() {
 
   // Fetch data for searchable selects
   const { data: companiesData } = useCompanies({ size: 100 })
-  const { data: usersData } = useUsers({ size: 100 })
+  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER' })
   const { data: driversData } = useDrivers({ size: 100 })
   const { data: vehiclesData } = useVehicles({ size: 100 })
   const { data: brokersData } = useBrokers()
@@ -114,7 +114,7 @@ export function RoutesPage() {
     () =>
       (companiesData?.content || []).map((c) => ({
         value: String(c.id),
-        label: c.displayName || c.fullName,
+        label: c.fullName,
       })),
     [companiesData]
   )
@@ -271,7 +271,7 @@ export function RoutesPage() {
               setRouteSheetOpen(true)
             }}
           >
-            {t('actions.addRoute')}
+            {t('actions.addDispatch')}
           </Button>
         </div>
 
