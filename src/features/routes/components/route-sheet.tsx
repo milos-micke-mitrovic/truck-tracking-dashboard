@@ -39,7 +39,6 @@ import type {
   WeightUnit,
   UnitType,
   ReferenceNumberType,
-  ParsePdfResponse,
   StopType,
   InlineBrokerRequest,
   InlineFacilityRequest,
@@ -344,6 +343,8 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
         const mappedStops = data.stops.map((stop) => ({
           type: (stop.type || 'PICKUP') as StopType,
           facilityId: '', // Must be selected manually from facilities dropdown
+          facilityType: '' as FacilityType | '',
+          facilityAddress: '',
           arrivalSlotType: '' as ArrivalSlotType | '',
           arrivalStartDate: stop.arrivalStartDate || '',
           arrivalEndDate: stop.arrivalEndDate || '',

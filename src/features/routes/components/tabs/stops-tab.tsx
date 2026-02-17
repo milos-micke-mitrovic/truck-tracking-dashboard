@@ -17,7 +17,7 @@ import {
   Separator,
 } from '@/shared/ui'
 import { FormSection } from '@/shared/components'
-import { useFacilities, FACILITY_TYPE_VALUES, type FacilityType } from '@/features/facilities'
+import { useFacilities, FACILITY_TYPE_VALUES } from '@/features/facilities'
 import type { RouteFormValues, StopFormValues } from '../../types'
 import {
   STOP_TYPE_VALUES,
