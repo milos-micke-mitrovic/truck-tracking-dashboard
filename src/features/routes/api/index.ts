@@ -11,6 +11,7 @@ import type {
   RouteStopResponse,
   StopRequest,
   StopUpdateRequest,
+  ParsePdfResponse,
 } from '../types'
 
 // Query keys
@@ -225,5 +226,52 @@ export function useDeleteRouteStop() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: routeKeys.all })
     },
+  })
+}
+
+// --- PDF Parse API functions ---
+
+// Helper to get auth token
+function getToken(): string | null {
+  try {
+    const stored = localStorage.getItem('auth')
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      return parsed.token || null
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
+async function parsePdfForRoute(file: File): Promise<ParsePdfResponse> {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL || '/api'}/confirmations/parse-pdf`,
+    {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    }
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(errorText || `Parse failed: ${response.statusText}`)
+  }
+
+  return response.json()
+}
+
+// --- PDF Parse hooks ---
+
+export function useParsePdf() {
+  return useMutation({
+    mutationFn: parsePdfForRoute,
   })
 }

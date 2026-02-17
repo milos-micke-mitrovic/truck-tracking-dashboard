@@ -74,6 +74,8 @@
     "booking": {
       "broker": "Broker",
       "selectBroker": "Select broker",
+      "brokerMcNumber": "MC Number (Optional)",
+      "brokerMcNumberPlaceholder": "Enter MC number if creating new broker",
       "brokerRepresentative": "Broker Representative",
       "brokerIdentifier": "Load Number",
       "internalIdentifier": "Internal Identifier",
@@ -88,10 +90,18 @@
       "selectType": "Select type",
       "facility": "Facility",
       "selectFacility": "Select facility",
+      "facilityType": "Facility Type",
+      "selectFacilityType": "Select type (required for new facility)",
+      "facilityAddress": "Facility Address (Optional)",
+      "facilityAddressPlaceholder": "Enter address if creating new facility",
       "arrivalSlotType": "Arrival Slot",
       "selectArrivalSlot": "Select arrival slot",
       "arrivalStartDate": "Arrival Start",
       "arrivalEndDate": "Arrival End",
+      "unitCount": "Unit Count",
+      "unitCountPlaceholder": "Enter number of units",
+      "unitType": "Unit Type",
+      "selectUnitType": "Select unit type",
       "referenceNumbers": "Reference Numbers",
       "addReference": "Add Reference",
       "referenceType": "Type",
@@ -122,7 +132,15 @@
       "unitCount": "Unit Count",
       "unitType": "Unit Type",
       "selectUnitType": "Select unit type"
-    }
+    },
+    "parsePdf": {
+      "title": "Import from PDF",
+      "description": "Upload a rate confirmation or load confirmation PDF to auto-fill form fields",
+      "upload": "Upload PDF",
+      "parsing": "Parsing..."
+    },
+    "pdfParseSuccess": "PDF parsed successfully and form fields updated",
+    "pdfParseError": "Failed to parse PDF. Please try again or fill the form manually."
   },
   "deleteConfirm": {
     "title": "Delete Dispatch",

@@ -17,7 +17,7 @@ import {
   Separator,
 } from '@/shared/ui'
 import { FormSection } from '@/shared/components'
-import { useFacilities } from '@/features/facilities'
+import { useFacilities, FACILITY_TYPE_VALUES } from '@/features/facilities'
 import type { RouteFormValues, StopFormValues } from '../../types'
 import {
   STOP_TYPE_VALUES,
@@ -25,6 +25,7 @@ import {
   ACCESSORY_TYPE_VALUES,
   REQUIRED_DOCUMENT_TYPE_VALUES,
   REFERENCE_NUMBER_TYPE_VALUES,
+  UNIT_TYPE_VALUES,
 } from '../../constants'
 
 type StopsTabProps = {
@@ -34,12 +35,16 @@ type StopsTabProps = {
 const getDefaultStop = (order: number): StopFormValues => ({
   type: order === 0 ? 'PICKUP' : 'DELIVERY',
   facilityId: '',
+  facilityType: '',
+  facilityAddress: '',
   arrivalSlotType: '',
   arrivalStartDate: '',
   arrivalEndDate: '',
   referenceNumbers: [],
   accessories: [],
   requiredDocuments: [],
+  unitCount: '',
+  unitType: '',
 })
 
 export function StopsTab({ form }: StopsTabProps) {
@@ -90,6 +95,16 @@ export function StopsTab({ form }: StopsTabProps) {
     label: t(`enums.referenceNumbers.${v}`),
   }))
 
+  const unitTypeOptions = UNIT_TYPE_VALUES.map((v) => ({
+    value: v,
+    label: t(`enums.unitTypes.${v}`),
+  }))
+
+  const facilityTypeOptions = FACILITY_TYPE_VALUES.map((v) => ({
+    value: v,
+    label: v.charAt(0) + v.slice(1).toLowerCase(),
+  }))
+
   return (
     <div className="space-y-3">
       {stopFields.map((stopField, stopIndex) => (
@@ -137,11 +152,44 @@ export function StopsTab({ form }: StopsTabProps) {
                   <FormLabel>{t('sheet.stops.facility')}</FormLabel>
                   <Select
                     searchable
+                    creatable
                     options={facilityOptions}
                     value={field.value}
                     onChange={field.onChange}
                     placeholder={t('sheet.stops.selectFacility')}
                   />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`stops.${stopIndex}.facilityType`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('sheet.stops.facilityType')}</FormLabel>
+                  <Select
+                    options={facilityTypeOptions}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder={t('sheet.stops.selectFacilityType')}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`stops.${stopIndex}.facilityAddress`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('sheet.stops.facilityAddress')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder={t('sheet.stops.facilityAddressPlaceholder')}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -187,6 +235,43 @@ export function StopsTab({ form }: StopsTabProps) {
                   <DatePicker
                     value={field.value}
                     onChange={field.onChange}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name={`stops.${stopIndex}.unitCount`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('sheet.stops.unitCount')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="number"
+                      min="0"
+                      placeholder={t('sheet.stops.unitCountPlaceholder')}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name={`stops.${stopIndex}.unitType`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('sheet.stops.unitType')}</FormLabel>
+                  <Select
+                    options={unitTypeOptions}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder={t('sheet.stops.selectUnitType')}
                   />
                   <FormMessage />
                 </FormItem>

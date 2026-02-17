@@ -14,3 +14,5 @@ export {
   useUpdateFacility,
   useDeleteFacility,
 } from './api'
+
+export { FACILITY_TYPE_VALUES } from './constants'
