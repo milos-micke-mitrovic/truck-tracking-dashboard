@@ -52,7 +52,7 @@ export function getVisibleRoles<T extends string>(
   return roles.filter((role) => {
     if (role === 'SUPER_ADMIN') return false
     if (role === 'DRIVER') return false
-    if (role === 'ADMIN' && !isSuperAdmin(viewer)) return false
+    if (role === 'ADMIN' && viewer?.role !== 'ADMIN' && !isSuperAdmin(viewer)) return false
     return true
   })
 }
