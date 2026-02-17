@@ -44,11 +44,28 @@ export function BookingTab({ form }: BookingTabProps) {
                 <FormLabel>{t('sheet.booking.broker')}</FormLabel>
                 <Select
                   searchable
+                  creatable
                   options={brokerOptions}
                   value={field.value}
                   onChange={field.onChange}
                   placeholder={t('sheet.booking.selectBroker')}
                 />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="brokerMcNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('sheet.booking.brokerMcNumber')}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder={t('sheet.booking.brokerMcNumberPlaceholder')}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

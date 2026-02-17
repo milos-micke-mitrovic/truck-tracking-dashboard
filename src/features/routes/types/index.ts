@@ -1,4 +1,4 @@
-import type { FacilityShort } from '@/features/facilities'
+import type { FacilityShort, FacilityType } from '@/features/facilities'
 import type { BrokerShort } from '@/features/brokers'
 
 // --- Enum types ---
@@ -90,6 +90,19 @@ export type ReferenceNumberType =
   | 'GATE_CHECK_IN'
   | 'ITEM'
 
+// --- Inline creation request types ---
+
+export type InlineBrokerRequest = {
+  legalName?: string
+  mcNumber?: string
+}
+
+export type InlineFacilityRequest = {
+  name: string
+  facilityType: FacilityType
+  address?: string
+}
+
 // --- Short response types (nested in RouteResponse) ---
 
 export type CompanyShort = {
@@ -143,6 +156,8 @@ export type RouteStopResponse = {
   referenceNumbers: ReferenceNumberResponse[]
   accessories: AccessoryType[]
   requiredDocuments: RequiredDocumentType[]
+  unitCount: number | null
+  unitType: UnitType | null
 }
 
 export type LoadDetailsResponse = {
@@ -221,6 +236,7 @@ export type StopReferenceNumberRequest = {
 export type StopRequest = {
   type: StopType
   facilityId?: number
+  newFacility?: InlineFacilityRequest
   stopOrder: number
   arrivalSlotType?: ArrivalSlotType
   arrivalStartDate?: string
@@ -228,6 +244,8 @@ export type StopRequest = {
   referenceNumbers?: StopReferenceNumberRequest[]
   accessories?: AccessoryType[]
   requiredDocuments?: RequiredDocumentType[]
+  unitCount?: number
+  unitType?: UnitType
 }
 
 export type StopUpdateRequest = {
@@ -243,6 +261,8 @@ export type StopUpdateRequest = {
   referenceNumbers?: StopReferenceNumberRequest[]
   accessories?: AccessoryType[]
   requiredDocuments?: RequiredDocumentType[]
+  unitCount?: number
+  unitType?: UnitType
 }
 
 export type LoadDetailsRequest = {
@@ -264,6 +284,7 @@ export type RouteCreateRequest = {
   coDriverId?: number
   autoDispatch?: boolean
   brokerId?: number
+  newBroker?: InlineBrokerRequest
   brokerRepresentative?: string
   brokerIdentifier?: string
   internalIdentifier?: string
@@ -329,12 +350,16 @@ export type ReferenceNumberFormValue = {
 export type StopFormValues = {
   type: StopType
   facilityId: string
+  facilityType: FacilityType | ''
+  facilityAddress: string
   arrivalSlotType: ArrivalSlotType | ''
   arrivalStartDate: string
   arrivalEndDate: string
   referenceNumbers: ReferenceNumberFormValue[]
   accessories: AccessoryType[]
   requiredDocuments: RequiredDocumentType[]
+  unitCount: string
+  unitType: UnitType | ''
 }
 
 export type LoadDetailsFormValues = {
@@ -358,6 +383,7 @@ export type RouteFormValues = {
   autoDispatch: boolean
   // Booking tab
   brokerId: string
+  brokerMcNumber: string
   brokerRepresentative: string
   brokerIdentifier: string
   internalIdentifier: string
@@ -374,4 +400,56 @@ export type RouteFormValues = {
   routeType: RouteType | ''
   // Load tab
   loadDetails: LoadDetailsFormValues
+}
+
+// --- PDF Parse Response ---
+
+export type ParsePdfResponse = {
+  extractionId: number
+  extraction: {
+    // Broker info
+    brokerName?: string
+    brokerRepresentative?: string
+    brokerIdentifier?: string
+    brokerRate?: number
+
+    // Route info
+    totalMiles?: number
+    estimatedDuration?: string
+    routeHighway?: string
+
+    // Load details
+    loadDetails?: {
+      weight?: string
+      weightUnit?: string // 'LBS' | 'KG'
+      lengthFeet?: string
+      commodity?: string
+      capacity?: string // 'FULL' | 'PARTIAL'
+      temperature?: string
+      unitCount?: number
+      unitType?: string // 'PALLETS' | 'BAGS' | etc.
+    }
+
+    // Stops
+    stops?: Array<{
+      type?: string // 'PICKUP' | 'DELIVERY'
+      facilityName?: string
+      address?: string
+      city?: string
+      state?: string
+      zipCode?: string
+      arrivalStartDate?: string // ISO datetime string
+      arrivalEndDate?: string // ISO datetime string
+      referenceNumbers?: Array<{
+        type?: string // 'BOL' | 'APPT_CONF' | etc.
+        value?: string
+      }>
+      stopOrder?: number
+      unitCount?: number
+      unitType?: string
+    }>
+
+    // Debug info
+    rawText?: string
+  }
 }
