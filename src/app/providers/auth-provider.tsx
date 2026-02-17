@@ -98,6 +98,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
+  // Attempt proactive token refresh with retry logic and exponential backoff
+  const attemptProactiveRefresh = useCallback(async (token: string, retries = 3): Promise<boolean> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        await refreshAccessToken(token)
+        console.log('[Auth] Proactive token refresh succeeded')
+        return true
+      } catch (error) {
+        console.error(`[Auth] Proactive refresh attempt ${i + 1}/${retries} failed:`, error)
+        if (i === retries - 1) {
+          // Final failure - log and let reactive refresh handle it
+          console.error('[Auth] All proactive refresh attempts failed. Token will expire soon.')
+          return false
+        }
+        // Exponential backoff: wait 1s, 2s, 3s between retries
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)))
+      }
+    }
+    return false
+  }, [])
+
   // Schedule a proactive refresh based on the token's exp claim
   const scheduleRefresh = useCallback((token: string, currentRefreshToken: string) => {
     clearRefreshTimer()
@@ -108,20 +129,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const expiresAt = payload.exp * 1000
     const delay = expiresAt - Date.now() - REFRESH_BUFFER_MS
 
+    console.log(`[Auth] Scheduling token refresh in ${Math.round(delay / 1000)}s`)
+
     if (delay <= 0) {
-      // Token already expired or about to — refresh immediately
-      refreshAccessToken(currentRefreshToken).catch(() => {
-        // Refresh failed; the next API call will trigger 401 → auth:logout
-      })
+      // Token already expired or about to — refresh immediately with retry
+      console.log('[Auth] Token expiring imminently, attempting immediate refresh')
+      attemptProactiveRefresh(currentRefreshToken)
       return
     }
 
     refreshTimerRef.current = setTimeout(() => {
-      refreshAccessToken(currentRefreshToken).catch(() => {
-        // Refresh failed; the next API call will trigger 401 → auth:logout
-      })
+      console.log('[Auth] Proactive refresh timer fired')
+      attemptProactiveRefresh(currentRefreshToken)
     }, delay)
-  }, [clearRefreshTimer])
+  }, [clearRefreshTimer, attemptProactiveRefresh])
 
   // Listen for custom events from http-client
   useEffect(() => {
@@ -151,6 +172,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return clearRefreshTimer
   }, [state.token, state.refreshToken, scheduleRefresh, clearRefreshTimer])
+
+  // Handle background tab scenarios - check token validity when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && state.token && state.refreshToken) {
+        const payload = decodeJwt(state.token)
+        if (!payload?.exp) return
+
+        const expiresIn = (payload.exp * 1000) - Date.now()
+
+        console.log(`[Auth] Tab became visible. Token expires in ${Math.round(expiresIn / 1000)}s`)
+
+        // If token expires in less than 5 minutes, refresh it proactively
+        if (expiresIn < 5 * 60 * 1000 && expiresIn > 0) {
+          console.log('[Auth] Token expiring soon after tab visibility change. Refreshing...')
+          attemptProactiveRefresh(state.refreshToken)
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [state.token, state.refreshToken, attemptProactiveRefresh])
 
   return (
     <AuthContext.Provider value={{ ...state, login, logout, updateTokens }}>
