@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LogOut, Settings, Route, Building2 } from 'lucide-react'
+import { LogOut, Settings, Route, Building2, FileText } from 'lucide-react'
 import { Logo } from '@/shared/components'
 import {
   Sidebar,
@@ -102,6 +102,27 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {!isSuperAdmin(user) && user?.role === 'ADMIN' && (
+          <SidebarGroup className="mt-auto pb-2">
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip={t('sidebar.companyDocs')}>
+                    <NavLink
+                      to="/company-docs"
+                      className={({ isActive }) =>
+                        cn(isActive && 'bg-sidebar-accent')
+                      }
+                    >
+                      <FileText className="size-4" />
+                      <BodySmall as="span">{t('sidebar.companyDocs')}</BodySmall>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter className="border-t p-2">
         <SidebarMenu>

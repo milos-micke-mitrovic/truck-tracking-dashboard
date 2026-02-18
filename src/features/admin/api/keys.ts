@@ -15,6 +15,8 @@ export const adminKeys = {
   companiesList: (params: CompanyFilters & PageParams) =>
     [...adminKeys.companies(), 'list', params] as const,
   company: (id: number) => [...adminKeys.companies(), 'detail', id] as const,
+  companyDocuments: (companyId?: number) =>
+    [...adminKeys.companies(), 'documents', companyId] as const,
 
   // Drivers
   drivers: () => [...adminKeys.all, 'drivers'] as const,

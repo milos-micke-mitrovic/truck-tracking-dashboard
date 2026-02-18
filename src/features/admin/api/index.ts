@@ -8,6 +8,7 @@ export {
   useCreateCompany,
   useUpdateCompany,
   useDeleteCompany,
+  useCompanyDocuments,
 } from './companies'
 
 // Drivers

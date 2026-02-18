@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { httpClient } from '@/shared/api/http-client'
 import type { PageResponse, PageParams } from '@/shared/types'
-import type { Company, CompanyListItem, CompanyRequest, CompanyFilters } from '../types'
+import type { Company, CompanyListItem, CompanyRequest, CompanyFilters, CompanyDocumentItem } from '../types'
 import { adminKeys } from './keys'
 
 // API functions
@@ -41,6 +41,12 @@ async function updateCompany(id: number, data: CompanyRequest): Promise<Company>
 
 async function deleteCompany(id: number): Promise<void> {
   return httpClient.delete(`/companies/${id}`)
+}
+
+async function fetchCompanyDocuments(companyId?: number): Promise<CompanyDocumentItem[]> {
+  const params = new URLSearchParams()
+  if (companyId !== undefined) params.set('companyId', String(companyId))
+  return httpClient.get(`/documents/companies?${params}`)
 }
 
 // Hooks
@@ -87,5 +93,12 @@ export function useDeleteCompany() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.companies() })
     },
+  })
+}
+
+export function useCompanyDocuments(companyId?: number) {
+  return useQuery({
+    queryKey: adminKeys.companyDocuments(companyId),
+    queryFn: () => fetchCompanyDocuments(companyId),
   })
 }
