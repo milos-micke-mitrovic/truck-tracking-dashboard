@@ -80,6 +80,17 @@ export type CompanyFilters = {
   status?: CompanyStatus | 'all'
 }
 
+// Document list item for the company documents panel
+export type CompanyDocumentItem = {
+  id: number
+  type: string
+  name: string
+  expirationDate: string | null
+  createdAt: string
+  companyId: number
+  companyName: string
+}
+
 // Document form value for creating/editing
 export type CompanyDocumentFormValue = {
   id?: number

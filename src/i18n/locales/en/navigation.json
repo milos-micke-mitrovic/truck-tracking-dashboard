@@ -3,7 +3,8 @@
     "dashboard": "Dashboard",
     "admin": "Admin",
     "dispatch": "Dispatch",
-    "tenants": "Tenants"
+    "tenants": "Tenants",
+    "companyDocs": "Company Docs"
   },
   "breadcrumbs": {
     "home": "Home"

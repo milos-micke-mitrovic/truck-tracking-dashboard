@@ -28,6 +28,11 @@ const TenantsPage = lazy(() =>
     default: m.TenantsPage,
   }))
 )
+const CompanyDocumentsPage = lazy(() =>
+  import('@/features/admin/pages/company-documents-page').then((m) => ({
+    default: m.CompanyDocumentsPage,
+  }))
+)
 
 // Redirects to the user's default route based on role
 function DefaultRedirect() {
@@ -104,6 +109,16 @@ export const router = createBrowserRouter([
           <RouteGuard allowedRoles={['SUPER_ADMIN']}>
             <LazyPage>
               <TenantsPage />
+            </LazyPage>
+          </RouteGuard>
+        ),
+      },
+      {
+        path: '/company-docs',
+        element: (
+          <RouteGuard allowedRoles={['ADMIN']}>
+            <LazyPage>
+              <CompanyDocumentsPage />
             </LazyPage>
           </RouteGuard>
         ),

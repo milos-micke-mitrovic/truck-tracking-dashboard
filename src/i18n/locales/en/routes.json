@@ -37,7 +37,7 @@
     "CANCELLED": "Cancelled"
   },
   "actions": {
-    "addDispatch": "Add Dispatch",
+    "addDispatch": "Add Route",
     "copyIdentifier": "Copy identifier",
     "copied": "Copied!"
   },
@@ -45,7 +45,7 @@
     "required": "This field is required"
   },
   "sheet": {
-    "addTitle": "Add Dispatch",
+    "addTitle": "Add Route",
     "editTitle": "Edit Dispatch",
     "error": "An error occurred. Please try again.",
     "cancel": "Cancel",
