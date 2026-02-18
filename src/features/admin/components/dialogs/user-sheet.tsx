@@ -74,7 +74,7 @@ export function UserSheet({
   const { data: user, isLoading: isLoadingUser } = useUser(userId || 0)
 
   // Fetch companies for selector
-  const { data: companiesData } = useCompanies({ size: 100 })
+  const { data: companiesData } = useCompanies({ size: 100, tenantId: authUser?.tenantId })
 
   const createMutation = useCreateUser()
   const updateMutation = useUpdateUser()

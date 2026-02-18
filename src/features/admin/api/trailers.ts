@@ -25,7 +25,7 @@ async function fetchTrailers(
   if (params.companyId) searchParams.set('companyId', String(params.companyId))
   if (params.vehicleId) searchParams.set('vehicleId', String(params.vehicleId))
 
-  return httpClient.get(`/trailers?${searchParams}`)
+  return httpClient.get(`/trailers?${searchParams}`, { tenantId: params.tenantId })
 }
 
 async function fetchTrailer(id: number): Promise<Trailer> {

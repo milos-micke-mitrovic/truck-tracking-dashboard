@@ -12,6 +12,7 @@ import {
 } from '@/shared/ui'
 import { FormSection } from '@/shared/components'
 import { useCompanies, useDrivers, useVehicles, useUsers } from '@/features/admin/api'
+import { useAuth } from '@/features/auth'
 import type { RouteFormValues } from '../../types'
 
 type CarrierTabProps = {
@@ -20,11 +21,12 @@ type CarrierTabProps = {
 
 export function CarrierTab({ form }: CarrierTabProps) {
   const { t } = useTranslation('routes')
+  const { user } = useAuth()
 
-  const { data: companiesData } = useCompanies({ size: 100 })
-  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER' })
-  const { data: vehiclesData } = useVehicles({ size: 100 })
-  const { data: driversData } = useDrivers({ size: 100 })
+  const { data: companiesData } = useCompanies({ size: 100, tenantId: user?.tenantId })
+  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER', tenantId: user?.tenantId })
+  const { data: vehiclesData } = useVehicles({ size: 100, tenantId: user?.tenantId })
+  const { data: driversData } = useDrivers({ size: 100, tenantId: user?.tenantId })
 
   const companyOptions = useMemo(
     () =>
