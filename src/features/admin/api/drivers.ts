@@ -21,7 +21,7 @@ async function fetchDrivers(
   if (params.status && params.status !== 'all')
     searchParams.set('status', params.status)
 
-  return httpClient.get(`/drivers?${searchParams}`)
+  return httpClient.get(`/drivers?${searchParams}`, { tenantId: params.tenantId })
 }
 
 async function fetchDriver(id: number): Promise<Driver> {

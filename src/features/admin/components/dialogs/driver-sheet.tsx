@@ -91,9 +91,9 @@ export function DriverSheet({
   // Fetch full driver data when editing
   const { data: driver, isLoading: isLoadingDriver } = useDriver(driverId || 0)
 
-  // Fetch companies and vehicles for selectors
-  const { data: companiesData } = useCompanies({ size: 100 })
-  const { data: vehiclesData } = useVehicles({ size: 100 })
+  // Fetch companies and vehicles for selectors, scoped to current tenant
+  const { data: companiesData } = useCompanies({ size: 100, tenantId: user?.tenantId })
+  const { data: vehiclesData } = useVehicles({ size: 100, tenantId: user?.tenantId })
 
   const createMutation = useCreateDriver()
   const updateMutation = useUpdateDriver()

@@ -125,6 +125,7 @@ export type VehicleUpdateRequest = Partial<VehicleCreateRequest>
 
 // Filters for vehicle list (matches BE VehicleFilterRequest)
 export type VehicleFilters = {
+  tenantId?: number
   unitId?: string
   licensePlate?: string
   vin?: string

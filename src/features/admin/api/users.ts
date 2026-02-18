@@ -28,7 +28,7 @@ async function fetchUsers(
     searchParams.set('status', params.status)
   if (params.companyId) searchParams.set('companyId', String(params.companyId))
 
-  return httpClient.get(`/users?${searchParams}`)
+  return httpClient.get(`/users?${searchParams}`, { tenantId: params.tenantId })
 }
 
 async function fetchUser(id: number): Promise<User> {

@@ -97,6 +97,7 @@ export type DriverRequest = {
 
 // Filters (matches BE DriverFilterRequest)
 export type DriverFilters = {
+  tenantId?: number
   name?: string
   username?: string
   phoneNumber?: string

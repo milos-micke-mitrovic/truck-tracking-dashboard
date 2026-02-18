@@ -86,6 +86,7 @@ export type UserUpdateRequest = Partial<UserCreateRequest>
 
 // Filters for user list (matches BE UserFilterRequest)
 export type UserFilters = {
+  tenantId?: number
   name?: string
   email?: string
   username?: string

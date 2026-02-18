@@ -96,8 +96,8 @@ export function TrailerSheet({
   )
 
   // Fetch companies and vehicles for selectors
-  const { data: companiesData } = useCompanies({ size: 100 })
-  const { data: vehiclesData } = useVehicles({ size: 100 })
+  const { data: companiesData } = useCompanies({ size: 100, tenantId: user?.tenantId })
+  const { data: vehiclesData } = useVehicles({ size: 100, tenantId: user?.tenantId })
 
   const createMutation = useCreateTrailer()
   const updateMutation = useUpdateTrailer()

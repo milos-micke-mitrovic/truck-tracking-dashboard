@@ -29,7 +29,7 @@ async function fetchVehicles(
     searchParams.set('status', params.status)
   if (params.companyId) searchParams.set('companyId', String(params.companyId))
 
-  return httpClient.get(`/vehicles?${searchParams}`)
+  return httpClient.get(`/vehicles?${searchParams}`, { tenantId: params.tenantId })
 }
 
 async function fetchVehicle(id: number): Promise<Vehicle> {

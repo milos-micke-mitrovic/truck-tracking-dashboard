@@ -103,9 +103,9 @@ export function VehicleSheet({
     vehicleId || 0
   )
 
-  // Fetch companies and drivers for selectors
-  const { data: companiesData } = useCompanies({ size: 100 })
-  const { data: driversData } = useDrivers({ size: 100 })
+  // Fetch companies and drivers for selectors, scoped to current tenant
+  const { data: companiesData } = useCompanies({ size: 100, tenantId: user?.tenantId })
+  const { data: driversData } = useDrivers({ size: 100, tenantId: user?.tenantId })
 
   const createMutation = useCreateVehicle()
   const updateMutation = useUpdateVehicle()
