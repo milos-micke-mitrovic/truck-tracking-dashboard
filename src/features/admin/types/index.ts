@@ -11,6 +11,7 @@ export type {
   Company,
   CompanyRequest,
   CompanyFilters,
+  CompanyDocumentItem,
   CompanyFormValues,
   CompanySheetProps,
 } from './company'
