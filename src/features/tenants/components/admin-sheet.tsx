@@ -317,7 +317,7 @@ export function AdminSheet({
                       <FormItem>
                         <FormLabel>{t('adminSheet.username')}</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input {...field} autoComplete="off" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -333,7 +333,7 @@ export function AdminSheet({
                           {t('adminSheet.password')}
                         </FormLabel>
                         <FormControl>
-                          <Input type="password" {...field} />
+                          <Input type="password" {...field} autoComplete="new-password" />
                         </FormControl>
                         {isEdit && (
                           <Caption>{t('adminSheet.leaveBlank')}</Caption>

@@ -40,6 +40,7 @@ export type JwtPayload = {
   first_name: string
   last_name: string
   email: string
+  company_id?: number
   exp: number
   iat: number
 }

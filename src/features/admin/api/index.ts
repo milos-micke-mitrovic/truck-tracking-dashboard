@@ -5,6 +5,7 @@ export { adminKeys } from './keys'
 export {
   useCompanies,
   useCompany,
+  useMyCompany,
   useCreateCompany,
   useUpdateCompany,
   useDeleteCompany,

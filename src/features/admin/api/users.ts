@@ -62,11 +62,11 @@ async function searchUsers(
 }
 
 async function createUser(data: UserCreateRequest): Promise<User> {
-  return httpClient.post('/users', data)
+  return httpClient.post('/users', data, { tenantId: data.tenantId })
 }
 
 async function updateUser(id: number, data: UserUpdateRequest): Promise<User> {
-  return httpClient.put(`/users/${id}`, data)
+  return httpClient.put(`/users/${id}`, data, { tenantId: data.tenantId })
 }
 
 async function deleteUser(id: number): Promise<void> {

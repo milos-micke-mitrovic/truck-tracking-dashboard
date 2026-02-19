@@ -28,6 +28,7 @@ export function jwtPayloadToUser(payload: JwtPayload): User {
     email: payload.email,
     role: payload.role as User['role'],
     tenantId: payload.tenant_id,
+    companyId: payload.company_id,
     status: 'ACTIVE',
   }
 }

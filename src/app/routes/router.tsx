@@ -116,11 +116,9 @@ export const router = createBrowserRouter([
       {
         path: '/company-docs',
         element: (
-          <RouteGuard allowedRoles={['ADMIN']}>
-            <LazyPage>
-              <CompanyDocumentsPage />
-            </LazyPage>
-          </RouteGuard>
+          <LazyPage>
+            <CompanyDocumentsPage />
+          </LazyPage>
         ),
       },
     ],
