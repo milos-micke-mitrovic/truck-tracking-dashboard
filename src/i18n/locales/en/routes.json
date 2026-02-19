@@ -142,6 +142,15 @@
     "pdfParseSuccess": "PDF parsed successfully and form fields updated",
     "pdfParseError": "Failed to parse PDF. Please try again or fill the form manually."
   },
+  "pod": {
+    "title": "Proof of Delivery",
+    "viewButton": "View POD",
+    "empty": "No POD submissions found for this route.",
+    "stop": "Stop",
+    "driver": "Driver",
+    "notes": "Notes",
+    "downloadError": "Failed to download document"
+  },
   "deleteConfirm": {
     "title": "Delete Dispatch",
     "description": "Are you sure you want to delete this dispatch? This action cannot be undone."
