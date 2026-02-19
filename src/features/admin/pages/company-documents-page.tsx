@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { useAuth } from '@/features/auth'
 import { Button, H1, Select, Spinner, DataTable, DataTableColumnHeader } from '@/shared/ui'
 import { downloadDocument } from '@/shared/api/documents'
-import { useCompanies, useCompanyDocuments } from '../api'
+import { useCompanies, useMyCompany, useCompanyDocuments } from '../api'
 import type { CompanyDocumentItem } from '../types'
 
 function formatDocumentType(type: string): string {
@@ -27,11 +27,17 @@ function isExpired(dateStr: string | null): boolean {
 
 export function CompanyDocumentsPage() {
   const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | undefined>(undefined)
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
 
-  const { data: companiesData } = useCompanies({ size: 100, tenantId: user?.tenantId })
-  const { data: documents, isLoading } = useCompanyDocuments(selectedCompanyId)
+  const { data: companiesData } = useCompanies(
+    isAdmin ? { size: 100, tenantId: user?.tenantId } : { enabled: false }
+  )
+  const { data: myCompany } = useMyCompany(!isAdmin)
+  const { data: documents, isLoading } = useCompanyDocuments(
+    isAdmin ? selectedCompanyId : undefined
+  )
 
   const companyOptions = useMemo(
     () => [
@@ -121,19 +127,25 @@ export function CompanyDocumentsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <H1>Company Documents</H1>
+      <H1>
+        {!isAdmin && myCompany?.fullName
+          ? `Company Documents — ${myCompany.fullName}`
+          : 'Company Documents'}
+      </H1>
 
-      <div className="flex items-center gap-3">
-        <Select
-          options={companyOptions}
-          value={selectedCompanyId !== undefined ? String(selectedCompanyId) : ''}
-          onChange={(value) =>
-            setSelectedCompanyId(value ? parseInt(value, 10) : undefined)
-          }
-          placeholder="All Companies"
-          className="w-[240px]"
-        />
-      </div>
+      {isAdmin && (
+        <div className="flex items-center gap-3">
+          <Select
+            options={companyOptions}
+            value={selectedCompanyId !== undefined ? String(selectedCompanyId) : ''}
+            onChange={(value) =>
+              setSelectedCompanyId(value ? parseInt(value, 10) : undefined)
+            }
+            placeholder="All Companies"
+            className="w-[240px]"
+          />
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">

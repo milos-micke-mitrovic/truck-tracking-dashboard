@@ -102,7 +102,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {!isSuperAdmin(user) && user?.role === 'ADMIN' && (
+        {!isSuperAdmin(user) && (
           <SidebarGroup className="mt-auto pb-2">
             <SidebarGroupContent>
               <SidebarMenu>

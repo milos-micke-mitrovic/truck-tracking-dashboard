@@ -32,15 +32,19 @@ async function fetchCompany(id: number): Promise<Company> {
 }
 
 async function createCompany(data: CompanyRequest): Promise<Company> {
-  return httpClient.post('/companies', data)
+  return httpClient.post('/companies', data, { tenantId: data.tenantId })
 }
 
 async function updateCompany(id: number, data: CompanyRequest): Promise<Company> {
-  return httpClient.put(`/companies/${id}`, data)
+  return httpClient.put(`/companies/${id}`, data, { tenantId: data.tenantId })
 }
 
 async function deleteCompany(id: number): Promise<void> {
   return httpClient.delete(`/companies/${id}`)
+}
+
+async function fetchMyCompany(): Promise<Company> {
+  return httpClient.get('/companies/me')
 }
 
 async function fetchCompanyDocuments(companyId?: number): Promise<CompanyDocumentItem[]> {
@@ -50,10 +54,12 @@ async function fetchCompanyDocuments(companyId?: number): Promise<CompanyDocumen
 }
 
 // Hooks
-export function useCompanies(params: CompanyFilters & PageParams = {}) {
+export function useCompanies(params: CompanyFilters & PageParams & { enabled?: boolean } = {}) {
+  const { enabled, ...queryParams } = params
   return useQuery({
-    queryKey: adminKeys.companiesList(params),
-    queryFn: () => fetchCompanies(params),
+    queryKey: adminKeys.companiesList(queryParams),
+    queryFn: () => fetchCompanies(queryParams),
+    enabled: enabled !== false,
   })
 }
 
@@ -62,6 +68,14 @@ export function useCompany(id: number) {
     queryKey: adminKeys.company(id),
     queryFn: () => fetchCompany(id),
     enabled: id > 0,
+  })
+}
+
+export function useMyCompany(enabled = true) {
+  return useQuery({
+    queryKey: adminKeys.myCompany(),
+    queryFn: fetchMyCompany,
+    enabled,
   })
 }
 
