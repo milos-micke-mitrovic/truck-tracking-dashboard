@@ -402,6 +402,32 @@ export type RouteFormValues = {
   loadDetails: LoadDetailsFormValues
 }
 
+// --- POD types ---
+
+export type PodStatus = 'SUBMITTED' | 'APPROVED' | 'REJECTED'
+
+export type PodDocumentResponse = {
+  id: number
+  fileName: string
+  originalFileName: string
+  fileSize: number | null
+  contentType: string | null
+  sortOrder: number
+}
+
+export type PodSubmissionResponse = {
+  id: number
+  stopId: number
+  routeId: number
+  driverId: number
+  driverName: string | null
+  notes: string | null
+  status: PodStatus
+  submittedAt: string
+  documents: PodDocumentResponse[]
+  createdAt: string
+}
+
 // --- PDF Parse Response ---
 
 export type ParsePdfResponse = {

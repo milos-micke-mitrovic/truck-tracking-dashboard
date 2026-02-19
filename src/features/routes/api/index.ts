@@ -12,6 +12,7 @@ import type {
   StopRequest,
   StopUpdateRequest,
   ParsePdfResponse,
+  PodSubmissionResponse,
 } from '../types'
 
 // Query keys
@@ -23,6 +24,7 @@ export const routeKeys = {
   details: () => [...routeKeys.all, 'detail'] as const,
   detail: (id: string) => [...routeKeys.details(), id] as const,
   stops: (routeId: string) => [...routeKeys.all, 'stops', routeId] as const,
+  pods: (routeId: string) => [...routeKeys.all, 'pods', routeId] as const,
 }
 
 // --- Route API functions ---
@@ -227,6 +229,57 @@ export function useDeleteRouteStop() {
       queryClient.invalidateQueries({ queryKey: routeKeys.all })
     },
   })
+}
+
+// --- POD API functions ---
+
+async function fetchRoutePods(
+  routeId: string
+): Promise<PodSubmissionResponse[]> {
+  return httpClient.get(`/routes/${routeId}/pods`)
+}
+
+// --- POD hooks ---
+
+export function useRoutePods(routeId: string | null) {
+  return useQuery({
+    queryKey: routeKeys.pods(routeId!),
+    queryFn: () => fetchRoutePods(routeId!),
+    enabled: !!routeId,
+  })
+}
+
+export async function downloadPodDocument(documentId: number): Promise<void> {
+  const url = `${import.meta.env.VITE_API_URL || '/api'}/pod/documents/${documentId}/download`
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Download failed: ${response.statusText}`)
+  }
+
+  const contentDisposition = response.headers.get('Content-Disposition')
+  let filename = `pod_document_${documentId}`
+  if (contentDisposition) {
+    const match = contentDisposition.match(/filename="?([^"]+)"?/)
+    if (match) {
+      filename = match[1]
+    }
+  }
+
+  const blob = await response.blob()
+  const blobUrl = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = blobUrl
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(blobUrl)
 }
 
 // --- PDF Parse API functions ---

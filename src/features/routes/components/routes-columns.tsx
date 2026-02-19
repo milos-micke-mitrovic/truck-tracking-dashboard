@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check, FileText } from 'lucide-react'
 import type { RouteShortResponse } from '../types'
 import { RouteStatusBadge } from './route-status-badge'
 import {
@@ -15,6 +15,7 @@ type ColumnsConfig = {
   t: (key: string) => string
   copiedId: string | null
   onCopy: (id: string, text: string) => void
+  onViewPod: (routeId: string) => void
 }
 
 const formatDate = (dateStr: string | null | undefined) => {
@@ -37,6 +38,7 @@ export function getRoutesColumns({
   t,
   copiedId,
   onCopy,
+  onViewPod,
 }: ColumnsConfig): ColumnDef<RouteShortResponse>[] {
   return [
     {
@@ -186,6 +188,31 @@ export function getRoutesColumns({
           date={row.original.bookedAt}
         />
       ),
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => (
+        <div className="flex justify-end">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onViewPod(row.original.id)
+                }}
+                className="cursor-pointer rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <FileText className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{t('pod.viewButton')}</TooltipContent>
+          </Tooltip>
+        </div>
+      ),
+      size: 50,
+      enableSorting: false,
     },
   ]
 }

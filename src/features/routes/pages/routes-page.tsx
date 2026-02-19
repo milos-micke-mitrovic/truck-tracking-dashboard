@@ -6,6 +6,7 @@ import { useRoutes } from '../api'
 import type { RouteFilters, RouteStatus } from '../types'
 import { ROUTE_STATUS_VALUES } from '../constants'
 import { RouteSheet } from '../components/route-sheet'
+import { PodViewerSheet } from '../components/pod-viewer-sheet'
 import { getRoutesColumns } from '../components/routes-columns'
 import {
   Button,
@@ -47,6 +48,8 @@ export function RoutesPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [routeSheetOpen, setRouteSheetOpen] = useState(false)
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
+  const [podSheetOpen, setPodSheetOpen] = useState(false)
+  const [podRouteId, setPodRouteId] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<RouteFilters>({
     status: 'all',
@@ -99,6 +102,18 @@ export function RoutesPage() {
     setRouteSheetOpen(open)
     if (!open) {
       setSelectedRouteId(null)
+    }
+  }
+
+  const handleViewPod = (routeId: string) => {
+    setPodRouteId(routeId)
+    setPodSheetOpen(true)
+  }
+
+  const handlePodSheetOpenChange = (open: boolean) => {
+    setPodSheetOpen(open)
+    if (!open) {
+      setPodRouteId(null)
     }
   }
 
@@ -156,7 +171,7 @@ export function RoutesPage() {
   )
 
   const columns = useMemo(
-    () => getRoutesColumns({ t, copiedId, onCopy: handleCopy }),
+    () => getRoutesColumns({ t, copiedId, onCopy: handleCopy, onViewPod: handleViewPod }),
     [t, copiedId]
   )
 
@@ -293,6 +308,12 @@ export function RoutesPage() {
         open={routeSheetOpen}
         onOpenChange={handleSheetOpenChange}
         routeId={selectedRouteId}
+      />
+
+      <PodViewerSheet
+        open={podSheetOpen}
+        onOpenChange={handlePodSheetOpenChange}
+        routeId={podRouteId}
       />
     </div>
   )
