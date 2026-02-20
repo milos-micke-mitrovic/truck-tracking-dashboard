@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
@@ -23,10 +23,26 @@ export function CarrierTab({ form }: CarrierTabProps) {
   const { t } = useTranslation('routes')
   const { user } = useAuth()
 
+  const selectedCompanyId = form.watch('companyId')
+  const companyIdNum = selectedCompanyId ? Number(selectedCompanyId) : undefined
+  const noCompany = !selectedCompanyId
+
+  const prevCompanyIdRef = useRef(selectedCompanyId)
+  useEffect(() => {
+    const prev = prevCompanyIdRef.current
+    prevCompanyIdRef.current = selectedCompanyId
+    if (prev && prev !== selectedCompanyId) {
+      form.setValue('dispatcherId', '')
+      form.setValue('vehicleId', '')
+      form.setValue('driverId', '')
+      form.setValue('coDriverId', '')
+    }
+  }, [selectedCompanyId, form])
+
   const { data: companiesData } = useCompanies({ size: 100, tenantId: user?.tenantId })
-  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER', tenantId: user?.tenantId })
-  const { data: vehiclesData } = useVehicles({ size: 100, tenantId: user?.tenantId })
-  const { data: driversData } = useDrivers({ size: 100, tenantId: user?.tenantId })
+  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER', tenantId: user?.tenantId, companyId: companyIdNum })
+  const { data: vehiclesData } = useVehicles({ size: 100, tenantId: user?.tenantId, companyId: companyIdNum })
+  const { data: driversData } = useDrivers({ size: 100, tenantId: user?.tenantId, companyId: companyIdNum })
 
   const companyOptions = useMemo(
     () =>
@@ -55,6 +71,8 @@ export function CarrierTab({ form }: CarrierTabProps) {
     [vehiclesData]
   )
 
+  const selectedDriverId = form.watch('driverId')
+
   const driverOptions = useMemo(
     () =>
       (driversData?.content || []).map((d) => ({
@@ -62,6 +80,11 @@ export function CarrierTab({ form }: CarrierTabProps) {
         label: d.name,
       })),
     [driversData]
+  )
+
+  const coDriverOptions = useMemo(
+    () => driverOptions.filter((d) => d.value !== selectedDriverId),
+    [driverOptions, selectedDriverId]
   )
 
   return (
@@ -94,6 +117,7 @@ export function CarrierTab({ form }: CarrierTabProps) {
                 <FormLabel>{t('sheet.carrier.dispatcher')}</FormLabel>
                 <Select
                   searchable
+                  disabled={noCompany}
                   options={dispatcherOptions}
                   value={field.value}
                   onChange={field.onChange}
@@ -111,6 +135,7 @@ export function CarrierTab({ form }: CarrierTabProps) {
                 <FormLabel>{t('sheet.carrier.vehicle')}</FormLabel>
                 <Select
                   searchable
+                  disabled={noCompany}
                   options={vehicleOptions}
                   value={field.value}
                   onChange={field.onChange}
@@ -128,6 +153,7 @@ export function CarrierTab({ form }: CarrierTabProps) {
                 <FormLabel>{t('sheet.carrier.driver')}</FormLabel>
                 <Select
                   searchable
+                  disabled={noCompany}
                   options={driverOptions}
                   value={field.value}
                   onChange={field.onChange}
@@ -145,7 +171,8 @@ export function CarrierTab({ form }: CarrierTabProps) {
                 <FormLabel>{t('sheet.carrier.coDriver')}</FormLabel>
                 <Select
                   searchable
-                  options={driverOptions}
+                  disabled={noCompany || !selectedDriverId}
+                  options={coDriverOptions}
                   value={field.value}
                   onChange={field.onChange}
                   placeholder={t('sheet.carrier.selectCoDriver')}
