@@ -23,6 +23,7 @@ import {
   getUserInitials,
   isSuperAdmin,
 } from '@/features/auth'
+import { usePodNotifications } from '@/features/routes/context/pod-notification-context'
 
 export function AppSidebar() {
   const { t } = useTranslation('navigation')
@@ -30,6 +31,7 @@ export function AppSidebar() {
   const { user, logout } = useAuth()
   const logoutMutation = useLogout()
   const navigate = useNavigate()
+  const { totalUnread } = usePodNotifications()
   const isCollapsed = state === 'collapsed'
 
   const handleLogout = async () => {
@@ -95,6 +97,11 @@ export function AppSidebar() {
                     >
                       <Route className="size-4" />
                       <BodySmall as="span">{t('sidebar.dispatch')}</BodySmall>
+                      {totalUnread > 0 && (
+                        <span className="ml-auto flex size-5 shrink-0 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
+                          {totalUnread > 99 ? '99+' : totalUnread}
+                        </span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

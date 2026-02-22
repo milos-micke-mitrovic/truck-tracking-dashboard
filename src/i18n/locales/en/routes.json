@@ -149,7 +149,8 @@
     "stop": "Stop",
     "driver": "Driver",
     "notes": "Notes",
-    "downloadError": "Failed to download document"
+    "downloadError": "Failed to download document",
+    "newPod": "New POD received"
   },
   "deleteConfirm": {
     "title": "Delete Dispatch",

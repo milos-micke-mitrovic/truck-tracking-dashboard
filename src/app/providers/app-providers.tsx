@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'sonner'
 import { AuthProvider } from '@/features/auth'
+import { PodNotificationProvider } from '@/features/routes/context/pod-notification-context'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,8 +22,10 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {children}
-        <Toaster position="top-right" richColors closeButton />
+        <PodNotificationProvider>
+          {children}
+          <Toaster position="top-right" richColors closeButton />
+        </PodNotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
   )
