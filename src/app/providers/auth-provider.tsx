@@ -99,10 +99,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // Attempt proactive token refresh with retry logic and exponential backoff
-  const attemptProactiveRefresh = useCallback(async (token: string, retries = 3): Promise<boolean> => {
+  const attemptProactiveRefresh = useCallback(async (refreshToken: string, retries = 3): Promise<boolean> => {
     for (let i = 0; i < retries; i++) {
       try {
-        await refreshAccessToken(token)
+        const response = await refreshAccessToken(refreshToken)
+        updateTokens(response.accessToken, response.refreshToken)
         console.log('[Auth] Proactive token refresh succeeded')
         return true
       } catch (error) {
@@ -117,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     return false
-  }, [])
+  }, [updateTokens])
 
   // Schedule a proactive refresh based on the token's exp claim
   const scheduleRefresh = useCallback((token: string, currentRefreshToken: string) => {

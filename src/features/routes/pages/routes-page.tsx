@@ -21,6 +21,7 @@ import {
 import { useFilterVisibility } from '@/shared/hooks'
 import { useCompanies, useDrivers, useVehicles, useUsers } from '@/features/admin/api'
 import { useBrokers } from '@/features/brokers'
+import { usePodNotifications } from '../context/pod-notification-context'
 
 // All available filters
 const ROUTE_FILTERS: FilterConfig[] = [
@@ -45,6 +46,7 @@ export function RoutesPage() {
       defaultVisible: DEFAULT_VISIBLE,
     })
 
+  const { notifications: podNotifications, clearRouteNotifications } = usePodNotifications()
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [routeSheetOpen, setRouteSheetOpen] = useState(false)
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null)
@@ -110,6 +112,12 @@ export function RoutesPage() {
     setPodSheetOpen(true)
   }
 
+  const handleNotificationClick = (routeId: string) => {
+    clearRouteNotifications(String(routeId))
+    setPodRouteId(routeId)
+    setPodSheetOpen(true)
+  }
+
   const handlePodSheetOpenChange = (open: boolean) => {
     setPodSheetOpen(open)
     if (!open) {
@@ -171,8 +179,15 @@ export function RoutesPage() {
   )
 
   const columns = useMemo(
-    () => getRoutesColumns({ t, copiedId, onCopy: handleCopy, onViewPod: handleViewPod }),
-    [t, copiedId]
+    () => getRoutesColumns({
+      t,
+      copiedId,
+      onCopy: handleCopy,
+      onViewPod: handleViewPod,
+      podNotifications,
+      onNotificationClick: handleNotificationClick,
+    }),
+    [t, copiedId, podNotifications]
   )
 
   return (
