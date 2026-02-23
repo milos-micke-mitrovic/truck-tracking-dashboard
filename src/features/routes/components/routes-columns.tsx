@@ -194,6 +194,20 @@ export function getRoutesColumns({
       ),
     },
     {
+      accessorKey: 'completedAt',
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title={t('columns.completedAt')}
+        />
+      ),
+      cell: ({ row }) => (
+        <BodySmall as="span" className="text-muted-foreground">
+          {formatDate(row.original.completedAt)}
+        </BodySmall>
+      ),
+    },
+    {
       id: 'podNotification',
       header: '',
       cell: ({ row }) => {

@@ -223,6 +223,7 @@ export type RouteShortResponse = {
   dispatcherName: string | null
   status: RouteStatus
   bookedAt: string | null
+  completedAt: string | null
   createdAt: string
 }
 

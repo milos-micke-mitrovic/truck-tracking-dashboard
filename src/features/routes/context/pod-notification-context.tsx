@@ -8,9 +8,11 @@ import {
   type ReactNode,
 } from 'react'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth'
 import { isSuperAdmin } from '@/features/auth'
 import { createDispatcherSse, type PodSubmittedHandler } from '@/shared/services/dispatcher-sse'
+import { routeKeys } from '../api'
 
 type PodNotificationContextType = {
   notifications: Map<string, number>
@@ -22,6 +24,7 @@ const PodNotificationContext = createContext<PodNotificationContextType | null>(
 
 export function PodNotificationProvider({ children }: { children: ReactNode }) {
   const { user, isAuthenticated } = useAuth()
+  const queryClient = useQueryClient()
   const [notifications, setNotifications] = useState<Map<string, number>>(new Map())
   const disconnectRef = useRef<(() => void) | null>(null)
 
@@ -54,6 +57,7 @@ export function PodNotificationProvider({ children }: { children: ReactNode }) {
       const routeId = String(payload.data.routeId)
       addNotification(routeId)
       toast.info(payload.body, { duration: 5000 })
+      queryClient.invalidateQueries({ queryKey: routeKeys.all })
     }
 
     disconnectRef.current = createDispatcherSse(
