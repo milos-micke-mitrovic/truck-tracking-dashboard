@@ -12,8 +12,9 @@ import {
   Badge,
   BodySmall,
   Caption,
+  Textarea,
 } from '@/shared/ui'
-import { useRoutePods, downloadPodDocument } from '../api'
+import { useRoutePods, downloadPodDocument, useApprovePod, useRejectPod } from '../api'
 import type { PodSubmissionResponse, PodDocumentResponse } from '../types'
 
 type PodViewerSheetProps = {
@@ -60,6 +61,11 @@ export function PodViewerSheet({ open, onOpenChange, routeId }: PodViewerSheetPr
   const { t } = useTranslation('routes')
   const { data: pods, isLoading } = useRoutePods(open ? routeId : null)
   const [downloadingId, setDownloadingId] = useState<number | null>(null)
+  const [rejectingPodId, setRejectingPodId] = useState<number | null>(null)
+  const [rejectReason, setRejectReason] = useState('')
+
+  const approveMutation = useApprovePod(routeId ?? '')
+  const rejectMutation = useRejectPod(routeId ?? '')
 
   const handleDownload = async (doc: PodDocumentResponse) => {
     setDownloadingId(doc.id)
@@ -70,6 +76,32 @@ export function PodViewerSheet({ open, onOpenChange, routeId }: PodViewerSheetPr
     } finally {
       setDownloadingId(null)
     }
+  }
+
+  const handleApprove = async (podId: number) => {
+    try {
+      await approveMutation.mutateAsync(podId)
+      toast.success(t('pod.approveSuccess'))
+    } catch {
+      toast.error(t('pod.approveError'))
+    }
+  }
+
+  const handleReject = async (podId: number) => {
+    if (!rejectReason.trim()) return
+    try {
+      await rejectMutation.mutateAsync({ podId, reason: rejectReason.trim() })
+      toast.success(t('pod.rejectSuccess'))
+      setRejectingPodId(null)
+      setRejectReason('')
+    } catch {
+      toast.error(t('pod.rejectError'))
+    }
+  }
+
+  const cancelReject = () => {
+    setRejectingPodId(null)
+    setRejectReason('')
   }
 
   return (
@@ -153,6 +185,62 @@ export function PodViewerSheet({ open, onOpenChange, routeId }: PodViewerSheetPr
                       )
                     })}
                   </div>
+
+                  {pod.status === 'SUBMITTED' && rejectingPodId !== pod.id && (
+                    <div className="flex justify-end gap-2 border-t px-4 py-3">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          setRejectingPodId(pod.id)
+                          setRejectReason('')
+                        }}
+                      >
+                        {t('pod.reject')}
+                      </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        loading={approveMutation.isPending && approveMutation.variables === pod.id}
+                        onClick={() => handleApprove(pod.id)}
+                      >
+                        {t('pod.approve')}
+                      </Button>
+                    </div>
+                  )}
+
+                  {rejectingPodId === pod.id && (
+                    <div className="border-t px-4 py-3 space-y-2">
+                      <Textarea
+                        placeholder={t('pod.rejectReasonPlaceholder')}
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        rows={3}
+                      />
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline" onClick={cancelReject}>
+                          {t('cancel')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          loading={rejectMutation.isPending}
+                          disabled={!rejectReason.trim()}
+                          onClick={() => handleReject(pod.id)}
+                        >
+                          {t('pod.confirmReject')}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {pod.status !== 'SUBMITTED' && pod.reviewedAt && (
+                    <div className="border-t px-4 py-2">
+                      <Caption className="text-muted-foreground">
+                        {t('pod.reviewedAt')}: {formatDate(pod.reviewedAt)}
+                      </Caption>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

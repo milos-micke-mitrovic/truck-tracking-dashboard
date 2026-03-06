@@ -107,11 +107,6 @@ export function RoutesPage() {
     }
   }
 
-  const handleViewPod = (routeId: string) => {
-    setPodRouteId(routeId)
-    setPodSheetOpen(true)
-  }
-
   const handleNotificationClick = (routeId: string) => {
     clearRouteNotifications(String(routeId))
     setPodRouteId(routeId)
@@ -183,7 +178,6 @@ export function RoutesPage() {
       t,
       copiedId,
       onCopy: handleCopy,
-      onViewPod: handleViewPod,
       podNotifications,
       onNotificationClick: handleNotificationClick,
     }),

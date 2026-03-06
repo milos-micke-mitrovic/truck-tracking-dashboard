@@ -151,7 +151,16 @@
     "driver": "Driver",
     "notes": "Notes",
     "downloadError": "Failed to download document",
-    "newPod": "New POD received"
+    "newPod": "New POD received",
+    "approve": "Approve",
+    "reject": "Reject",
+    "confirmReject": "Confirm Reject",
+    "rejectReasonPlaceholder": "Enter rejection reason...",
+    "approveSuccess": "POD approved successfully",
+    "approveError": "Failed to approve POD",
+    "rejectSuccess": "POD rejected successfully",
+    "rejectError": "Failed to reject POD",
+    "reviewedAt": "Reviewed at"
   },
   "deleteConfirm": {
     "title": "Delete Dispatch",

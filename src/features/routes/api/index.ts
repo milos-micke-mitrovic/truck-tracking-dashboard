@@ -239,6 +239,14 @@ async function fetchRoutePods(
   return httpClient.get(`/routes/${routeId}/pods`)
 }
 
+async function approvePod(podId: number): Promise<PodSubmissionResponse> {
+  return httpClient.patch(`/pod/${podId}/approve`, {})
+}
+
+async function rejectPod(podId: number, reason: string): Promise<PodSubmissionResponse> {
+  return httpClient.patch(`/pod/${podId}/reject`, { reason })
+}
+
 // --- POD hooks ---
 
 export function useRoutePods(routeId: string | null) {
@@ -246,6 +254,31 @@ export function useRoutePods(routeId: string | null) {
     queryKey: routeKeys.pods(routeId!),
     queryFn: () => fetchRoutePods(routeId!),
     enabled: !!routeId,
+  })
+}
+
+export function useApprovePod(routeId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (podId: number) => approvePod(podId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: routeKeys.pods(routeId) })
+      queryClient.invalidateQueries({ queryKey: routeKeys.detail(routeId) })
+      queryClient.invalidateQueries({ queryKey: routeKeys.lists() })
+    },
+  })
+}
+
+export function useRejectPod(routeId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ podId, reason }: { podId: number; reason: string }) =>
+      rejectPod(podId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: routeKeys.pods(routeId) })
+      queryClient.invalidateQueries({ queryKey: routeKeys.detail(routeId) })
+      queryClient.invalidateQueries({ queryKey: routeKeys.lists() })
+    },
   })
 }
 

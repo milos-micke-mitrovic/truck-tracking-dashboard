@@ -427,6 +427,7 @@ export type PodSubmissionResponse = {
   submittedAt: string
   documents: PodDocumentResponse[]
   createdAt: string
+  reviewedAt?: string
 }
 
 // --- PDF Parse Response ---

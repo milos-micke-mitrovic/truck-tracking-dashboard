@@ -1,5 +1,5 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Copy, Check, FileText, Bell } from 'lucide-react'
+import { Copy, Check, FileText } from 'lucide-react'
 import type { RouteShortResponse } from '../types'
 import { RouteStatusBadge } from './route-status-badge'
 import {
@@ -15,7 +15,6 @@ type ColumnsConfig = {
   t: (key: string) => string
   copiedId: string | null
   onCopy: (id: string, text: string) => void
-  onViewPod: (routeId: string) => void
   podNotifications: Map<string, number>
   onNotificationClick: (routeId: string) => void
 }
@@ -40,7 +39,6 @@ export function getRoutesColumns({
   t,
   copiedId,
   onCopy,
-  onViewPod,
   podNotifications,
   onNotificationClick,
 }: ColumnsConfig): ColumnDef<RouteShortResponse>[] {
@@ -208,7 +206,7 @@ export function getRoutesColumns({
       ),
     },
     {
-      id: 'podNotification',
+      id: 'actions',
       header: '',
       cell: ({ row }) => {
         const count = podNotifications.get(String(row.original.id)) || 0
@@ -224,7 +222,7 @@ export function getRoutesColumns({
                   }}
                   className="relative cursor-pointer rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
-                  <Bell className="h-4 w-4" />
+                  <FileText className="h-4 w-4" />
                   {count > 0 && (
                     <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[9px] font-medium text-destructive-foreground">
                       {count > 9 ? '9+' : count}
@@ -239,31 +237,6 @@ export function getRoutesColumns({
           </div>
         )
       },
-      size: 50,
-      enableSorting: false,
-    },
-    {
-      id: 'actions',
-      header: '',
-      cell: ({ row }) => (
-        <div className="flex justify-end">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onViewPod(row.original.id)
-                }}
-                className="cursor-pointer rounded p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              >
-                <FileText className="h-4 w-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>{t('pod.viewButton')}</TooltipContent>
-          </Tooltip>
-        </div>
-      ),
       size: 50,
       enableSorting: false,
     },
