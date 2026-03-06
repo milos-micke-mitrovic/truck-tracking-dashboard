@@ -15,7 +15,6 @@ type ColumnsConfig = {
   t: (key: string) => string
   copiedId: string | null
   onCopy: (id: string, text: string) => void
-  onViewPod: (routeId: string) => void
   podNotifications: Map<string, number>
   onNotificationClick: (routeId: string) => void
 }
@@ -40,7 +39,6 @@ export function getRoutesColumns({
   t,
   copiedId,
   onCopy,
-  onViewPod,
   podNotifications,
   onNotificationClick,
 }: ColumnsConfig): ColumnDef<RouteShortResponse>[] {
