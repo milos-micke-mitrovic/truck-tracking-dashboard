@@ -349,6 +349,7 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
         const mappedStops = data.stops.map((stop) => ({
           type: (stop.type || 'PICKUP') as StopType,
           facilityId: '', // Must be selected manually from facilities dropdown
+          facilityName: '',
           facilityType: '' as FacilityType | '',
           facilityAddress: '',
           arrivalSlotType: '' as ArrivalSlotType | '',
