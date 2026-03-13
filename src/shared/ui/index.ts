@@ -23,7 +23,7 @@ export {
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
 
 // Select
-export { Select, MultiSelect, type SelectOption, type MultiSelectOption } from './select'
+export { Select, MultiSelect, AutocompleteInput, type SelectOption, type MultiSelectOption, type AutocompleteInputProps, type AutocompleteOption } from './select'
 
 // Date & Time
 export { Calendar, DatePicker, TimePicker } from './date-time'

@@ -22,12 +22,17 @@ export type Broker = {
 
 export type BrokerShort = {
   id: string
+  name: string | null
   mcNumber: string
-  legalName: string | null
-  dbaName: string | null
 }
 
 export type BrokerCreateRequest = {
   tenantId: number
+  mcNumber: string
+}
+
+export type BrokerSearchResult = {
+  id: number
+  name: string
   mcNumber: string
 }

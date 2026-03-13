@@ -3,6 +3,7 @@ export type {
   BrokerShort,
   BrokerSyncStatus,
   BrokerCreateRequest,
+  BrokerSearchResult,
 } from './types'
 
 export {
@@ -13,4 +14,5 @@ export {
   useDeleteBroker,
   useSyncBroker,
   useSyncAllBrokers,
+  useBrokerSearch,
 } from './api'

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { httpClient } from '@/shared/api/http-client'
-import type { Broker, BrokerCreateRequest } from '../types'
+import type { Broker, BrokerCreateRequest, BrokerSearchResult } from '../types'
 
 // Query keys
 export const brokerKeys = {
@@ -8,6 +8,7 @@ export const brokerKeys = {
   lists: () => [...brokerKeys.all, 'list'] as const,
   details: () => [...brokerKeys.all, 'detail'] as const,
   detail: (id: string) => [...brokerKeys.details(), id] as const,
+  search: (q: string) => [...brokerKeys.all, 'search', q] as const,
 }
 
 // API functions
@@ -33,6 +34,10 @@ async function syncBroker(id: string): Promise<Broker> {
 
 async function syncAllBrokers(): Promise<void> {
   return httpClient.post('/v1/brokers/sync-all')
+}
+
+async function searchBrokers(query: string, limit = 10): Promise<BrokerSearchResult[]> {
+  return httpClient.get(`/brokers/search?q=${encodeURIComponent(query)}&limit=${limit}`)
 }
 
 // Hooks
@@ -88,5 +93,13 @@ export function useSyncAllBrokers() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: brokerKeys.all })
     },
+  })
+}
+
+export function useBrokerSearch(query: string) {
+  return useQuery({
+    queryKey: brokerKeys.search(query),
+    queryFn: () => searchBrokers(query),
+    enabled: query.length >= 2,
   })
 }
