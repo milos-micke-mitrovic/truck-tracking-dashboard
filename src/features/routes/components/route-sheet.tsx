@@ -59,6 +59,7 @@ const getDefaultValues = (): RouteFormValues => ({
   coDriverId: '',
   autoDispatch: false,
   brokerId: '',
+  brokerName: '',
   brokerMcNumber: '',
   brokerRepresentative: '',
   brokerIdentifier: '',
@@ -69,6 +70,7 @@ const getDefaultValues = (): RouteFormValues => ({
     {
       type: 'PICKUP',
       facilityId: '',
+      facilityName: '',
       facilityType: '',
       facilityAddress: '',
       arrivalSlotType: '',
@@ -97,6 +99,7 @@ const getDefaultValues = (): RouteFormValues => ({
     unitCount: '',
     unitType: '',
   },
+  extractionId: undefined,
 })
 
 function isNumericString(value: string): boolean {
@@ -112,6 +115,7 @@ function mapRouteToFormValues(route: RouteResponse): RouteFormValues {
     coDriverId: route.coDriver?.id ? String(route.coDriver.id) : '',
     autoDispatch: route.autoDispatched,
     brokerId: route.broker?.id ? String(route.broker.id) : '',
+    brokerName: route.broker?.name || '',
     brokerMcNumber: '',
     brokerRepresentative: route.brokerRepresentative || '',
     brokerIdentifier: route.brokerIdentifier || '',
@@ -122,6 +126,7 @@ function mapRouteToFormValues(route: RouteResponse): RouteFormValues {
       route.stops?.map((stop) => ({
         type: stop.type,
         facilityId: stop.facility?.id ? String(stop.facility.id) : '',
+        facilityName: stop.facility?.name || '',
         facilityType: '',
         facilityAddress: '',
         arrivalSlotType: stop.arrivalSlotType || '',
@@ -256,6 +261,7 @@ function mapFormToCreateRequest(values: RouteFormValues): RouteCreateRequest {
     fuelCost: values.fuelCost ? parseFloat(values.fuelCost) : undefined,
     routeType: (values.routeType as RouteType) || undefined,
     loadDetails,
+    extractionId: values.extractionId || undefined,
   }
 }
 
@@ -343,6 +349,7 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
         const mappedStops = data.stops.map((stop) => ({
           type: (stop.type || 'PICKUP') as StopType,
           facilityId: '', // Must be selected manually from facilities dropdown
+          facilityName: '',
           facilityType: '' as FacilityType | '',
           facilityAddress: '',
           arrivalSlotType: '' as ArrivalSlotType | '',
@@ -358,6 +365,10 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
           unitType: (stop.unitType as UnitType) || '',
         }))
         form.setValue('stops', mappedStops)
+      }
+
+      if (response.extractionId) {
+        form.setValue('extractionId', response.extractionId)
       }
 
       toast.success(t('sheet.pdfParseSuccess'))

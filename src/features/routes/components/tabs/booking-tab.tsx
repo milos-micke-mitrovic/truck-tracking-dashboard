@@ -1,9 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import {
   Input,
-  Select,
+  AutocompleteInput,
   FormField,
   FormItem,
   FormLabel,
@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from '@/shared/ui'
 import { FormSection } from '@/shared/components'
-import { useBrokers } from '@/features/brokers'
+import { useBrokerSearch } from '@/features/brokers'
 import type { RouteFormValues } from '../../types'
 
 type BookingTabProps = {
@@ -21,15 +21,16 @@ type BookingTabProps = {
 export function BookingTab({ form }: BookingTabProps) {
   const { t } = useTranslation('routes')
 
-  const { data: brokersData } = useBrokers()
+  const [brokerSearchQuery, setBrokerSearchQuery] = useState('')
+  const { data: brokerResults } = useBrokerSearch(brokerSearchQuery)
 
   const brokerOptions = useMemo(
     () =>
-      (brokersData || []).map((b) => ({
+      (brokerResults || []).map((b) => ({
         value: String(b.id),
-        label: b.legalName || b.dbaName || b.mcNumber,
+        label: b.name + (b.mcNumber ? ` (${b.mcNumber})` : ''),
       })),
-    [brokersData]
+    [brokerResults]
   )
 
   return (
@@ -42,13 +43,15 @@ export function BookingTab({ form }: BookingTabProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t('sheet.booking.broker')}</FormLabel>
-                <Select
-                  searchable
-                  creatable
-                  options={brokerOptions}
-                  value={field.value}
+                <AutocompleteInput
+                  value={field.value ?? ''}
                   onChange={field.onChange}
+                  options={brokerOptions}
+                  onSearchChange={setBrokerSearchQuery}
+                  onLabelChange={(label) => form.setValue('brokerName', label)}
                   placeholder={t('sheet.booking.selectBroker')}
+                  creatable
+                  initialLabel={form.watch('brokerName')}
                 />
                 <FormMessage />
               </FormItem>

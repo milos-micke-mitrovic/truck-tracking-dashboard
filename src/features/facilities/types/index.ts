@@ -46,3 +46,11 @@ export type FacilityUpdateRequest = {
   phone?: string
   notes?: string
 }
+
+export type FacilitySearchResult = {
+  id: number
+  name: string
+  city: string | null
+  state: string | null
+  street: string | null
+}

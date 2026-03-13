@@ -4,6 +4,7 @@ import type {
   Facility,
   FacilityCreateRequest,
   FacilityUpdateRequest,
+  FacilitySearchResult,
 } from '../types'
 
 // Query keys
@@ -12,6 +13,7 @@ export const facilityKeys = {
   lists: () => [...facilityKeys.all, 'list'] as const,
   details: () => [...facilityKeys.all, 'detail'] as const,
   detail: (id: string) => [...facilityKeys.details(), id] as const,
+  search: (q: string) => [...facilityKeys.all, 'search', q] as const,
 }
 
 // API functions
@@ -36,6 +38,10 @@ async function updateFacility(
 
 async function deleteFacility(id: string): Promise<void> {
   return httpClient.delete(`/v1/facilities/${id}`)
+}
+
+async function searchFacilities(query: string, limit = 10): Promise<FacilitySearchResult[]> {
+  return httpClient.get(`/facilities/search?q=${encodeURIComponent(query)}&limit=${limit}`)
 }
 
 // Hooks
@@ -82,5 +88,13 @@ export function useDeleteFacility() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: facilityKeys.all })
     },
+  })
+}
+
+export function useFacilitySearch(query: string) {
+  return useQuery({
+    queryKey: facilityKeys.search(query),
+    queryFn: () => searchFacilities(query),
+    enabled: query.length >= 2,
   })
 }

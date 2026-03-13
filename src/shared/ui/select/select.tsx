@@ -39,6 +39,7 @@ type SelectProps = {
   options: Option[]
   value?: string
   onChange?: (value: string) => void
+  onSearchChange?: (value: string) => void
   disabled?: boolean
   searchable?: boolean
   clearable?: boolean
@@ -59,6 +60,7 @@ function Select({
   options,
   value,
   onChange,
+  onSearchChange,
   disabled,
   searchable = false,
   clearable = false,
@@ -157,7 +159,7 @@ function Select({
               placeholder={isCreating ? t('select.typeCustomValue') : resolvedSearchPlaceholder}
               className="h-9"
               value={searchValue}
-              onValueChange={setSearchValue}
+              onValueChange={(v) => { setSearchValue(v); onSearchChange?.(v) }}
               autoFocus={isCreating}
             />
           )}

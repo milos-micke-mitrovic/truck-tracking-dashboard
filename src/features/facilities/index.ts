@@ -4,6 +4,7 @@ export type {
   FacilityType,
   FacilityCreateRequest,
   FacilityUpdateRequest,
+  FacilitySearchResult,
 } from './types'
 
 export {
@@ -13,6 +14,7 @@ export {
   useCreateFacility,
   useUpdateFacility,
   useDeleteFacility,
+  useFacilitySearch,
 } from './api'
 
 export { FACILITY_TYPE_VALUES } from './constants'

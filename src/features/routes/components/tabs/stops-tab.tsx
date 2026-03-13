@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { useFieldArray } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -7,6 +7,7 @@ import {
   Button,
   Input,
   Select,
+  AutocompleteInput,
   MultiSelect,
   DatePicker,
   FormField,
@@ -17,7 +18,7 @@ import {
   Separator,
 } from '@/shared/ui'
 import { FormSection } from '@/shared/components'
-import { useFacilities, FACILITY_TYPE_VALUES } from '@/features/facilities'
+import { useFacilitySearch, FACILITY_TYPE_VALUES } from '@/features/facilities'
 import type { RouteFormValues, StopFormValues } from '../../types'
 import {
   STOP_TYPE_VALUES,
@@ -35,6 +36,7 @@ type StopsTabProps = {
 const getDefaultStop = (order: number): StopFormValues => ({
   type: order === 0 ? 'PICKUP' : 'DELIVERY',
   facilityId: '',
+  facilityName: '',
   facilityType: '',
   facilityAddress: '',
   arrivalSlotType: '',
@@ -50,8 +52,6 @@ const getDefaultStop = (order: number): StopFormValues => ({
 export function StopsTab({ form }: StopsTabProps) {
   const { t } = useTranslation('routes')
 
-  const { data: facilitiesData } = useFacilities()
-
   const {
     fields: stopFields,
     append: appendStop,
@@ -60,15 +60,6 @@ export function StopsTab({ form }: StopsTabProps) {
     control: form.control,
     name: 'stops',
   })
-
-  const facilityOptions = useMemo(
-    () =>
-      (facilitiesData || []).map((f) => ({
-        value: String(f.id),
-        label: `${f.name}${f.city ? ` - ${f.city}` : ''}${f.state ? `, ${f.state}` : ''}`,
-      })),
-    [facilitiesData]
-  )
 
   const stopTypeOptions = STOP_TYPE_VALUES.map((v) => ({
     value: v,
@@ -150,13 +141,14 @@ export function StopsTab({ form }: StopsTabProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('sheet.stops.facility')}</FormLabel>
-                  <Select
-                    searchable
-                    creatable
-                    options={facilityOptions}
-                    value={field.value}
+                  <FacilitySelectField
+                    value={field.value ?? ''}
                     onChange={field.onChange}
                     placeholder={t('sheet.stops.selectFacility')}
+                    initialLabel={form.watch(`stops.${stopIndex}.facilityName`)}
+                    onLabelChange={(label) =>
+                      form.setValue(`stops.${stopIndex}.facilityName`, label)
+                    }
                   />
                   <FormMessage />
                 </FormItem>
@@ -335,6 +327,47 @@ export function StopsTab({ form }: StopsTabProps) {
         {t('sheet.stops.addStop')}
       </Button>
     </div>
+  )
+}
+
+type FacilitySelectFieldProps = {
+  value: string
+  onChange: (value: string) => void
+  placeholder: string
+  initialLabel?: string
+  onLabelChange?: (label: string) => void
+}
+
+function FacilitySelectField({
+  value,
+  onChange,
+  placeholder,
+  initialLabel,
+  onLabelChange,
+}: FacilitySelectFieldProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const { data: facilityResults } = useFacilitySearch(searchQuery)
+
+  const facilityOptions = useMemo(
+    () =>
+      (facilityResults || []).map((f) => ({
+        value: String(f.id),
+        label: `${f.name}${f.city ? ` - ${f.city}` : ''}${f.state ? `, ${f.state}` : ''}`,
+      })),
+    [facilityResults]
+  )
+
+  return (
+    <AutocompleteInput
+      value={value}
+      onChange={onChange}
+      options={facilityOptions}
+      onSearchChange={setSearchQuery}
+      onLabelChange={onLabelChange}
+      placeholder={placeholder}
+      creatable
+      initialLabel={initialLabel}
+    />
   )
 }
 

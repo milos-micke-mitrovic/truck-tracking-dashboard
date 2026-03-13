@@ -299,6 +299,7 @@ export type RouteCreateRequest = {
   fuelCost?: number
   routeType?: RouteType
   loadDetails?: LoadDetailsRequest
+  extractionId?: number
 }
 
 export type RouteUpdateRequest = {
@@ -351,6 +352,7 @@ export type ReferenceNumberFormValue = {
 export type StopFormValues = {
   type: StopType
   facilityId: string
+  facilityName: string
   facilityType: FacilityType | ''
   facilityAddress: string
   arrivalSlotType: ArrivalSlotType | ''
@@ -384,6 +386,7 @@ export type RouteFormValues = {
   autoDispatch: boolean
   // Booking tab
   brokerId: string
+  brokerName: string
   brokerMcNumber: string
   brokerRepresentative: string
   brokerIdentifier: string
@@ -401,6 +404,8 @@ export type RouteFormValues = {
   routeType: RouteType | ''
   // Load tab
   loadDetails: LoadDetailsFormValues
+  // PDF extraction tracking
+  extractionId?: number
 }
 
 // --- POD types ---
