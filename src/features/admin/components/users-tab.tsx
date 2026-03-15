@@ -135,7 +135,7 @@ export function UsersTab() {
   ], [t])
 
   return (
-    <div>
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center justify-between gap-4 py-4">
         <div className="flex flex-wrap items-center gap-3">
           {isFilterVisible('name') && (
@@ -217,7 +217,7 @@ export function UsersTab() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd} aria-label={t('actions.addUser')}>
             <span className="hidden sm:inline">{t('actions.addUser')}</span>
           </Button>
         </div>

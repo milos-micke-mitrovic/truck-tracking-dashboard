@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   Button,
   Spinner,
   Input,
@@ -23,7 +22,8 @@ import {
   FormMessage,
   ConfirmDialog,
 } from '@/shared/ui'
-import { FormSection, DocumentsSection } from '@/shared/components'
+import { FormSection, DocumentsSection, UnsavedChangesDialog } from '@/shared/components'
+import { useUnsavedChanges } from '@/shared/hooks'
 import { getApiErrorMessage, emailValidationRules } from '@/shared/utils'
 import { useAuth, getVisibleRoles } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
@@ -82,6 +82,7 @@ export function UserSheet({
   const uploadMutation = useUploadTempFile()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   const form = useForm<UserFormValues>({
     defaultValues: getFormDefaults(),
@@ -167,7 +168,7 @@ export function UserSheet({
       )
       form.setValue(`documents.${index}.isNew`, true)
     } catch {
-      toast.error(t('driverDialog.uploadError') || 'Upload failed')
+      toast.error(t('common:errors.uploadFailed'))
     }
   }
 
@@ -261,8 +262,25 @@ export function UserSheet({
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
+  const { isDirty } = form.formState
+  useUnsavedChanges(isDirty)
+
+  const handleSheetOpenChange = (value: boolean) => {
+    if (!value && isDirty) {
+      setUnsavedDialogOpen(true)
+      return
+    }
+    onOpenChange(value)
+  }
+
+  const handleDiscardChanges = () => {
+    setUnsavedDialogOpen(false)
+    form.reset()
+    onOpenChange(false)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent size="xl" className="flex flex-col overflow-hidden p-0">
         {isEdit && isLoadingUser ? (
           <>
@@ -295,11 +313,14 @@ export function UserSheet({
                       {t('actions.delete')}
                     </Button>
                   )}
-                  <SheetClose asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      {t('dialogs.cancel')}
-                    </Button>
-                  </SheetClose>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSheetOpenChange(false)}
+                  >
+                    {t('dialogs.cancel')}
+                  </Button>
                   <Button type="submit" size="sm" loading={isLoading}>
                     {t('dialogs.save')}
                   </Button>
@@ -493,6 +514,12 @@ export function UserSheet({
           description={t('deleteConfirm.user.description')}
           onConfirm={handleDelete}
           loading={deleteMutation.isPending}
+        />
+
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onConfirm={handleDiscardChanges}
         />
       </SheetContent>
     </Sheet>

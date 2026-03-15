@@ -78,10 +78,12 @@ async function toggleUserStatus(id: number): Promise<User> {
 }
 
 // Hooks
-export function useUsers(params: UserFilters & PageParams = {}) {
+export function useUsers(params: UserFilters & PageParams & { enabled?: boolean } = {}) {
+  const { enabled, ...queryParams } = params
   return useQuery({
-    queryKey: adminKeys.usersList(params),
-    queryFn: () => fetchUsers(params),
+    queryKey: adminKeys.usersList(queryParams),
+    queryFn: () => fetchUsers(queryParams),
+    enabled: enabled !== false,
   })
 }
 

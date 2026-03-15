@@ -131,7 +131,7 @@ export function PodViewerSheet({ open, onOpenChange, routeId }: PodViewerSheetPr
                         {t('pod.stop')} #{index + 1}
                       </BodySmall>
                       <Badge variant={getStatusVariant(pod.status)}>
-                        {pod.status}
+                        {t(`pod.status.${pod.status}`)}
                       </Badge>
                     </div>
                     <Caption className="text-muted-foreground">

@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { Check, ChevronDown, X } from 'lucide-react'
 
 import { cn } from '@/shared/utils'
-import { IconButton } from '../button'
 import { Label } from '../label'
 import { Badge } from '../badge'
 import { Caption, BodySmall } from '../typography'
@@ -56,7 +55,7 @@ function MultiSelect({
   onChange,
   disabled,
   searchable = true,
-  clearable = false,
+  clearable = true,
   name,
   id,
   className,
@@ -64,6 +63,7 @@ function MultiSelect({
 }: MultiSelectProps) {
   const { t } = useTranslation('common')
   const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
   const selectId = id || name
 
   const resolvedPlaceholder = placeholder ?? t('select.placeholder')
@@ -91,7 +91,10 @@ function MultiSelect({
   }
 
   const selectElement = (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(isOpen) => {
+        setOpen(isOpen)
+        if (!isOpen) setSearch('')
+      }}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -118,15 +121,21 @@ function MultiSelect({
                 className="gap-1 pr-0.5"
               >
                 <BodySmall as="span" truncate>{option.label}</BodySmall>
-                <IconButton
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  icon={<X className="size-3" />}
+                <span
+                  role="button"
+                  tabIndex={0}
                   aria-label={t('select.remove', { label: option.label })}
                   onClick={(e) => handleRemove(option.value, e)}
-                  className="hover:bg-muted size-4"
-                />
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      handleRemove(option.value, e as unknown as React.MouseEvent)
+                    }
+                  }}
+                  className="hover:bg-muted flex size-4 items-center justify-center rounded-sm"
+                >
+                  <X className="size-3" />
+                </span>
               </Badge>
             ))}
             {selectedOptions.length > maxDisplay && (
@@ -137,15 +146,21 @@ function MultiSelect({
           </div>
           <div className="flex items-center gap-1">
             {showClearButton && (
-              <IconButton
-                type="button"
-                variant="ghost"
-                size="xs"
-                icon={<X />}
+              <span
+                role="button"
+                tabIndex={0}
                 aria-label={t('select.clearAll')}
                 onClick={handleClear}
-                className="text-muted-foreground hover:text-foreground"
-              />
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleClear(e as unknown as React.MouseEvent)
+                  }
+                }}
+                className="text-muted-foreground hover:text-foreground flex items-center justify-center rounded-sm"
+              >
+                <X className="size-4" />
+              </span>
             )}
             <ChevronDown className="size-4 shrink-0 opacity-50" />
           </div>
@@ -157,7 +172,12 @@ function MultiSelect({
       >
         <Command>
           {searchable && (
-            <CommandInput placeholder={resolvedSearchPlaceholder} className="h-9" />
+            <CommandInput
+              placeholder={resolvedSearchPlaceholder}
+              className="h-9"
+              value={search}
+              onValueChange={setSearch}
+            />
           )}
           <CommandList>
             <CommandEmpty>{resolvedEmptyText}</CommandEmpty>

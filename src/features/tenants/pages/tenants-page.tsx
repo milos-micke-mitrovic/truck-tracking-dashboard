@@ -12,11 +12,26 @@ import {
   Input,
   DataTable,
   DataTableColumnHeader,
+  FilterToggle,
+  type FilterConfig,
 } from '@/shared/ui'
 import { formatDate } from '@/shared/utils'
+import { useFilterVisibility, usePageTitle } from '@/shared/hooks'
+
+const TENANT_FILTERS: FilterConfig[] = [
+  { key: 'search', labelKey: 'filters.search' },
+]
+
+const DEFAULT_VISIBLE = ['search']
 
 export function TenantsPage() {
   const { t } = useTranslation('tenants')
+  usePageTitle(t('title'))
+  const { visibleFilters, toggleFilter, isFilterVisible } =
+    useFilterVisibility({
+      storageKey: 'tenants',
+      defaultVisible: DEFAULT_VISIBLE,
+    })
 
   const [search, setSearch] = useState('')
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -97,18 +112,26 @@ export function TenantsPage() {
   )
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex min-h-0 flex-1 flex-col gap-6">
       <H1>{t('title')}</H1>
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center gap-3 py-3">
-          <Input
-            placeholder={t('filters.search')}
-            value={search}
-            debounce={300}
-            onDebounceChange={setSearch}
-            clearable
-            className="w-[250px]"
+          {isFilterVisible('search') && (
+            <Input
+              placeholder={t('filters.search')}
+              value={search}
+              debounce={300}
+              onDebounceChange={setSearch}
+              clearable
+              className="w-[250px]"
+            />
+          )}
+          <FilterToggle
+            filters={TENANT_FILTERS}
+            visibleFilters={visibleFilters}
+            onToggleFilter={toggleFilter}
+            namespace="tenants"
           />
           <div className="flex-1" />
           <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>

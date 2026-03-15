@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   Button,
   Input,
   Select,
@@ -25,7 +24,8 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { FormSection, DocumentsSection } from '@/shared/components'
+import { FormSection, DocumentsSection, UnsavedChangesDialog } from '@/shared/components'
+import { useUnsavedChanges } from '@/shared/hooks'
 import { getApiErrorMessage, emailValidationRules } from '@/shared/utils'
 import { useAuth } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
@@ -101,6 +101,7 @@ export function DriverSheet({
   const uploadMutation = useUploadTempFile()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   const form = useForm<DriverFormValues>({
     defaultValues: getFormDefaults(),
@@ -270,6 +271,23 @@ export function DriverSheet({
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
+  const { isDirty } = form.formState
+  useUnsavedChanges(isDirty)
+
+  const handleSheetOpenChange = (value: boolean) => {
+    if (!value && isDirty) {
+      setUnsavedDialogOpen(true)
+      return
+    }
+    onOpenChange(value)
+  }
+
+  const handleDiscardChanges = () => {
+    setUnsavedDialogOpen(false)
+    form.reset()
+    onOpenChange(false)
+  }
+
   const countryOptions = COUNTRY_VALUES.map((value) => ({
     value,
     label: t(`driverDialog.countries.${value}`),
@@ -278,7 +296,7 @@ export function DriverSheet({
   const stateOptions = getStateOptionsByCountry(country)
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent size="lg" className="flex flex-col overflow-hidden p-0">
         {isEdit && isLoadingDriver ? (
           <>
@@ -311,11 +329,14 @@ export function DriverSheet({
                       {t('actions.delete')}
                     </Button>
                   )}
-                  <SheetClose asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      {t('dialogs.cancel')}
-                    </Button>
-                  </SheetClose>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSheetOpenChange(false)}
+                  >
+                    {t('dialogs.cancel')}
+                  </Button>
                   <Button type="submit" size="sm" loading={isLoading}>
                     {t('dialogs.save')}
                   </Button>
@@ -615,6 +636,12 @@ export function DriverSheet({
           description={t('deleteConfirm.driver.description')}
           onConfirm={handleDelete}
           loading={deleteMutation.isPending}
+        />
+
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onConfirm={handleDiscardChanges}
         />
       </SheetContent>
     </Sheet>

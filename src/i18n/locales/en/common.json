@@ -46,17 +46,37 @@
     "showingEmpty": "No results",
     "showingSingle": "Showing 1 of 1",
     "items": "items",
-    "item": "item"
+    "item": "item",
+    "goToFirstPage": "Go to first page",
+    "goToPreviousPage": "Go to previous page",
+    "goToNextPage": "Go to next page",
+    "goToLastPage": "Go to last page"
   },
   "table": {
     "noData": "No data available",
-    "loading": "Loading data..."
+    "loading": "Loading data...",
+    "noResults": "No results."
+  },
+  "companyDocuments": {
+    "title": "Company Documents",
+    "titleWithCompany": "Company Documents — {{company}}",
+    "allCompanies": "All Companies",
+    "columns": {
+      "company": "Company",
+      "documentType": "Document Type",
+      "fileName": "File Name",
+      "expiryDate": "Expiry Date",
+      "uploadDate": "Upload Date",
+      "download": "Download"
+    },
+    "downloadError": "Failed to download {{fileName}}"
   },
   "errors": {
     "generic": "An error occurred. Please try again.",
     "network": "Network error. Please check your connection.",
     "notFound": "Resource not found.",
-    "unauthorized": "You are not authorized to perform this action."
+    "unauthorized": "You are not authorized to perform this action.",
+    "uploadFailed": "Upload failed"
   },
   "success": {
     "saved": "Changes saved successfully",
@@ -149,5 +169,28 @@
     "title": "Sidebar",
     "description": "Displays the mobile sidebar.",
     "toggle": "Toggle Sidebar"
+  },
+  "notifications": {
+    "unreadCount": "{{count}} unread notifications"
+  },
+  "subscriptionPlans": {
+    "BASIC": "Basic",
+    "STANDARD": "Standard",
+    "PREMIUM": "Premium",
+    "ENTERPRISE": "Enterprise"
+  },
+  "unsavedChanges": {
+    "title": "Unsaved Changes",
+    "description": "You have unsaved changes. Are you sure you want to close?",
+    "confirm": "Discard",
+    "cancel": "Keep Editing"
+  },
+  "fuelTypes": {
+    "DIESEL": "Diesel",
+    "GASOLINE": "Gasoline",
+    "ELECTRIC": "Electric",
+    "HYBRID": "Hybrid",
+    "CNG": "CNG",
+    "LNG": "LNG"
   }
 }

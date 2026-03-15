@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Download } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '@/features/auth'
-import { Button, H1, Select, Spinner, DataTable, DataTableColumnHeader } from '@/shared/ui'
+import { Button, H1, Select, Spinner, DataTable, DataTableColumnHeader, Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui'
 import { downloadDocument } from '@/shared/api/documents'
+import { formatDate } from '@/shared/utils'
 import { useCompanies, useMyCompany, useCompanyDocuments } from '../api'
 import type { CompanyDocumentItem } from '../types'
+import { usePageTitle } from '@/shared/hooks'
 
 function formatDocumentType(type: string): string {
   return type
@@ -15,17 +18,13 @@ function formatDocumentType(type: string): string {
     .join(' ')
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString()
-}
-
 function isExpired(dateStr: string | null): boolean {
   if (!dateStr) return false
   return new Date(dateStr) < new Date()
 }
 
 export function CompanyDocumentsPage() {
+  const { t } = useTranslation('common')
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | undefined>(undefined)
@@ -39,15 +38,21 @@ export function CompanyDocumentsPage() {
     isAdmin ? selectedCompanyId : undefined
   )
 
+  const pageTitle = !isAdmin && myCompany?.fullName
+    ? t('companyDocuments.titleWithCompany', { company: myCompany.fullName })
+    : t('companyDocuments.title')
+
+  usePageTitle(pageTitle)
+
   const companyOptions = useMemo(
     () => [
-      { value: '', label: 'All Companies' },
+      { value: '', label: t('companyDocuments.allCompanies') },
       ...(companiesData?.content || []).map((c) => ({
         value: String(c.id),
         label: c.fullName,
       })),
     ],
-    [companiesData]
+    [companiesData, t]
   )
 
   const handleDownload = async (doc: CompanyDocumentItem) => {
@@ -55,7 +60,7 @@ export function CompanyDocumentsPage() {
     try {
       await downloadDocument('company', doc.id)
     } catch {
-      toast.error(`Failed to download "${doc.name}"`)
+      toast.error(t('companyDocuments.downloadError', { fileName: doc.name }))
     } finally {
       setDownloadingId(null)
     }
@@ -66,32 +71,42 @@ export function CompanyDocumentsPage() {
       {
         accessorKey: 'companyName',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Company" />
+          <DataTableColumnHeader column={column} title={t('companyDocuments.columns.company')} />
         ),
       },
       {
         accessorKey: 'type',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Document Type" />
+          <DataTableColumnHeader column={column} title={t('companyDocuments.columns.documentType')} />
         ),
         cell: ({ row }) => formatDocumentType(row.original.type),
       },
       {
         accessorKey: 'name',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="File Name" />
+          <DataTableColumnHeader column={column} title={t('companyDocuments.columns.fileName')} />
+        ),
+        cell: ({ row }) => (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="block max-w-[200px] truncate">
+                {row.original.name}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{row.original.name}</TooltipContent>
+          </Tooltip>
         ),
       },
       {
         accessorKey: 'expirationDate',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Expiry Date" />
+          <DataTableColumnHeader column={column} title={t('companyDocuments.columns.expiryDate')} />
         ),
         cell: ({ row }) => {
           const dateStr = row.original.expirationDate
           return (
             <span className={isExpired(dateStr) ? 'text-destructive font-medium' : ''}>
-              {formatDate(dateStr)}
+              {dateStr ? formatDate(dateStr) : '—'}
             </span>
           )
         },
@@ -99,13 +114,13 @@ export function CompanyDocumentsPage() {
       {
         accessorKey: 'createdAt',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Upload Date" />
+          <DataTableColumnHeader column={column} title={t('companyDocuments.columns.uploadDate')} />
         ),
-        cell: ({ row }) => formatDate(row.original.createdAt),
+        cell: ({ row }) => (row.original.createdAt ? formatDate(row.original.createdAt) : '—'),
       },
       {
         id: 'actions',
-        header: 'Download',
+        header: t('companyDocuments.columns.download'),
         cell: ({ row }) => (
           <Button
             variant="ghost"
@@ -121,17 +136,12 @@ export function CompanyDocumentsPage() {
         ),
       },
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [downloadingId]
+    [downloadingId, t]
   )
 
   return (
-    <div className="flex flex-col gap-6">
-      <H1>
-        {!isAdmin && myCompany?.fullName
-          ? `Company Documents — ${myCompany.fullName}`
-          : 'Company Documents'}
-      </H1>
+    <div className="flex min-h-0 flex-1 flex-col gap-6">
+      <H1>{pageTitle}</H1>
 
       {isAdmin && (
         <div className="flex items-center gap-3">
@@ -141,7 +151,7 @@ export function CompanyDocumentsPage() {
             onChange={(value) =>
               setSelectedCompanyId(value ? parseInt(value, 10) : undefined)
             }
-            placeholder="All Companies"
+            placeholder={t('companyDocuments.allCompanies')}
             className="w-[240px]"
           />
         </div>

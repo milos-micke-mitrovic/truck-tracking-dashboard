@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   Button,
   Spinner,
   Input,
@@ -24,7 +23,8 @@ import {
   FormMessage,
   ConfirmDialog,
 } from '@/shared/ui'
-import { FormSection, DocumentsSection } from '@/shared/components'
+import { FormSection, DocumentsSection, UnsavedChangesDialog } from '@/shared/components'
+import { useUnsavedChanges } from '@/shared/hooks'
 import { getApiErrorMessage } from '@/shared/utils'
 import { useAuth } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
@@ -113,6 +113,7 @@ export function VehicleSheet({
   const uploadMutation = useUploadTempFile()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   const form = useForm<VehicleFormValues>({
     defaultValues: getFormDefaults(),
@@ -192,7 +193,7 @@ export function VehicleSheet({
 
   const fuelTypeOptions = FUEL_TYPE_VALUES.map((value) => ({
     value,
-    label: value.charAt(0) + value.slice(1).toLowerCase(),
+    label: t(`common:fuelTypes.${value}`),
   }))
 
   const statusOptions = VEHICLE_STATUS_VALUES.map((value) => ({
@@ -217,7 +218,7 @@ export function VehicleSheet({
       )
       form.setValue(`documents.${index}.isNew`, true)
     } catch {
-      toast.error(t('driverDialog.uploadError') || 'Upload failed')
+      toast.error(t('common:errors.uploadFailed'))
     }
   }
 
@@ -313,8 +314,25 @@ export function VehicleSheet({
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
+  const { isDirty } = form.formState
+  useUnsavedChanges(isDirty)
+
+  const handleSheetOpenChange = (value: boolean) => {
+    if (!value && isDirty) {
+      setUnsavedDialogOpen(true)
+      return
+    }
+    onOpenChange(value)
+  }
+
+  const handleDiscardChanges = () => {
+    setUnsavedDialogOpen(false)
+    form.reset()
+    onOpenChange(false)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent size="xl" className="flex flex-col overflow-hidden p-0">
         {isEdit && isLoadingVehicle ? (
           <>
@@ -347,11 +365,14 @@ export function VehicleSheet({
                       {t('actions.delete')}
                     </Button>
                   )}
-                  <SheetClose asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      {t('dialogs.cancel')}
-                    </Button>
-                  </SheetClose>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSheetOpenChange(false)}
+                  >
+                    {t('dialogs.cancel')}
+                  </Button>
                   <Button type="submit" size="sm" loading={isLoading}>
                     {t('dialogs.save')}
                   </Button>
@@ -748,6 +769,12 @@ export function VehicleSheet({
           description={t('deleteConfirm.vehicle.description')}
           onConfirm={handleDelete}
           loading={deleteMutation.isPending}
+        />
+
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onConfirm={handleDiscardChanges}
         />
       </SheetContent>
     </Sheet>

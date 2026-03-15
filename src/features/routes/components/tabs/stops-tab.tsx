@@ -346,7 +346,7 @@ function FacilitySelectField({
   onLabelChange,
 }: FacilitySelectFieldProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const { data: facilityResults } = useFacilitySearch(searchQuery)
+  const { data: facilityResults, isFetching: facilityLoading } = useFacilitySearch(searchQuery)
 
   const facilityOptions = useMemo(
     () =>
@@ -367,6 +367,7 @@ function FacilitySelectField({
       placeholder={placeholder}
       creatable
       initialLabel={initialLabel}
+      loading={facilityLoading}
     />
   )
 }

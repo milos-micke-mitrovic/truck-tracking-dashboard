@@ -3,18 +3,20 @@ import { useForm } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Trash2, Upload } from 'lucide-react'
+import { Trash2, Upload, Loader2 } from 'lucide-react'
+import { cn } from '@/shared/utils'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   Button,
   Spinner,
   Form,
   ConfirmDialog,
 } from '@/shared/ui'
+import { UnsavedChangesDialog } from '@/shared/components'
+import { useUnsavedChanges } from '@/shared/hooks'
 import { getApiErrorMessage } from '@/shared/utils'
 import {
   useRoute,
@@ -283,6 +285,7 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
   const deleteMutation = useDeleteRoute()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   const parsePdfMutation = useParsePdf()
   const pdfInputRef = useRef<HTMLInputElement>(null)
@@ -382,7 +385,7 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
       if (isEdit && routeId) {
         const data = mapFormToUpdateRequest(values)
         await updateMutation.mutateAsync({ id: routeId, data })
-        toast.success(t('sheet.editTitle'))
+        toast.success(t('common:success.saved'))
       } else {
         const data = mapFormToCreateRequest(values)
         await createMutation.mutateAsync(data)
@@ -391,7 +394,7 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
         queryClient.invalidateQueries({ queryKey: brokerKeys.all })
         queryClient.invalidateQueries({ queryKey: facilityKeys.all })
 
-        toast.success(t('sheet.addTitle'))
+        toast.success(t('common:success.saved'))
       }
       onOpenChange(false)
     } catch (error) {
@@ -413,8 +416,25 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
+  const { isDirty } = form.formState
+  useUnsavedChanges(isDirty)
+
+  const handleSheetOpenChange = (value: boolean) => {
+    if (!value && isDirty) {
+      setUnsavedDialogOpen(true)
+      return
+    }
+    onOpenChange(value)
+  }
+
+  const handleDiscardChanges = () => {
+    setUnsavedDialogOpen(false)
+    form.reset()
+    onOpenChange(false)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent size="2xl" className="flex flex-col overflow-hidden p-0">
         {isEdit && isLoadingRoute ? (
           <>
@@ -447,11 +467,14 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
                       {t('common:actions.delete')}
                     </Button>
                   )}
-                  <SheetClose asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      {t('sheet.cancel')}
-                    </Button>
-                  </SheetClose>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSheetOpenChange(false)}
+                  >
+                    {t('sheet.cancel')}
+                  </Button>
                   <Button type="submit" size="sm" loading={isLoading}>
                     {t('sheet.save')}
                   </Button>
@@ -476,8 +499,15 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
                         {t('sheet.parsePdf.description')}
                       </p>
                     </div>
-                    <label className="flex h-9 cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
-                      <Upload className="h-4 w-4" />
+                    <label className={cn(
+                      'flex h-9 items-center gap-2 rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors',
+                      parsePdfMutation.isPending
+                        ? 'pointer-events-none opacity-50'
+                        : 'cursor-pointer hover:bg-accent hover:text-accent-foreground'
+                    )}>
+                      {parsePdfMutation.isPending
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Upload className="h-4 w-4" />}
                       {parsePdfMutation.isPending
                         ? t('sheet.parsePdf.parsing')
                         : t('sheet.parsePdf.upload')}
@@ -497,6 +527,11 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
                       />
                     </label>
                   </div>
+                  {parsePdfMutation.isPending && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t('sheet.parsePdf.processingHint')}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -516,6 +551,12 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
           description={t('deleteConfirm.description')}
           onConfirm={handleDelete}
           loading={deleteMutation.isPending}
+        />
+
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onConfirm={handleDiscardChanges}
         />
       </SheetContent>
     </Sheet>

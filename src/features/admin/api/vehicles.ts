@@ -74,10 +74,12 @@ async function deleteVehicle(id: number): Promise<void> {
 }
 
 // Hooks
-export function useVehicles(params: VehicleFilters & PageParams = {}) {
+export function useVehicles(params: VehicleFilters & PageParams & { enabled?: boolean } = {}) {
+  const { enabled, ...queryParams } = params
   return useQuery({
-    queryKey: adminKeys.vehiclesList(params),
-    queryFn: () => fetchVehicles(params),
+    queryKey: adminKeys.vehiclesList(queryParams),
+    queryFn: () => fetchVehicles(queryParams),
+    enabled: enabled !== false,
   })
 }
 

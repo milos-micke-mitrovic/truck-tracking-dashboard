@@ -138,7 +138,8 @@
       "title": "Import from PDF",
       "description": "Upload a rate confirmation or load confirmation PDF to auto-fill form fields",
       "upload": "Upload PDF",
-      "parsing": "Parsing..."
+      "parsing": "Parsing...",
+      "processingHint": "This may take a moment. Please wait while we extract the data from your PDF."
     },
     "pdfParseSuccess": "PDF parsed successfully and form fields updated",
     "pdfParseError": "Failed to parse PDF. Please try again or fill the form manually."
@@ -160,7 +161,13 @@
     "approveError": "Failed to approve POD",
     "rejectSuccess": "POD rejected successfully",
     "rejectError": "Failed to reject POD",
-    "reviewedAt": "Reviewed at"
+    "reviewedAt": "Reviewed at",
+    "status": {
+      "SUBMITTED": "Submitted",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "PENDING": "Pending"
+    }
   },
   "deleteConfirm": {
     "title": "Delete Dispatch",

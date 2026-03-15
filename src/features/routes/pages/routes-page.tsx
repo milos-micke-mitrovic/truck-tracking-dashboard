@@ -12,15 +12,16 @@ import {
   Button,
   Input,
   Select,
+  AutocompleteInput,
   DatePicker,
   DataTable,
   H1,
   FilterToggle,
   type FilterConfig,
 } from '@/shared/ui'
-import { useFilterVisibility } from '@/shared/hooks'
+import { useFilterVisibility, usePageTitle } from '@/shared/hooks'
 import { useCompanies, useDrivers, useVehicles, useUsers } from '@/features/admin/api'
-import { useBrokers } from '@/features/brokers'
+import { useBrokerSearch } from '@/features/brokers'
 import { usePodNotifications } from '../context/pod-notification-context'
 
 // All available filters
@@ -40,6 +41,7 @@ const DEFAULT_VISIBLE = ['identifier', 'status']
 
 export function RoutesPage() {
   const { t } = useTranslation('routes')
+  usePageTitle(t('title'))
   const { visibleFilters, toggleFilter, isFilterVisible } =
     useFilterVisibility({
       storageKey: 'routes',
@@ -67,12 +69,18 @@ export function RoutesPage() {
     ...pagination,
   })
 
-  // Fetch data for searchable selects
-  const { data: companiesData } = useCompanies({ size: 100 })
-  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER' })
-  const { data: driversData } = useDrivers({ size: 100 })
-  const { data: vehiclesData } = useVehicles({ size: 100 })
-  const { data: brokersData } = useBrokers()
+  // Fetch data for searchable selects — only when filter is visible
+  const companyFilterVisible = isFilterVisible('companyId')
+  const dispatcherFilterVisible = isFilterVisible('dispatcherId')
+  const driverFilterVisible = isFilterVisible('driverId')
+  const vehicleFilterVisible = isFilterVisible('vehicleId')
+
+  const { data: companiesData } = useCompanies({ size: 100, enabled: companyFilterVisible })
+  const { data: usersData } = useUsers({ size: 100, role: 'DISPATCHER', enabled: dispatcherFilterVisible })
+  const { data: driversData } = useDrivers({ size: 100, enabled: driverFilterVisible })
+  const { data: vehiclesData } = useVehicles({ size: 100, enabled: vehicleFilterVisible })
+  const [brokerSearchQuery, setBrokerSearchQuery] = useState('')
+  const { data: brokerResults, isFetching: brokerLoading } = useBrokerSearch(brokerSearchQuery)
 
   const updateFilter = <K extends keyof RouteFilters>(
     key: K,
@@ -166,11 +174,11 @@ export function RoutesPage() {
 
   const brokerOptions = useMemo(
     () =>
-      (brokersData || []).map((b) => ({
+      (brokerResults || []).map((b) => ({
         value: String(b.id),
-        label: b.legalName || b.dbaName || b.mcNumber,
+        label: b.name + (b.mcNumber ? ` (${b.mcNumber})` : ''),
       })),
-    [brokersData]
+    [brokerResults]
   )
 
   const columns = useMemo(
@@ -181,11 +189,11 @@ export function RoutesPage() {
       podNotifications,
       onNotificationClick: handleNotificationClick,
     }),
-    [t, copiedId, podNotifications]
+    [t, copiedId, podNotifications, handleNotificationClick, handleCopy]
   )
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex min-h-0 flex-1 flex-col gap-6">
       <H1>{t('title')}</H1>
 
       <div className="flex flex-col gap-4">
@@ -251,14 +259,16 @@ export function RoutesPage() {
             />
           )}
           {isFilterVisible('brokerId') && (
-            <Select
-              searchable
-              options={brokerOptions}
-              value={filters.brokerId || ''}
-              onChange={(value) => updateFilter('brokerId', value)}
-              placeholder={t('filters.brokerId')}
-              className="w-[160px]"
-            />
+            <div className="w-[200px]">
+              <AutocompleteInput
+                options={brokerOptions}
+                value={filters.brokerId || ''}
+                onChange={(value) => updateFilter('brokerId', value)}
+                onSearchChange={setBrokerSearchQuery}
+                placeholder={t('filters.brokerId')}
+                loading={brokerLoading}
+              />
+            </div>
           )}
           {isFilterVisible('bookedAtFrom') && (
             <DatePicker

@@ -33,6 +33,7 @@ import {
   Input,
   Label,
 } from '@/shared/ui'
+import { usePageTitle } from '@/shared/hooks'
 
 const DRIVER_APP_URL = 'https://truck-drive.vercel.app'
 
@@ -46,6 +47,7 @@ type LoginFormValues = z.infer<ReturnType<typeof createLoginSchema>>
 
 export function LoginPage() {
   const { t } = useTranslation('auth')
+  usePageTitle('Login')
   const navigate = useNavigate()
   const { login } = useAuth()
   const loginMutation = useLogin()
@@ -77,7 +79,7 @@ export function LoginPage() {
 
       const user = jwtPayloadToUser(payload)
       login(user, response.accessToken, response.refreshToken)
-      toast.success(`Welcome back, ${getUserDisplayName(user)}!`)
+      toast.success(t('login.welcomeBack', { name: getUserDisplayName(user) }))
       navigate('/routes')
     } catch (error) {
       // Check if it's a network error (server down)

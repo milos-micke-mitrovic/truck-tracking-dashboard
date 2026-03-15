@@ -41,10 +41,12 @@ async function deleteDriver(id: number): Promise<void> {
 }
 
 // Hooks
-export function useDrivers(params: DriverFilters & PageParams = {}) {
+export function useDrivers(params: DriverFilters & PageParams & { enabled?: boolean } = {}) {
+  const { enabled, ...queryParams } = params
   return useQuery({
-    queryKey: adminKeys.driversList(params),
-    queryFn: () => fetchDrivers(params),
+    queryKey: adminKeys.driversList(queryParams),
+    queryFn: () => fetchDrivers(queryParams),
+    enabled: enabled !== false,
   })
 }
 

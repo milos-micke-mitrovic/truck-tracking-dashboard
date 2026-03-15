@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
-import { useDrivers } from '../api'
+import { useDrivers, useCompanies } from '../api'
 import { useAdminTab } from '../hooks'
 import type { DriverListItem, DriverFilters, DriverStatus } from '../types'
 import { DRIVER_STATUS_VALUES } from '../constants'
@@ -49,6 +49,18 @@ export function DriversTab() {
   } = useAdminTab<DriverFilters, DriverListItem>({
     defaultFilters: {},
   })
+
+  const companyFilterVisible = isFilterVisible('companyId')
+  const { data: companiesData } = useCompanies({ size: 100, enabled: companyFilterVisible })
+
+  const companyOptions = useMemo(
+    () =>
+      (companiesData?.content || []).map((c) => ({
+        value: String(c.id),
+        label: c.fullName,
+      })),
+    [companiesData]
+  )
 
   const { data, isLoading, isFetching } = useDrivers({
     ...filters,
@@ -113,7 +125,7 @@ export function DriversTab() {
   )
 
   return (
-    <div>
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center justify-between gap-4 py-4">
         <div className="flex flex-wrap items-center gap-3">
           {isFilterVisible('name') && (
@@ -147,14 +159,14 @@ export function DriversTab() {
             />
           )}
           {isFilterVisible('companyId') && (
-            <Input
-              placeholder={t('filters.company')}
+            <Select
+              searchable
+              options={companyOptions}
               value={filters.companyId ? String(filters.companyId) : ''}
-              debounce={300}
-              onDebounceChange={(value) =>
+              onChange={(value) =>
                 updateFilter('companyId', value ? Number(value) : undefined)
               }
-              clearable
+              placeholder={t('filters.company')}
               className="w-[180px]"
             />
           )}
@@ -182,7 +194,7 @@ export function DriversTab() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd} aria-label={t('actions.addDriver')}>
             <span className="hidden sm:inline">{t('actions.addDriver')}</span>
           </Button>
         </div>

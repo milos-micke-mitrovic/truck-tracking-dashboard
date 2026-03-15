@@ -11,6 +11,7 @@ import {
   type PaginationState,
 } from '@tanstack/react-table'
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   Table,
   TableBody,
@@ -57,9 +58,11 @@ export function DataTable<TData, TValue>({
   onSortingChange,
   loading = false,
   isLoading = false,
-  emptyText = 'No results.',
+  emptyText,
   onRowClick,
 }: DataTableProps<TData, TValue>) {
+  const { t } = useTranslation('common')
+  const resolvedEmptyText = emptyText ?? t('table.noResults')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [paginationState, setPaginationState] = useState<PaginationState>({
@@ -113,8 +116,8 @@ export function DataTable<TData, TValue>({
   const showEmptyState = !isTableLoading && !table.getRowModel().rows?.length
 
   return (
-    <div className="space-y-4">
-      <div className="relative overflow-x-auto rounded-md border">
+    <div className="flex min-h-0 flex-col gap-4">
+      <div className="relative min-h-0 shrink overflow-auto rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -169,7 +172,7 @@ export function DataTable<TData, TValue>({
         {/* Empty state */}
         {showEmptyState && (
           <div className="pointer-events-none absolute inset-0 top-10 flex items-center justify-center">
-            <BodySmall color="muted">{emptyText}</BodySmall>
+            <BodySmall color="muted">{resolvedEmptyText}</BodySmall>
           </div>
         )}
       </div>

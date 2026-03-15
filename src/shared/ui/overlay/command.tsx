@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon, X } from 'lucide-react'
 
 import { cn } from '@/shared/utils'
 import {
@@ -60,6 +60,8 @@ function CommandDialog({
 
 function CommandInput({
   className,
+  value,
+  onValueChange,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
@@ -70,12 +72,23 @@ function CommandInput({
       <SearchIcon className="size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input
         data-slot="command-input"
+        value={value}
+        onValueChange={onValueChange}
         className={cn(
           'placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50',
           className
         )}
         {...props}
       />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onValueChange?.('')}
+          className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+        >
+          <X className="size-4" />
+        </button>
+      )}
     </div>
   )
 }

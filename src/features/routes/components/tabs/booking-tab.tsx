@@ -22,7 +22,7 @@ export function BookingTab({ form }: BookingTabProps) {
   const { t } = useTranslation('routes')
 
   const [brokerSearchQuery, setBrokerSearchQuery] = useState('')
-  const { data: brokerResults } = useBrokerSearch(brokerSearchQuery)
+  const { data: brokerResults, isFetching: brokerLoading } = useBrokerSearch(brokerSearchQuery)
 
   const brokerOptions = useMemo(
     () =>
@@ -52,6 +52,7 @@ export function BookingTab({ form }: BookingTabProps) {
                   placeholder={t('sheet.booking.selectBroker')}
                   creatable
                   initialLabel={form.watch('brokerName')}
+                  loading={brokerLoading}
                 />
                 <FormMessage />
               </FormItem>

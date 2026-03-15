@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { X, Plus } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { X, Plus, Loader2 } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 type AutocompleteOption = {
@@ -17,6 +17,28 @@ type AutocompleteInputProps = {
   creatable?: boolean
   disabled?: boolean
   initialLabel?: string
+  loading?: boolean
+  debounceMs?: number
+}
+
+function useDebounce(callback: (value: string) => void, delay: number) {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const debouncedFn = useCallback(
+    (value: string) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => callback(value), delay)
+    },
+    [callback, delay]
+  )
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
+
+  return debouncedFn
 }
 
 function AutocompleteInput({
@@ -29,6 +51,8 @@ function AutocompleteInput({
   creatable = false,
   disabled = false,
   initialLabel,
+  loading = false,
+  debounceMs = 300,
 }: AutocompleteInputProps) {
   const [inputText, setInputText] = useState('')
   const [selectedLabel, setSelectedLabel] = useState<string | null>(initialLabel ?? null)
@@ -38,6 +62,7 @@ function AutocompleteInput({
   // Sync selectedLabel when initialLabel changes externally (edit mode / form reset)
   useEffect(() => {
     if (initialLabel !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing internal state with external prop
       setSelectedLabel(initialLabel || null)
     }
   }, [initialLabel])
@@ -45,10 +70,21 @@ function AutocompleteInput({
   // When value is cleared externally (form reset), reset internal state
   useEffect(() => {
     if (!value) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing internal state with external prop
       setInputText('')
       setSelectedLabel(null)
     }
   }, [value])
+
+  const debouncedSearch = useDebounce(
+    useCallback(
+      (text: string) => {
+        onSearchChange?.(text)
+      },
+      [onSearchChange]
+    ),
+    debounceMs
+  )
 
   const displayText = selectedLabel !== null ? selectedLabel : inputText
 
@@ -61,11 +97,16 @@ function AutocompleteInput({
     const text = e.target.value
     setInputText(text)
     setSelectedLabel(null)
-    onSearchChange?.(text)
     // Store typed text as the value (for inline creation path)
     onChange(text)
     onLabelChange?.(text)
     setOpen(text.length >= 2)
+
+    if (text.length >= 2) {
+      debouncedSearch(text)
+    } else {
+      onSearchChange?.('')
+    }
   }
 
   const handleSelect = (option: AutocompleteOption) => {
@@ -109,6 +150,7 @@ function AutocompleteInput({
   }
 
   const hasValue = selectedLabel !== null || value !== ''
+  const showDropdown = open && (options.length > 0 || showCreateOption || loading)
 
   return (
     <div className="relative">
@@ -130,11 +172,14 @@ function AutocompleteInput({
             hasValue && 'pr-8'
           )}
         />
+        {loading && !hasValue && (
+          <Loader2 className="text-muted-foreground absolute right-2.5 top-1/2 size-4 -translate-y-1/2 animate-spin" />
+        )}
         {hasValue && !disabled && (
           <button
             type="button"
             onMouseDown={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground"
             tabIndex={-1}
           >
             <X className="size-3.5" />
@@ -142,8 +187,13 @@ function AutocompleteInput({
         )}
       </div>
 
-      {open && (options.length > 0 || showCreateOption) && (
+      {showDropdown && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md">
+          {loading && options.length === 0 && !showCreateOption && (
+            <div className="flex items-center justify-center gap-2 px-2 py-3 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" />
+            </div>
+          )}
           {options.map((option) => (
             <button
               key={option.value}

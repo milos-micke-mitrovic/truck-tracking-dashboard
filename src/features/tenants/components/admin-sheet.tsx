@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   Button,
   Spinner,
   Input,
@@ -25,7 +24,8 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { FormSection } from '@/shared/components'
+import { FormSection, UnsavedChangesDialog } from '@/shared/components'
+import { useUnsavedChanges } from '@/shared/hooks'
 import { getApiErrorMessage, emailValidationRules } from '@/shared/utils'
 import { tenantKeys } from '../api'
 import {
@@ -86,6 +86,7 @@ export function AdminSheet({
   const deleteMutation = useDeleteUser()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   const form = useForm<AdminFormValues>({
     defaultValues: getFormDefaults(),
@@ -186,8 +187,25 @@ export function AdminSheet({
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
+  const { isDirty } = form.formState
+  useUnsavedChanges(isDirty)
+
+  const handleSheetOpenChange = (value: boolean) => {
+    if (!value && isDirty) {
+      setUnsavedDialogOpen(true)
+      return
+    }
+    onOpenChange(value)
+  }
+
+  const handleDiscardChanges = () => {
+    setUnsavedDialogOpen(false)
+    form.reset()
+    onOpenChange(false)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent size="md" className="flex flex-col overflow-hidden p-0">
         {isEdit && isLoadingUser ? (
           <>
@@ -220,11 +238,14 @@ export function AdminSheet({
                       {t('adminSheet.delete')}
                     </Button>
                   )}
-                  <SheetClose asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      {t('adminSheet.cancel')}
-                    </Button>
-                  </SheetClose>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSheetOpenChange(false)}
+                  >
+                    {t('adminSheet.cancel')}
+                  </Button>
                   <Button type="submit" size="sm" loading={isLoading}>
                     {t('adminSheet.save')}
                   </Button>
@@ -368,6 +389,12 @@ export function AdminSheet({
           description={t('deleteConfirm.adminDescription')}
           onConfirm={handleDelete}
           loading={deleteMutation.isPending}
+        />
+
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onConfirm={handleDiscardChanges}
         />
       </SheetContent>
     </Sheet>

@@ -150,7 +150,7 @@ export function TrailersTab() {
   )
 
   return (
-    <div>
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex flex-wrap items-center justify-between gap-4 py-4">
         <div className="flex flex-wrap items-center gap-3">
           {isFilterVisible('unitId') && (
@@ -251,7 +251,7 @@ export function TrailersTab() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd}>
+          <Button size="sm" prefixIcon={<Plus />} onClick={handleAdd} aria-label={t('actions.addTrailer')}>
             <span className="hidden sm:inline">{t('actions.addTrailer')}</span>
           </Button>
         </div>

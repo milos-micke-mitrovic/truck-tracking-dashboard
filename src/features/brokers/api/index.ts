@@ -13,27 +13,27 @@ export const brokerKeys = {
 
 // API functions
 async function fetchBrokers(): Promise<Broker[]> {
-  return httpClient.get('/v1/brokers')
+  return httpClient.get('/brokers')
 }
 
 async function fetchBroker(id: string): Promise<Broker> {
-  return httpClient.get(`/v1/brokers/${id}`)
+  return httpClient.get(`/brokers/${id}`)
 }
 
 async function createBroker(data: BrokerCreateRequest): Promise<Broker> {
-  return httpClient.post('/v1/brokers', data)
+  return httpClient.post('/brokers', data)
 }
 
 async function deleteBroker(id: string): Promise<void> {
-  return httpClient.delete(`/v1/brokers/${id}`)
+  return httpClient.delete(`/brokers/${id}`)
 }
 
 async function syncBroker(id: string): Promise<Broker> {
-  return httpClient.post(`/v1/brokers/${id}/sync`)
+  return httpClient.post(`/brokers/${id}/sync`)
 }
 
 async function syncAllBrokers(): Promise<void> {
-  return httpClient.post('/v1/brokers/sync-all')
+  return httpClient.post('/brokers/sync-all')
 }
 
 async function searchBrokers(query: string, limit = 10): Promise<BrokerSearchResult[]> {

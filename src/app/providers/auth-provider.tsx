@@ -104,13 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const response = await refreshAccessToken(refreshToken)
         updateTokens(response.accessToken, response.refreshToken)
-        console.log('[Auth] Proactive token refresh succeeded')
         return true
-      } catch (error) {
-        console.error(`[Auth] Proactive refresh attempt ${i + 1}/${retries} failed:`, error)
+      } catch {
         if (i === retries - 1) {
-          // Final failure - log and let reactive refresh handle it
-          console.error('[Auth] All proactive refresh attempts failed. Token will expire soon.')
           return false
         }
         // Exponential backoff: wait 1s, 2s, 3s between retries
@@ -130,17 +126,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const expiresAt = payload.exp * 1000
     const delay = expiresAt - Date.now() - REFRESH_BUFFER_MS
 
-    console.log(`[Auth] Scheduling token refresh in ${Math.round(delay / 1000)}s`)
-
     if (delay <= 0) {
       // Token already expired or about to — refresh immediately with retry
-      console.log('[Auth] Token expiring imminently, attempting immediate refresh')
       attemptProactiveRefresh(currentRefreshToken)
       return
     }
 
     refreshTimerRef.current = setTimeout(() => {
-      console.log('[Auth] Proactive refresh timer fired')
       attemptProactiveRefresh(currentRefreshToken)
     }, delay)
   }, [clearRefreshTimer, attemptProactiveRefresh])
@@ -183,11 +175,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const expiresIn = (payload.exp * 1000) - Date.now()
 
-        console.log(`[Auth] Tab became visible. Token expires in ${Math.round(expiresIn / 1000)}s`)
-
         // If token expires in less than 5 minutes, refresh it proactively
         if (expiresIn < 5 * 60 * 1000 && expiresIn > 0) {
-          console.log('[Auth] Token expiring soon after tab visibility change. Refreshing...')
           attemptProactiveRefresh(state.refreshToken)
         }
       }

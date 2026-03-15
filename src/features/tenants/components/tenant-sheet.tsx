@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   Button,
   Spinner,
   Input,
@@ -26,7 +25,8 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { FormSection } from '@/shared/components'
+import { FormSection, UnsavedChangesDialog } from '@/shared/components'
+import { useUnsavedChanges } from '@/shared/hooks'
 import { getApiErrorMessage } from '@/shared/utils'
 import { useCompanies } from '@/features/admin/api'
 import { CompanySheet } from '@/features/admin/components/dialogs/company-sheet'
@@ -76,6 +76,7 @@ export function TenantSheet({
   const deleteMutation = useDeleteTenant()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
   const [adminSheetOpen, setAdminSheetOpen] = useState(false)
   const [selectedAdmin, setSelectedAdmin] = useState<TenantAdmin | null>(null)
   const [companySheetOpen, setCompanySheetOpen] = useState(false)
@@ -145,8 +146,25 @@ export function TenantSheet({
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
+  const { isDirty } = form.formState
+  useUnsavedChanges(isDirty)
+
+  const handleSheetOpenChange = (value: boolean) => {
+    if (!value && isDirty) {
+      setUnsavedDialogOpen(true)
+      return
+    }
+    onOpenChange(value)
+  }
+
+  const handleDiscardChanges = () => {
+    setUnsavedDialogOpen(false)
+    form.reset()
+    onOpenChange(false)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent size="lg" className="flex flex-col overflow-hidden p-0">
         {isEdit && isLoadingTenant ? (
           <>
@@ -179,11 +197,14 @@ export function TenantSheet({
                       {t('sheet.delete')}
                     </Button>
                   )}
-                  <SheetClose asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      {t('sheet.cancel')}
-                    </Button>
-                  </SheetClose>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSheetOpenChange(false)}
+                  >
+                    {t('sheet.cancel')}
+                  </Button>
                   <Button type="submit" size="sm" loading={isLoading}>
                     {t('sheet.save')}
                   </Button>
@@ -201,7 +222,7 @@ export function TenantSheet({
                   <FormField
                     control={form.control}
                     name="name"
-                    rules={{ required: true }}
+                    rules={{ required: t('common:validation.required') }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required>{t('sheet.name')}</FormLabel>
@@ -215,7 +236,7 @@ export function TenantSheet({
                   <FormField
                     control={form.control}
                     name="code"
-                    rules={{ required: true }}
+                    rules={{ required: t('common:validation.required') }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required>{t('sheet.code')}</FormLabel>
@@ -391,6 +412,12 @@ export function TenantSheet({
           description={t('deleteConfirm.description')}
           onConfirm={handleDelete}
           loading={deleteMutation.isPending}
+        />
+
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onConfirm={handleDiscardChanges}
         />
       </SheetContent>
     </Sheet>

@@ -12,9 +12,9 @@ export function DashboardLayout() {
           <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger />
           </header>
-          <main className="min-w-0 flex-1 overflow-auto p-4">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden p-4">
             <Outlet />
-          </main>
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </RouteGuard>

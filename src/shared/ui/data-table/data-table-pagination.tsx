@@ -80,7 +80,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
             icon={<ChevronsLeft />}
-            aria-label="Go to first page"
+            aria-label={t('pagination.goToFirstPage')}
           />
           <IconButton
             variant="outline"
@@ -88,7 +88,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
             icon={<ChevronLeft />}
-            aria-label="Go to previous page"
+            aria-label={t('pagination.goToPreviousPage')}
           />
           <IconButton
             variant="outline"
@@ -96,7 +96,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
             icon={<ChevronRight />}
-            aria-label="Go to next page"
+            aria-label={t('pagination.goToNextPage')}
           />
           <IconButton
             variant="outline"
@@ -105,7 +105,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(pageCount - 1)}
             disabled={!table.getCanNextPage()}
             icon={<ChevronsRight />}
-            aria-label="Go to last page"
+            aria-label={t('pagination.goToLastPage')}
           />
         </div>
       </div>

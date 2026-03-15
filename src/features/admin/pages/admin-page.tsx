@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { H1, Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui'
+import { usePageTitle } from '@/shared/hooks'
 import {
   CompaniesTab,
   DriversTab,
@@ -10,12 +11,13 @@ import {
 
 export function AdminPage() {
   const { t } = useTranslation('admin')
+  usePageTitle(t('title'))
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex min-h-0 flex-1 flex-col gap-6">
       <H1>{t('title')}</H1>
 
-      <Tabs defaultValue="companies" className="w-full">
+      <Tabs defaultValue="companies" className="flex min-h-0 w-full flex-1 flex-col">
         <TabsList className="w-full justify-start">
           <TabsTrigger value="companies">{t('tabs.companies')}</TabsTrigger>
           <TabsTrigger value="drivers">{t('tabs.drivers')}</TabsTrigger>

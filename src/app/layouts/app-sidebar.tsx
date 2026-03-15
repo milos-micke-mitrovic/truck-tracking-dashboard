@@ -92,13 +92,26 @@ export function AppSidebar() {
                     <NavLink
                       to="/routes"
                       className={({ isActive }) =>
-                        cn(isActive && 'bg-sidebar-accent')
+                        cn('relative', isActive && 'bg-sidebar-accent')
                       }
                     >
-                      <Route className="size-4" />
+                      <div className="relative">
+                        <Route className="size-4" />
+                        {totalUnread > 0 && isCollapsed && (
+                          <span
+                            className="absolute -right-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-destructive text-[8px] font-medium text-destructive-foreground"
+                            aria-label={t('common:notifications.unreadCount', { count: totalUnread })}
+                          >
+                            {totalUnread > 9 ? '9+' : totalUnread}
+                          </span>
+                        )}
+                      </div>
                       <BodySmall as="span">{t('sidebar.dispatch')}</BodySmall>
-                      {totalUnread > 0 && (
-                        <span className="ml-auto flex size-5 shrink-0 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
+                      {totalUnread > 0 && !isCollapsed && (
+                        <span
+                          className="ml-auto flex size-5 shrink-0 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground"
+                          aria-label={t('common:notifications.unreadCount', { count: totalUnread })}
+                        >
                           {totalUnread > 99 ? '99+' : totalUnread}
                         </span>
                       )}

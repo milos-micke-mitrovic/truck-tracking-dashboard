@@ -9,7 +9,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetClose,
   Button,
   Input,
   Select,
@@ -24,7 +23,8 @@ import {
   FormControl,
   FormMessage,
 } from '@/shared/ui/form'
-import { FormSection, DocumentsSection } from '@/shared/components'
+import { FormSection, DocumentsSection, UnsavedChangesDialog } from '@/shared/components'
+import { useUnsavedChanges } from '@/shared/hooks'
 import { getApiErrorMessage } from '@/shared/utils'
 import { useAuth } from '@/features/auth'
 import { useUploadTempFile } from '@/shared/api/documents'
@@ -90,6 +90,7 @@ export function CompanySheet({
   const uploadMutation = useUploadTempFile()
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [unsavedDialogOpen, setUnsavedDialogOpen] = useState(false)
 
   const form = useForm<CompanyFormValues>({
     defaultValues: getFormDefaults(),
@@ -153,7 +154,7 @@ export function CompanySheet({
       )
       form.setValue(`documents.${index}.isNew`, true)
     } catch {
-      toast.error(t('driverDialog.uploadError') || 'Upload failed')
+      toast.error(t('common:errors.uploadFailed'))
     }
   }
 
@@ -228,8 +229,25 @@ export function CompanySheet({
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
+  const { isDirty } = form.formState
+  useUnsavedChanges(isDirty)
+
+  const handleSheetOpenChange = (value: boolean) => {
+    if (!value && isDirty) {
+      setUnsavedDialogOpen(true)
+      return
+    }
+    onOpenChange(value)
+  }
+
+  const handleDiscardChanges = () => {
+    setUnsavedDialogOpen(false)
+    form.reset()
+    onOpenChange(false)
+  }
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleSheetOpenChange}>
       <SheetContent size="lg" className="flex flex-col overflow-hidden p-0">
         {isEdit && isLoadingCompany ? (
           <>
@@ -262,11 +280,14 @@ export function CompanySheet({
                       {t('actions.delete')}
                     </Button>
                   )}
-                  <SheetClose asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      {t('dialogs.cancel')}
-                    </Button>
-                  </SheetClose>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSheetOpenChange(false)}
+                  >
+                    {t('dialogs.cancel')}
+                  </Button>
                   <Button type="submit" size="sm" loading={isLoading}>
                     {t('dialogs.save')}
                   </Button>
@@ -425,7 +446,7 @@ export function CompanySheet({
                         <Select
                           options={SUBSCRIPTION_PLAN_VALUES.map((value) => ({
                             value,
-                            label: value,
+                            label: t(`common:subscriptionPlans.${value}`),
                           }))}
                           value={field.value}
                           onChange={(v) => field.onChange(v as SubscriptionPlan)}
@@ -460,6 +481,12 @@ export function CompanySheet({
           description={t('deleteConfirm.company.description')}
           onConfirm={handleDelete}
           loading={deleteMutation.isPending}
+        />
+
+        <UnsavedChangesDialog
+          open={unsavedDialogOpen}
+          onOpenChange={setUnsavedDialogOpen}
+          onConfirm={handleDiscardChanges}
         />
       </SheetContent>
     </Sheet>
