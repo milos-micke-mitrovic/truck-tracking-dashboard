@@ -313,7 +313,16 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
       // SKIP CARRIER INFO - must be entered manually
       // Do NOT fill: companyId, dispatcherId, vehicleId, driverId, coDriverId
 
-      // Booking info
+      // Booking info — broker
+      if (data.matchedBrokerId) {
+        form.setValue('brokerId', String(data.matchedBrokerId))
+        form.setValue('brokerName', data.matchedBroker?.name || data.brokerName || '')
+      } else if (data.brokerName) {
+        form.setValue('brokerId', data.brokerName)
+        form.setValue('brokerName', data.brokerName)
+      }
+      if (data.brokerMcNumber)
+        form.setValue('brokerMcNumber', data.brokerMcNumber)
       if (data.brokerIdentifier)
         form.setValue('brokerIdentifier', data.brokerIdentifier)
       if (data.brokerRepresentative)
@@ -349,24 +358,30 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
 
       // Stops - map extracted stops to form format
       if (data.stops && data.stops.length > 0) {
-        const mappedStops = data.stops.map((stop) => ({
-          type: (stop.type || 'PICKUP') as StopType,
-          facilityId: '', // Must be selected manually from facilities dropdown
-          facilityName: '',
-          facilityType: '' as FacilityType | '',
-          facilityAddress: '',
-          arrivalSlotType: '' as ArrivalSlotType | '',
-          arrivalStartDate: stop.arrivalStartDate || '',
-          arrivalEndDate: stop.arrivalEndDate || '',
-          referenceNumbers: (stop.referenceNumbers || []).map((ref) => ({
-            type: (ref.type || '') as ReferenceNumberType | '',
-            value: ref.value || '',
-          })),
-          accessories: [],
-          requiredDocuments: [],
-          unitCount: stop.unitCount != null ? String(stop.unitCount) : '',
-          unitType: (stop.unitType as UnitType) || '',
-        }))
+        const mappedStops = data.stops.map((stop) => {
+          const addressParts = [stop.address, stop.city, stop.state, stop.zipCode].filter(Boolean)
+          const facilityAddress = addressParts.join(', ')
+          const facilityId = stop.matchedFacilityId ? String(stop.matchedFacilityId) : ''
+          const facilityName = stop.matchedFacility?.name || stop.facilityName || ''
+          return {
+            type: (stop.type || 'PICKUP') as StopType,
+            facilityId,
+            facilityName,
+            facilityType: '' as FacilityType | '',
+            facilityAddress,
+            arrivalSlotType: '' as ArrivalSlotType | '',
+            arrivalStartDate: stop.arrivalStartDate || '',
+            arrivalEndDate: stop.arrivalEndDate || '',
+            referenceNumbers: (stop.referenceNumbers || []).map((ref) => ({
+              type: (ref.type || '') as ReferenceNumberType | '',
+              value: ref.value || '',
+            })),
+            accessories: [],
+            requiredDocuments: [],
+            unitCount: stop.unitCount != null ? String(stop.unitCount) : '',
+            unitType: (stop.unitType as UnitType) || '',
+          }
+        })
         form.setValue('stops', mappedStops)
       }
 

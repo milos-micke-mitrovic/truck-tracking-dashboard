@@ -35,8 +35,6 @@ function getToken(): string | null {
 }
 
 export function createDispatcherSse(
-  tenantId: number,
-  userId: number,
   onPodSubmitted: PodSubmittedHandler
 ): () => void {
   let eventSource: EventSource | null = null
@@ -48,7 +46,7 @@ export function createDispatcherSse(
     if (disposed) return
 
     const token = getToken()
-    let url = `${API_BASE_URL}/sse/dispatch/subscribe/${tenantId}/${userId}`
+    let url = `${API_BASE_URL}/sse/dispatch/subscribe`
     if (token) {
       url += `?token=${encodeURIComponent(token)}`
     }
