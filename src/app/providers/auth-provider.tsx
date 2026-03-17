@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react'
 import { AUTH_STORAGE_KEY } from '@/shared/utils'
-import { decodeJwt } from '@/features/auth/utils'
+import { decodeJwt, jwtPayloadToUser } from '@/features/auth/utils'
 import { refreshAccessToken } from '@/features/auth/api'
 import { router } from '@/app/routes/router'
 import type { User, AuthState } from '@/features/auth/types'
@@ -88,9 +88,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateTokens = useCallback((token: string, refreshToken: string) => {
     setState((prev) => {
       if (!prev.user) return prev
-      const newState = { ...prev, token, refreshToken }
+      const payload = decodeJwt(token)
+      const user = payload ? jwtPayloadToUser(payload) : prev.user
+      const newState = { ...prev, user, token, refreshToken }
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({
-        user: prev.user,
+        user,
         token,
         refreshToken,
       }))

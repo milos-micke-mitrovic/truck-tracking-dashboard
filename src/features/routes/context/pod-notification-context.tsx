@@ -99,17 +99,13 @@ export function PodNotificationProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries({ queryKey: routeKeys.all })
     }
 
-    disconnectRef.current = createDispatcherSse(
-      user.tenantId,
-      user.id,
-      handlePodSubmitted
-    )
+    disconnectRef.current = createDispatcherSse(handlePodSubmitted)
 
     return () => {
       disconnectRef.current?.()
       disconnectRef.current = null
     }
-  }, [isDispatcher, user, queryClient])
+  }, [isDispatcher, queryClient])
 
   return (
     <PodNotificationContext.Provider

@@ -442,9 +442,12 @@ export type ParsePdfResponse = {
   extraction: {
     // Broker info
     brokerName?: string
+    brokerMcNumber?: string
     brokerRepresentative?: string
     brokerIdentifier?: string
     brokerRate?: number
+    matchedBrokerId?: number
+    matchedBroker?: { id: number; name: string; mcNumber?: string }
 
     // Route info
     totalMiles?: number
@@ -480,6 +483,8 @@ export type ParsePdfResponse = {
       stopOrder?: number
       unitCount?: number
       unitType?: string
+      matchedFacilityId?: number
+      matchedFacility?: { id: number; name: string; city?: string | null; state?: string | null; street?: string | null }
     }>
 
     // Debug info
