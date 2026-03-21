@@ -274,7 +274,7 @@ export function CompanySheet({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSheetOpenChange(false)}
+                    onClick={() => onOpenChange(false)}
                   >
                     {t('dialogs.cancel')}
                   </Button>

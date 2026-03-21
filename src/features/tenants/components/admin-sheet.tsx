@@ -242,7 +242,7 @@ export function AdminSheet({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSheetOpenChange(false)}
+                    onClick={() => onOpenChange(false)}
                   >
                     {t('adminSheet.cancel')}
                   </Button>

@@ -42,6 +42,8 @@ export function CompaniesTab() {
     filters,
     updateFilter,
     pagination,
+    sorting,
+    handleSortingChange,
     dialogOpen,
     setDialogOpen,
     selectedItem: selectedCompany,
@@ -55,6 +57,7 @@ export function CompaniesTab() {
   const { data, isLoading, isFetching } = useCompanies({
     ...filters,
     ...pagination,
+    ...sorting,
   })
 
   const columns: ColumnDef<CompanyListItem>[] = useMemo(
@@ -236,11 +239,13 @@ export function CompaniesTab() {
         data={data?.content || []}
         isLoading={isLoading || isFetching}
         manualPagination
+        manualSorting
         pageCount={data?.totalPages}
         totalCount={data?.totalElements}
         pageIndex={pagination.page}
         pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
+        onSortingChange={handleSortingChange}
         onRowClick={handleRowClick}
       />
 

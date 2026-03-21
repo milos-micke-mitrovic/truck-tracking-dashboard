@@ -1,5 +1,10 @@
 import { useState, useCallback } from 'react'
-import type { PaginationState } from '@tanstack/react-table'
+import type { PaginationState, SortingState } from '@tanstack/react-table'
+
+type SortParams = {
+  sortBy?: string
+  sortDir?: 'asc' | 'desc'
+}
 
 type UseAdminTabOptions<TFilters> = {
   defaultFilters: TFilters
@@ -10,10 +15,12 @@ type UseAdminTabReturn<TFilters, TItem> = {
   filters: TFilters
   setFilters: React.Dispatch<React.SetStateAction<TFilters>>
   updateFilter: <K extends keyof TFilters>(key: K, value: TFilters[K]) => void
-  pagination: { page: number; size: number } // 0-based page for Spring Boot
+  pagination: { page: number; size: number }
   setPagination: React.Dispatch<
     React.SetStateAction<{ page: number; size: number }>
   >
+  sorting: SortParams
+  handleSortingChange: (state: SortingState) => void
   dialogOpen: boolean
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
   selectedItem: TItem | null
@@ -29,13 +36,14 @@ export function useAdminTab<TFilters, TItem>({
 }: UseAdminTabOptions<TFilters>): UseAdminTabReturn<TFilters, TItem> {
   const [filters, setFilters] = useState<TFilters>(defaultFilters)
   const [pagination, setPagination] = useState(defaultPagination)
+  const [sorting, setSorting] = useState<SortParams>({})
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<TItem | null>(null)
 
   const updateFilter = useCallback(
     <K extends keyof TFilters>(key: K, value: TFilters[K]) => {
       setFilters((prev) => ({ ...prev, [key]: value }))
-      setPagination((prev) => ({ ...prev, page: 0 })) // Reset to first page
+      setPagination((prev) => ({ ...prev, page: 0 }))
     },
     []
   )
@@ -54,12 +62,23 @@ export function useAdminTab<TFilters, TItem>({
     setPagination({ page: state.pageIndex, size: state.pageSize })
   }, [])
 
+  const handleSortingChange = useCallback((state: SortingState) => {
+    if (state.length > 0) {
+      setSorting({ sortBy: state[0].id, sortDir: state[0].desc ? 'desc' : 'asc' })
+    } else {
+      setSorting({})
+    }
+    setPagination((prev) => ({ ...prev, page: 0 }))
+  }, [])
+
   return {
     filters,
     setFilters,
     updateFilter,
     pagination,
     setPagination,
+    sorting,
+    handleSortingChange,
     dialogOpen,
     setDialogOpen,
     selectedItem,

@@ -93,6 +93,7 @@ export function getRoutesColumns({
     },
     {
       accessorKey: 'originCity',
+      enableSorting: false,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.origin')} />
       ),
@@ -109,6 +110,7 @@ export function getRoutesColumns({
     },
     {
       accessorKey: 'destinationCity',
+      enableSorting: false,
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}
@@ -151,6 +153,7 @@ export function getRoutesColumns({
     },
     {
       accessorKey: 'unitNumber',
+      enableSorting: false,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.unit')} />
       ),
@@ -167,6 +170,7 @@ export function getRoutesColumns({
     },
     {
       accessorKey: 'dispatcherName',
+      enableSorting: false,
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}

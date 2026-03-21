@@ -42,6 +42,8 @@ export function VehiclesTab() {
     filters,
     updateFilter,
     pagination,
+    sorting,
+    handleSortingChange,
     handlePaginationChange,
     dialogOpen,
     setDialogOpen,
@@ -55,6 +57,7 @@ export function VehiclesTab() {
   const { data, isLoading, isFetching } = useVehicles({
     ...filters,
     ...pagination,
+    ...sorting,
   })
 
   const columns: ColumnDef<VehicleListItem>[] = useMemo(
@@ -108,6 +111,7 @@ export function VehiclesTab() {
       },
       {
         accessorKey: 'driver',
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={t('columns.driver')} />
         ),
@@ -238,11 +242,13 @@ export function VehiclesTab() {
         data={data?.content || []}
         isLoading={isLoading || isFetching}
         manualPagination
+        manualSorting
         pageCount={data?.totalPages}
         totalCount={data?.totalElements}
         pageIndex={pagination.page}
         pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
+        onSortingChange={handleSortingChange}
         onRowClick={handleRowClick}
       />
       <VehicleSheet

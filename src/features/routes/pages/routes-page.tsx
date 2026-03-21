@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import type { PaginationState } from '@tanstack/react-table'
+import type { PaginationState, SortingState } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useRoutes } from '../api'
 import type { RouteFilters, RouteStatus } from '../types'
@@ -65,9 +65,21 @@ export function RoutesPage() {
     size: 20,
   })
 
+  const [sorting, setSorting] = useState<{ sortBy?: string; sortDir?: 'asc' | 'desc' }>({})
+
+  const handleSortingChange = useCallback((state: SortingState) => {
+    if (state.length > 0) {
+      setSorting({ sortBy: state[0].id, sortDir: state[0].desc ? 'desc' : 'asc' })
+    } else {
+      setSorting({})
+    }
+    setPagination((prev) => ({ ...prev, page: 0 }))
+  }, [])
+
   const { data, isLoading, isFetching } = useRoutes({
     ...filters,
     ...pagination,
+    ...sorting,
   })
 
   // Fetch data for searchable selects — only when filter is visible
@@ -319,11 +331,13 @@ export function RoutesPage() {
           data={data?.content || []}
           isLoading={isLoading || isFetching}
           manualPagination
+          manualSorting
           pageCount={data?.totalPages}
           totalCount={data?.totalElements}
           pageIndex={pagination.page}
           pageSize={pagination.size}
           onPaginationChange={handlePaginationChange}
+          onSortingChange={handleSortingChange}
           onRowClick={handleRowClick}
         />
       </div>

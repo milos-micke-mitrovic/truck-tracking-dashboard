@@ -203,7 +203,7 @@ export function TenantSheet({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSheetOpenChange(false)}
+                    onClick={() => onOpenChange(false)}
                   >
                     {t('sheet.cancel')}
                   </Button>

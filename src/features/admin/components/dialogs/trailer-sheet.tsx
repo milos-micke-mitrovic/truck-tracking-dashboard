@@ -330,7 +330,7 @@ export function TrailerSheet({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSheetOpenChange(false)}
+                    onClick={() => onOpenChange(false)}
                   >
                     {t('dialogs.cancel')}
                   </Button>

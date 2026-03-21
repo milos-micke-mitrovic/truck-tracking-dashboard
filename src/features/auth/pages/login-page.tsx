@@ -220,7 +220,7 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowInstallGuide(!showInstallGuide)}
-                className="text-muted-foreground hover:text-foreground flex items-center justify-center gap-1 text-sm transition-colors"
+                className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center justify-center gap-1 text-sm transition-colors"
               >
                 {t('login.driverApp.installGuide')}
                 {showInstallGuide ? (

@@ -44,6 +44,8 @@ export function UsersTab() {
     filters,
     updateFilter,
     pagination,
+    sorting,
+    handleSortingChange,
     handlePaginationChange,
     dialogOpen,
     setDialogOpen,
@@ -57,6 +59,7 @@ export function UsersTab() {
   const { data, isLoading, isFetching } = useUsers({
     ...filters,
     ...pagination,
+    ...sorting,
   })
 
   // Filter out SUPER_ADMIN always, and ADMIN if current user is not SUPER_ADMIN
@@ -71,6 +74,7 @@ export function UsersTab() {
   const columns: ColumnDef<UserListItem>[] = useMemo(() => [
     {
       accessorKey: 'name',
+      id: 'firstName',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('columns.name')} />
       ),
@@ -227,11 +231,13 @@ export function UsersTab() {
         data={filteredContent}
         isLoading={isLoading || isFetching}
         manualPagination
+        manualSorting
         pageCount={data?.totalPages}
         totalCount={filteredContent.length}
         pageIndex={pagination.page}
         pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
+        onSortingChange={handleSortingChange}
         onRowClick={handleRowClick}
       />
       <UserSheet

@@ -40,6 +40,8 @@ export function DriversTab() {
     filters,
     updateFilter,
     pagination,
+    sorting,
+    handleSortingChange,
     dialogOpen,
     setDialogOpen,
     selectedItem: selectedDriver,
@@ -65,12 +67,14 @@ export function DriversTab() {
   const { data, isLoading, isFetching } = useDrivers({
     ...filters,
     ...pagination,
+    ...sorting,
   })
 
   const columns: ColumnDef<DriverListItem>[] = useMemo(
     () => [
       {
         accessorKey: 'name',
+        id: 'firstName',
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={t('columns.name')} />
         ),
@@ -95,6 +99,7 @@ export function DriversTab() {
       },
       {
         accessorKey: 'companyName',
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={t('columns.company')} />
         ),
@@ -204,11 +209,13 @@ export function DriversTab() {
         data={data?.content || []}
         isLoading={isLoading || isFetching}
         manualPagination
+        manualSorting
         pageCount={data?.totalPages}
         totalCount={data?.totalElements}
         pageIndex={pagination.page}
         pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
+        onSortingChange={handleSortingChange}
         onRowClick={handleRowClick}
       />
 

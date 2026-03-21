@@ -52,6 +52,8 @@ export function TrailersTab() {
     filters,
     updateFilter,
     pagination,
+    sorting,
+    handleSortingChange,
     handlePaginationChange,
     dialogOpen,
     setDialogOpen,
@@ -65,6 +67,7 @@ export function TrailersTab() {
   const { data, isLoading, isFetching } = useTrailers({
     ...filters,
     ...pagination,
+    ...sorting,
   })
 
   const columns: ColumnDef<TrailerListItem>[] = useMemo(
@@ -261,11 +264,13 @@ export function TrailersTab() {
         data={data?.content || []}
         isLoading={isLoading || isFetching}
         manualPagination
+        manualSorting
         pageCount={data?.totalPages}
         totalCount={data?.totalElements}
         pageIndex={pagination.page}
         pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}
+        onSortingChange={handleSortingChange}
         onRowClick={handleRowClick}
       />
       <TrailerSheet

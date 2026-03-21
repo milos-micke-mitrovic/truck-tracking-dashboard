@@ -488,7 +488,7 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => handleSheetOpenChange(false)}
+                    onClick={() => onOpenChange(false)}
                   >
                     {t('sheet.cancel')}
                   </Button>
