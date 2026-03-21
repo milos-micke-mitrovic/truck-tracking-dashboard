@@ -383,7 +383,7 @@ export function VehicleSheet({
                 {isEdit ? t('vehicleSheet.editTitle') : t('actions.addVehicle')}
               </SheetTitle>
             </SheetHeader>
-            <div className="space-y-3 overflow-y-auto px-6 py-4">
+            <div className="flex-1 space-y-3 overflow-y-auto px-6 py-4">
               <FormSection title={t('vehicleSheet.identification')}>
                 <div className="grid gap-3 md:grid-cols-2">
                   <FormField

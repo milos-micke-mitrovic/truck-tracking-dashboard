@@ -3,6 +3,7 @@ import {
   useContext,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   type ReactNode,
 } from 'react'
@@ -51,15 +52,24 @@ export function PodNotificationProvider({ children }: { children: ReactNode }) {
     refetchOnWindowFocus: true,
   })
 
-  const notifications = new Map(
-    Object.entries(unreadCounts || {}).map(([routeId, count]) => [routeId, count])
+  const notifications = useMemo(
+    () => new Map(
+      Object.entries(unreadCounts || {}).map(([routeId, count]) => [routeId, count])
+    ),
+    [unreadCounts]
   )
-  const totalUnread = Array.from(notifications.values()).reduce((sum, count) => sum + count, 0)
+  const totalUnread = useMemo(
+    () => Array.from(notifications.values()).reduce((sum, count) => sum + count, 0),
+    [notifications]
+  )
 
   // Mark notifications read for a route
   const markReadMutation = useMutation({
     mutationFn: markNotificationsRead,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCounts() })
+    },
+    onError: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCounts() })
     },
   })

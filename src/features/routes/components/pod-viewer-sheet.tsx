@@ -46,14 +46,18 @@ function formatDate(dateStr: string) {
   })
 }
 
-function getStatusVariant(status: string) {
+function getStatusColor(status: string) {
   switch (status) {
     case 'APPROVED':
-      return 'default' as const
+      return 'success' as const
     case 'REJECTED':
       return 'destructive' as const
+    case 'SUBMITTED':
+      return 'warning' as const
+    case 'PENDING':
+      return 'info' as const
     default:
-      return 'secondary' as const
+      return 'muted' as const
   }
 }
 
@@ -130,7 +134,7 @@ export function PodViewerSheet({ open, onOpenChange, routeId }: PodViewerSheetPr
                       <BodySmall className="font-medium">
                         {t('pod.stop')} #{index + 1}
                       </BodySmall>
-                      <Badge variant={getStatusVariant(pod.status)}>
+                      <Badge color={getStatusColor(pod.status)}>
                         {t(`pod.status.${pod.status}`)}
                       </Badge>
                     </div>
@@ -219,7 +223,7 @@ export function PodViewerSheet({ open, onOpenChange, routeId }: PodViewerSheetPr
                       />
                       <div className="flex justify-end gap-2">
                         <Button size="sm" variant="outline" onClick={cancelReject}>
-                          {t('cancel')}
+                          {t('common:actions.cancel')}
                         </Button>
                         <Button
                           size="sm"

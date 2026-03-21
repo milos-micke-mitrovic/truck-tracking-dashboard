@@ -50,7 +50,7 @@ export function LoadTab({ form }: LoadTabProps) {
               <FormItem>
                 <FormLabel>{t('sheet.load.weight')}</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="e.g. 1,500" />
+                  <Input {...field} placeholder={t('sheet.load.weightPlaceholder')} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -79,7 +79,7 @@ export function LoadTab({ form }: LoadTabProps) {
               <FormItem>
                 <FormLabel>{t('sheet.load.lengthFeet')}</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="e.g. 53ft" />
+                  <Input {...field} placeholder={t('sheet.load.lengthFeetPlaceholder')} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

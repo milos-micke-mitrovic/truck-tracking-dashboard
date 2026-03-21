@@ -47,6 +47,7 @@
   "adminSheet": {
     "addTitle": "Add Admin",
     "editTitle": "Edit Admin",
+    "adminInfo": "Admin Info",
     "firstName": "First Name",
     "lastName": "Last Name",
     "email": "Email",

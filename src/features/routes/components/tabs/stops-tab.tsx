@@ -93,7 +93,7 @@ export function StopsTab({ form }: StopsTabProps) {
 
   const facilityTypeOptions = FACILITY_TYPE_VALUES.map((v) => ({
     value: v,
-    label: v.charAt(0) + v.slice(1).toLowerCase(),
+    label: t(`enums.facilityTypes.${v}`),
   }))
 
   return (

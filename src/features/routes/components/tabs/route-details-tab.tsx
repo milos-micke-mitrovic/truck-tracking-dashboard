@@ -51,7 +51,7 @@ export function RouteDetailsTab({ form }: RouteDetailsTabProps) {
                   {t('sheet.routeDetails.estimatedDuration')}
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="e.g. 6h 51m" />
+                  <Input {...field} placeholder={t('sheet.routeDetails.estimatedDurationPlaceholder')} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -64,7 +64,7 @@ export function RouteDetailsTab({ form }: RouteDetailsTabProps) {
               <FormItem>
                 <FormLabel>{t('sheet.routeDetails.routeHighway')}</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="e.g. I-80" />
+                  <Input {...field} placeholder={t('sheet.routeDetails.routeHighwayPlaceholder')} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

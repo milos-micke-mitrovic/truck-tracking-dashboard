@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import type { PaginationState } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useRoutes } from '../api'
@@ -97,11 +98,15 @@ export function RoutesPage() {
     })
   }, [])
 
-  const handleCopy = async (id: string, text: string) => {
-    await navigator.clipboard.writeText(text)
-    setCopiedId(id)
-    setTimeout(() => setCopiedId(null), 2000)
-  }
+  const handleCopy = useCallback(async (id: string, text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch {
+      toast.error(t('common:errors.clipboardFailed', 'Failed to copy to clipboard'))
+    }
+  }, [t])
 
   const handleRowClick = (route: { id: string }) => {
     setSelectedRouteId(route.id)
@@ -115,11 +120,11 @@ export function RoutesPage() {
     }
   }
 
-  const handleNotificationClick = (routeId: string) => {
+  const handleNotificationClick = useCallback((routeId: string) => {
     clearRouteNotifications(String(routeId))
     setPodRouteId(routeId)
     setPodSheetOpen(true)
-  }
+  }, [clearRouteNotifications])
 
   const handlePodSheetOpenChange = (open: boolean) => {
     setPodSheetOpen(open)

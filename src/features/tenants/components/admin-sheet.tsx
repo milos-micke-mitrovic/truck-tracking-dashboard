@@ -258,12 +258,12 @@ export function AdminSheet({
             </SheetHeader>
 
             <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
-              <FormSection title={t('adminSheet.editTitle')}>
+              <FormSection title={t('adminSheet.adminInfo')}>
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="companyId"
-                    rules={{ required: true }}
+                    rules={{ required: t('common:validation.required') }}
                     render={({ field }) => (
                       <FormItem className="md:col-span-2">
                         <FormLabel required>
@@ -283,7 +283,7 @@ export function AdminSheet({
                   <FormField
                     control={form.control}
                     name="firstName"
-                    rules={{ required: true }}
+                    rules={{ required: t('common:validation.required') }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required>
@@ -299,7 +299,7 @@ export function AdminSheet({
                   <FormField
                     control={form.control}
                     name="lastName"
-                    rules={{ required: true }}
+                    rules={{ required: t('common:validation.required') }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required>
@@ -316,8 +316,8 @@ export function AdminSheet({
                     control={form.control}
                     name="email"
                     rules={emailValidationRules(
-                      t('adminSheet.email'),
-                      t('adminSheet.email')
+                      t('common:validation.required'),
+                      t('common:validation.invalidEmail')
                     )}
                     render={({ field }) => (
                       <FormItem>
@@ -347,7 +347,7 @@ export function AdminSheet({
                   <FormField
                     control={form.control}
                     name="password"
-                    rules={!isEdit ? { required: true } : {}}
+                    rules={!isEdit ? { required: t('common:validation.required') } : {}}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required={!isEdit}>

@@ -116,6 +116,8 @@
       "totalMiles": "Total Miles",
       "estimatedDuration": "Estimated Duration",
       "routeHighway": "Route / Highway",
+      "estimatedDurationPlaceholder": "e.g. 6h 51m",
+      "routeHighwayPlaceholder": "e.g. I-80",
       "tolls": "Tolls ($)",
       "fuelCost": "Fuel Cost ($)",
       "routeType": "Route Type",
@@ -123,9 +125,11 @@
     },
     "load": {
       "weight": "Weight",
+      "weightPlaceholder": "e.g. 1,500",
       "weightUnit": "Weight Unit",
       "selectWeightUnit": "Select unit",
       "lengthFeet": "Length (ft)",
+      "lengthFeetPlaceholder": "e.g. 53ft",
       "commodity": "Commodity",
       "capacity": "Capacity",
       "selectCapacity": "Select capacity",
@@ -237,6 +241,11 @@
       "LOADED_SCALE_PHOTO": "Loaded Scale Photo",
       "ESCORT_PHOTO": "Escort Photo",
       "LUMPER_RECEIPT_PHOTO": "Lumper Receipt Photo"
+    },
+    "facilityTypes": {
+      "SHIPPER": "Shipper",
+      "RECEIVER": "Receiver",
+      "BOTH": "Both"
     },
     "referenceNumbers": {
       "APPT_CONF": "Appt Conf #",

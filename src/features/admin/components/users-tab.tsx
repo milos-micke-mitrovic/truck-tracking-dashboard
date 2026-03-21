@@ -228,7 +228,7 @@ export function UsersTab() {
         isLoading={isLoading || isFetching}
         manualPagination
         pageCount={data?.totalPages}
-        totalCount={data?.totalElements}
+        totalCount={filteredContent.length}
         pageIndex={pagination.page}
         pageSize={pagination.size}
         onPaginationChange={handlePaginationChange}

@@ -8,7 +8,7 @@ import type { CompanyListItem, CompanyFilters, CompanyStatus } from '../types'
 import { COMPANY_STATUS_VALUES } from '../constants'
 import { StatusBadge } from './status-badge'
 import { CompanySheet } from './dialogs'
-import { Button, Input, Select } from '@/shared/ui'
+import { Button, Input, Select, Tooltip, TooltipTrigger, TooltipContent } from '@/shared/ui'
 import {
   DataTable,
   DataTableColumnHeader,
@@ -82,6 +82,16 @@ export function CompaniesTab() {
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title={t('columns.address')} />
         ),
+        cell: ({ row }) => (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="block max-w-[200px] truncate">
+                {row.original.address}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{row.original.address}</TooltipContent>
+          </Tooltip>
+        ),
       },
       {
         accessorKey: 'phoneNumber',
@@ -96,6 +106,16 @@ export function CompaniesTab() {
             column={column}
             title={t('columns.emailDomain')}
           />
+        ),
+        cell: ({ row }) => (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="block max-w-[200px] truncate">
+                {row.original.emailDomain}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{row.original.emailDomain}</TooltipContent>
+          </Tooltip>
         ),
       },
       {

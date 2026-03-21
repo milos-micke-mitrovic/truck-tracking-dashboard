@@ -90,6 +90,7 @@ function AutocompleteInput({
 
   // Reset highlighted index when options change or dropdown closes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing keyboard nav state with external changes
     setHighlightedIndex(-1)
   }, [options, open])
 

@@ -14,6 +14,8 @@ import {
   Spinner,
   Form,
   ConfirmDialog,
+  BodySmall,
+  Caption,
 } from '@/shared/ui'
 import { UnsavedChangesDialog } from '@/shared/components'
 import { useUnsavedChanges } from '@/shared/hooks'
@@ -242,11 +244,11 @@ function mapFormToCreateRequest(values: RouteFormValues): RouteCreateRequest {
   }
 
   return {
-    companyId: parseInt(values.companyId),
-    dispatcherId: values.dispatcherId ? parseInt(values.dispatcherId) : undefined,
-    vehicleId: values.vehicleId ? parseInt(values.vehicleId) : undefined,
-    driverId: values.driverId ? parseInt(values.driverId) : undefined,
-    coDriverId: values.coDriverId ? parseInt(values.coDriverId) : undefined,
+    companyId: Number(values.companyId) || 0,
+    dispatcherId: values.dispatcherId ? Number(values.dispatcherId) || undefined : undefined,
+    vehicleId: values.vehicleId ? Number(values.vehicleId) || undefined : undefined,
+    driverId: values.driverId ? Number(values.driverId) || undefined : undefined,
+    coDriverId: values.coDriverId ? Number(values.coDriverId) || undefined : undefined,
     autoDispatch: values.autoDispatch,
     brokerId,
     newBroker,
@@ -514,13 +516,13 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
                     <div className="flex flex-col items-center gap-3 py-2">
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                        <span className="text-sm font-medium text-primary">
+                        <BodySmall className="font-medium text-primary">
                           {t('sheet.parsePdf.parsing')}
-                        </span>
+                        </BodySmall>
                       </div>
-                      <p className="text-center text-xs text-muted-foreground">
+                      <Caption color="muted" className="text-center">
                         {t('sheet.parsePdf.processingHint')}
-                      </p>
+                      </Caption>
                     </div>
                   ) : (
                     <div className="flex items-center justify-between">
@@ -529,12 +531,12 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
                           <Sparkles className="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium">
+                          <BodySmall className="font-medium">
                             {t('sheet.parsePdf.title')}
-                          </h4>
-                          <p className="text-xs text-muted-foreground">
+                          </BodySmall>
+                          <Caption color="muted">
                             {t('sheet.parsePdf.description')}
-                          </p>
+                          </Caption>
                         </div>
                       </div>
                       <label className="flex h-9 cursor-pointer items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">

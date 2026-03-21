@@ -16,6 +16,8 @@ import {
   Badge,
   ConfirmDialog,
   Muted,
+  BodySmall,
+  Caption,
 } from '@/shared/ui'
 import {
   Form,
@@ -217,7 +219,7 @@ export function TenantSheet({
             </SheetHeader>
 
             <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
-              <FormSection title={t('sheet.editTitle')}>
+              <FormSection title={t('sheet.tenantInfo')}>
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
                     control={form.control}
@@ -305,7 +307,7 @@ export function TenantSheet({
                           }}
                         >
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium">{company.fullName}</div>
+                            <BodySmall className="font-medium">{company.fullName}</BodySmall>
                           </div>
                           <Badge
                             color={
@@ -364,10 +366,10 @@ export function TenantSheet({
                           }}
                         >
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium">{admin.name}</div>
-                            <div className="text-muted-foreground truncate text-xs">
+                            <BodySmall className="font-medium">{admin.name}</BodySmall>
+                            <Caption color="muted" truncate>
                               {admin.email}
-                            </div>
+                            </Caption>
                           </div>
                           <Badge
                             color={
