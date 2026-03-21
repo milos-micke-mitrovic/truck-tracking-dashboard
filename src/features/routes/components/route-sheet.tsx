@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Trash2, Upload, Loader2 } from 'lucide-react'
+import { Trash2, Sparkles, Loader2 } from 'lucide-react'
 import { cn } from '@/shared/utils'
 import {
   Sheet,
@@ -502,50 +502,59 @@ export function RouteSheet({ open, onOpenChange, routeId }: RouteSheetProps) {
             </SheetHeader>
 
             <div className="flex-1 space-y-4 overflow-y-auto px-6 py-4">
-              {/* PDF Upload Section - Only show in create mode */}
+              {/* AI PDF Extract - Only show in create mode */}
               {!isEdit && (
-                <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium">
-                        {t('sheet.parsePdf.title')}
-                      </h4>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {t('sheet.parsePdf.description')}
+                <div className={cn(
+                  'rounded-lg border p-4 transition-colors',
+                  parsePdfMutation.isPending
+                    ? 'border-primary/30 bg-primary/5'
+                    : 'border-dashed border-border bg-muted/30'
+                )}>
+                  {parsePdfMutation.isPending ? (
+                    <div className="flex flex-col items-center gap-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                        <span className="text-sm font-medium text-primary">
+                          {t('sheet.parsePdf.parsing')}
+                        </span>
+                      </div>
+                      <p className="text-center text-xs text-muted-foreground">
+                        {t('sheet.parsePdf.processingHint')}
                       </p>
                     </div>
-                    <label className={cn(
-                      'flex h-9 items-center gap-2 rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors',
-                      parsePdfMutation.isPending
-                        ? 'pointer-events-none opacity-50'
-                        : 'cursor-pointer hover:bg-accent hover:text-accent-foreground'
-                    )}>
-                      {parsePdfMutation.isPending
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : <Upload className="h-4 w-4" />}
-                      {parsePdfMutation.isPending
-                        ? t('sheet.parsePdf.parsing')
-                        : t('sheet.parsePdf.upload')}
-                      <input
-                        ref={pdfInputRef}
-                        type="file"
-                        className="hidden"
-                        accept=".pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0]
-                          if (file) {
-                            handleParsePdf(file)
-                            e.target.value = '' // Reset to allow re-upload
-                          }
-                        }}
-                        disabled={parsePdfMutation.isPending}
-                      />
-                    </label>
-                  </div>
-                  {parsePdfMutation.isPending && (
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {t('sheet.parsePdf.processingHint')}
-                    </p>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                          <Sparkles className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-medium">
+                            {t('sheet.parsePdf.title')}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            {t('sheet.parsePdf.description')}
+                          </p>
+                        </div>
+                      </div>
+                      <label className="flex h-9 cursor-pointer items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        {t('sheet.parsePdf.upload')}
+                        <input
+                          ref={pdfInputRef}
+                          type="file"
+                          className="hidden"
+                          accept=".pdf"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              handleParsePdf(file)
+                              e.target.value = ''
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
                   )}
                 </div>
               )}

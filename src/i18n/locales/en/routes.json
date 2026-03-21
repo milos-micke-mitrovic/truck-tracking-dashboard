@@ -135,14 +135,14 @@
       "selectUnitType": "Select unit type"
     },
     "parsePdf": {
-      "title": "Import from PDF",
-      "description": "Upload a rate confirmation or load confirmation PDF to auto-fill form fields",
+      "title": "AI Auto-Fill",
+      "description": "Upload a PDF and let AI extract the details for you",
       "upload": "Upload PDF",
-      "parsing": "Parsing...",
-      "processingHint": "This may take a moment. Please wait while we extract the data from your PDF."
+      "parsing": "AI is reading your document...",
+      "processingHint": "Extracting rates, stops, and booking details from your PDF."
     },
-    "pdfParseSuccess": "PDF parsed successfully and form fields updated",
-    "pdfParseError": "Failed to parse PDF. Please try again or fill the form manually."
+    "pdfParseSuccess": "AI extracted the data — review the fields below",
+    "pdfParseError": "AI couldn't extract the data. Please try again or fill the form manually."
   },
   "pod": {
     "title": "Proof of Delivery",
