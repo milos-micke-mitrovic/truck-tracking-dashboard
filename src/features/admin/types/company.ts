@@ -1,9 +1,6 @@
 // Company status from backend
 export type CompanyStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED'
 
-// Subscription plans (backend format)
-export type SubscriptionPlan = 'BASIC' | 'STANDARD' | 'PREMIUM' | 'ENTERPRISE'
-
 // Document from backend
 export type CompanyDocument = {
   id: number
@@ -52,12 +49,7 @@ export type CompanyRequest = {
   address: string
   phoneNumber: string
   emailDomain: string
-  subscriptionPlan: SubscriptionPlan
   status: CompanyStatus
-  subscriptionStartedAt?: string
-  subscriptionEndsAt?: string
-  autoRenew?: boolean
-  monthlyPrice?: number
   createdBy?: number
   documents?: {
     type: string
@@ -111,7 +103,6 @@ export type CompanyFormValues = {
   phoneNumber: string
   emailDomain: string
   status: CompanyStatus
-  subscriptionPlan: SubscriptionPlan
   documents: CompanyDocumentFormValue[]
 }
 

@@ -4,7 +4,6 @@ export type { Status, EnabledDisabled, OnlineStatus } from './common'
 // Company
 export type {
   CompanyStatus,
-  SubscriptionPlan,
   CompanyDocument,
   CompanyDocumentFormValue,
   CompanyListItem,

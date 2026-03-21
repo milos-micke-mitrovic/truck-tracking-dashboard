@@ -9,7 +9,7 @@ import {
   Select,
   AutocompleteInput,
   MultiSelect,
-  DatePicker,
+  DateTimePicker,
   FormField,
   FormItem,
   FormLabel,
@@ -210,7 +210,7 @@ export function StopsTab({ form }: StopsTabProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('sheet.stops.arrivalStartDate')}</FormLabel>
-                  <DatePicker
+                  <DateTimePicker
                     value={field.value}
                     onChange={field.onChange}
                   />
@@ -224,7 +224,7 @@ export function StopsTab({ form }: StopsTabProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('sheet.stops.arrivalEndDate')}</FormLabel>
-                  <DatePicker
+                  <DateTimePicker
                     value={field.value}
                     onChange={field.onChange}
                   />

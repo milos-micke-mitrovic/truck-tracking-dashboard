@@ -35,17 +35,9 @@ import type {
   CompanyFormValues,
   CompanySheetProps,
   CompanyStatus,
-  SubscriptionPlan,
   CompanyDocumentFormValue,
 } from '../../types'
 import { COMPANY_STATUS_VALUES, COMPANY_DOCUMENT_TYPES } from '../../constants'
-
-const SUBSCRIPTION_PLAN_VALUES: SubscriptionPlan[] = [
-  'BASIC',
-  'STANDARD',
-  'PREMIUM',
-  'ENTERPRISE',
-]
 
 const getFormDefaults = (company?: Company | null): CompanyFormValues => ({
   fullName: company?.fullName || '',
@@ -56,7 +48,6 @@ const getFormDefaults = (company?: Company | null): CompanyFormValues => ({
   phoneNumber: company?.phoneNumber || '',
   emailDomain: company?.emailDomain || '',
   status: company?.status || 'ACTIVE',
-  subscriptionPlan: 'BASIC',
   documents:
     company?.documents?.map((doc) => ({
       id: doc.id,
@@ -193,7 +184,6 @@ export function CompanySheet({
         phoneNumber: values.phoneNumber,
         emailDomain: values.emailDomain,
         status: values.status,
-        subscriptionPlan: values.subscriptionPlan,
         documents: documentRequests.length > 0 ? documentRequests : undefined,
         documentIdsToDelete: deletedDocumentIds.length > 0 ? deletedDocumentIds : undefined,
       }
@@ -430,26 +420,6 @@ export function CompanySheet({
                           }))}
                           value={field.value}
                           onChange={(v) => field.onChange(v as CompanyStatus)}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="subscriptionPlan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          {t('companyDialog.subscriptionPlan')}
-                        </FormLabel>
-                        <Select
-                          options={SUBSCRIPTION_PLAN_VALUES.map((value) => ({
-                            value,
-                            label: t(`common:subscriptionPlans.${value}`),
-                          }))}
-                          value={field.value}
-                          onChange={(v) => field.onChange(v as SubscriptionPlan)}
                         />
                         <FormMessage />
                       </FormItem>

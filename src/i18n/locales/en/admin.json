@@ -316,8 +316,7 @@
       "contact": "Contact",
       "settings": "Settings"
     },
-    "status": "Status",
-    "subscriptionPlan": "Subscription Plan"
+    "status": "Status"
   },
   "vehicleSheet": {
     "editTitle": "Edit Vehicle",

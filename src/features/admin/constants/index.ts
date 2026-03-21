@@ -21,8 +21,6 @@ export {
 
 // Company
 export {
-  PLAN_VALUES,
-  DEFAULT_PLAN,
   FLEET_OPTIONS,
   FLEET_VALUES,
   INDUSTRY_VALUES,
@@ -34,7 +32,6 @@ export {
   DEFAULT_WEEK_PERIOD_START_DAY,
   SETTLEMENT_TEMPLATE_VALUES,
   DEFAULT_SETTLEMENT_TEMPLATE,
-  type PlanValue,
   type FleetValue,
   type IndustryValue,
   type CargoTypeValue,

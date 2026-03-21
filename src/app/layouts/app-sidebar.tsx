@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LogOut, Settings, Route, Building2, FileText } from 'lucide-react'
 import { Logo } from '@/shared/components'
@@ -15,7 +15,6 @@ import {
   useSidebar,
 } from '@/shared/ui/sidebar'
 import { H4, Label, Caption, BodySmall } from '@/shared/ui/typography'
-import { cn } from '@/shared/utils'
 import {
   useAuth,
   useLogout,
@@ -32,6 +31,7 @@ export function AppSidebar() {
   const logoutMutation = useLogout()
   const navigate = useNavigate()
   const { totalUnread } = usePodNotifications()
+  const { pathname } = useLocation()
   const isCollapsed = state === 'collapsed'
 
   const handleLogout = async () => {
@@ -58,13 +58,8 @@ export function AppSidebar() {
             <SidebarMenu>
               {isSuperAdmin(user) && (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={t('sidebar.tenants')}>
-                    <NavLink
-                      to="/tenants"
-                      className={({ isActive }) =>
-                        cn(isActive && 'bg-sidebar-accent')
-                      }
-                    >
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/tenants')} tooltip={t('sidebar.tenants')}>
+                    <NavLink to="/tenants">
                       <Building2 className="size-4" />
                       <BodySmall as="span">{t('sidebar.tenants')}</BodySmall>
                     </NavLink>
@@ -73,13 +68,8 @@ export function AppSidebar() {
               )}
               {!isSuperAdmin(user) && user?.role === 'ADMIN' && (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={t('sidebar.admin')}>
-                    <NavLink
-                      to="/admin"
-                      className={({ isActive }) =>
-                        cn(isActive && 'bg-sidebar-accent')
-                      }
-                    >
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/admin')} tooltip={t('sidebar.admin')}>
+                    <NavLink to="/admin">
                       <Settings className="size-4" />
                       <BodySmall as="span">{t('sidebar.admin')}</BodySmall>
                     </NavLink>
@@ -88,13 +78,8 @@ export function AppSidebar() {
               )}
               {!isSuperAdmin(user) && (
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={t('sidebar.dispatch')}>
-                    <NavLink
-                      to="/routes"
-                      className={({ isActive }) =>
-                        cn('relative', isActive && 'bg-sidebar-accent')
-                      }
-                    >
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/routes')} tooltip={t('sidebar.dispatch')}>
+                    <NavLink to="/routes" className="relative">
                       <div className="relative">
                         <Route className="size-4" />
                         {totalUnread > 0 && isCollapsed && (
@@ -127,13 +112,8 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip={t('sidebar.companyDocs')}>
-                    <NavLink
-                      to="/company-docs"
-                      className={({ isActive }) =>
-                        cn(isActive && 'bg-sidebar-accent')
-                      }
-                    >
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/company-docs')} tooltip={t('sidebar.companyDocs')}>
+                    <NavLink to="/company-docs">
                       <FileText className="size-4" />
                       <BodySmall as="span">{t('sidebar.companyDocs')}</BodySmall>
                     </NavLink>
