@@ -57,7 +57,9 @@ function AutocompleteInput({
   const [inputText, setInputText] = useState('')
   const [selectedLabel, setSelectedLabel] = useState<string | null>(initialLabel ?? null)
   const [open, setOpen] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
   // Sync selectedLabel when initialLabel changes externally (edit mode / form reset)
   useEffect(() => {
@@ -85,6 +87,11 @@ function AutocompleteInput({
     ),
     debounceMs
   )
+
+  // Reset highlighted index when options change or dropdown closes
+  useEffect(() => {
+    setHighlightedIndex(-1)
+  }, [options, open])
 
   const displayText = selectedLabel !== null ? selectedLabel : inputText
 
@@ -149,6 +156,47 @@ function AutocompleteInput({
     setTimeout(() => setOpen(false), 150)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showDropdown) {
+      if (e.key === 'ArrowDown' && inputText.length >= 2) {
+        setOpen(true)
+      }
+      return
+    }
+
+    const totalItems = options.length + (showCreateOption ? 1 : 0)
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setHighlightedIndex((prev) => (prev + 1) % totalItems)
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setHighlightedIndex((prev) => (prev <= 0 ? totalItems - 1 : prev - 1))
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (highlightedIndex >= 0 && highlightedIndex < options.length) {
+          handleSelect(options[highlightedIndex])
+        } else if (highlightedIndex === options.length && showCreateOption) {
+          handleCreate()
+        }
+        break
+      case 'Escape':
+        setOpen(false)
+        break
+    }
+  }
+
+  // Scroll highlighted item into view
+  useEffect(() => {
+    if (highlightedIndex >= 0 && listRef.current) {
+      const items = listRef.current.querySelectorAll('[data-option]')
+      items[highlightedIndex]?.scrollIntoView({ block: 'nearest' })
+    }
+  }, [highlightedIndex])
+
   const hasValue = selectedLabel !== null || value !== ''
   const showDropdown = open && (options.length > 0 || showCreateOption || loading)
 
@@ -162,6 +210,7 @@ function AutocompleteInput({
           onChange={handleInputChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
@@ -188,19 +237,26 @@ function AutocompleteInput({
       </div>
 
       {showDropdown && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md">
+        <div ref={listRef} className="absolute top-full left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md">
           {loading && options.length === 0 && !showCreateOption && (
             <div className="flex items-center justify-center gap-2 px-2 py-3 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
             </div>
           )}
-          {options.map((option) => (
+          {options.map((option, index) => (
             <button
               key={option.value}
               type="button"
+              data-option
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(option)}
-              className="flex w-full items-center rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer text-left truncate"
+              onMouseEnter={() => setHighlightedIndex(index)}
+              className={cn(
+                'flex w-full items-center rounded-sm px-2 py-1.5 text-sm cursor-pointer text-left truncate',
+                highlightedIndex === index
+                  ? 'bg-accent text-accent-foreground'
+                  : 'hover:bg-accent hover:text-accent-foreground'
+              )}
             >
               {option.label}
             </button>
@@ -208,9 +264,16 @@ function AutocompleteInput({
           {showCreateOption && (
             <button
               type="button"
+              data-option
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleCreate}
-              className="flex w-full items-center gap-1.5 rounded-sm px-2 py-1.5 text-sm text-primary hover:bg-accent hover:text-accent-foreground cursor-pointer"
+              onMouseEnter={() => setHighlightedIndex(options.length)}
+              className={cn(
+                'flex w-full items-center gap-1.5 rounded-sm px-2 py-1.5 text-sm text-primary cursor-pointer',
+                highlightedIndex === options.length
+                  ? 'bg-accent text-accent-foreground'
+                  : 'hover:bg-accent hover:text-accent-foreground'
+              )}
             >
               <Plus className="size-3.5 shrink-0" />
               <span className="truncate">Add: {inputText.trim()}</span>

@@ -26,7 +26,7 @@ export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
 export { Select, MultiSelect, AutocompleteInput, type SelectOption, type MultiSelectOption, type AutocompleteInputProps, type AutocompleteOption } from './select'
 
 // Date & Time
-export { Calendar, DatePicker, TimePicker } from './date-time'
+export { Calendar, DatePicker, DateTimePicker, TimePicker } from './date-time'
 
 // Upload
 export { FileUpload, ImageUpload } from './upload'

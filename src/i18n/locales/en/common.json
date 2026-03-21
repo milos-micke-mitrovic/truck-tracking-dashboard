@@ -173,12 +173,6 @@
   "notifications": {
     "unreadCount": "{{count}} unread notifications"
   },
-  "subscriptionPlans": {
-    "BASIC": "Basic",
-    "STANDARD": "Standard",
-    "PREMIUM": "Premium",
-    "ENTERPRISE": "Enterprise"
-  },
   "unsavedChanges": {
     "title": "Unsaved Changes",
     "description": "You have unsaved changes. Are you sure you want to close?",

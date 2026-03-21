@@ -12,6 +12,7 @@ import {
   useLogin,
   useAuth,
   getUserDisplayName,
+  getDefaultRoute,
   decodeJwt,
   jwtPayloadToUser,
 } from '@/features/auth'
@@ -80,7 +81,7 @@ export function LoginPage() {
       const user = jwtPayloadToUser(payload)
       login(user, response.accessToken, response.refreshToken)
       toast.success(t('login.welcomeBack', { name: getUserDisplayName(user) }))
-      navigate('/routes')
+      navigate(getDefaultRoute(user))
     } catch (error) {
       // Check if it's a network error (server down)
       if (error instanceof TypeError && error.message === 'Failed to fetch') {

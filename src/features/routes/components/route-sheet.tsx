@@ -132,8 +132,8 @@ function mapRouteToFormValues(route: RouteResponse): RouteFormValues {
         facilityType: '',
         facilityAddress: '',
         arrivalSlotType: stop.arrivalSlotType || '',
-        arrivalStartDate: stop.arrivalStartDate?.split('T')[0] || '',
-        arrivalEndDate: stop.arrivalEndDate?.split('T')[0] || '',
+        arrivalStartDate: stop.arrivalStartDate || '',
+        arrivalEndDate: stop.arrivalEndDate || '',
         referenceNumbers:
           stop.referenceNumbers?.map((ref) => ({
             type: ref.type,
