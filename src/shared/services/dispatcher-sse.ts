@@ -17,6 +17,7 @@ type SseEventPayload = {
 }
 
 export type PodSubmittedHandler = (data: SseEventPayload) => void
+export type RouteStatusChangedHandler = (data: SseEventPayload) => void
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 const BASE_RECONNECT_DELAY_MS = 1000
@@ -35,7 +36,8 @@ function getToken(): string | null {
 }
 
 export function createDispatcherSse(
-  onPodSubmitted: PodSubmittedHandler
+  onPodSubmitted: PodSubmittedHandler,
+  onRouteStatusChanged: RouteStatusChangedHandler
 ): () => void {
   let eventSource: EventSource | null = null
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null
@@ -73,6 +75,19 @@ export function createDispatcherSse(
           // Ignore parse errors
         }
       })
+
+      const handleRouteEvent = (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(String(event.data)) as SseEventPayload
+          onRouteStatusChanged(data)
+        } catch {
+          // Ignore parse errors
+        }
+      }
+
+      eventSource.addEventListener('ROUTE_UPDATED', handleRouteEvent)
+      eventSource.addEventListener('ROUTE_ASSIGNED', handleRouteEvent)
+      eventSource.addEventListener('ROUTE_CANCELLED', handleRouteEvent)
     } catch {
       scheduleReconnect()
     }

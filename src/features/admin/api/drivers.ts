@@ -64,6 +64,7 @@ export function useCreateDriver() {
     mutationFn: createDriver,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.drivers() })
+      queryClient.invalidateQueries({ queryKey: adminKeys.vehicles() })
     },
   })
 }
@@ -75,6 +76,7 @@ export function useUpdateDriver() {
       updateDriver(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.drivers() })
+      queryClient.invalidateQueries({ queryKey: adminKeys.vehicles() })
     },
   })
 }
