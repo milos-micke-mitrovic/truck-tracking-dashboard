@@ -72,6 +72,14 @@ export function CarrierTab({ form }: CarrierTabProps) {
   )
 
   const selectedDriverId = form.watch('driverId')
+  const selectedVehicleId = form.watch('vehicleId')
+
+  // Auto-enable autoDispatch when both driver and vehicle are selected
+  useEffect(() => {
+    if (selectedDriverId && selectedVehicleId) {
+      form.setValue('autoDispatch', true)
+    }
+  }, [selectedDriverId, selectedVehicleId, form])
 
   const driverOptions = useMemo(
     () =>
